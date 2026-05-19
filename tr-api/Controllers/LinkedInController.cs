@@ -7,23 +7,27 @@ using tr_core.DTO.UserPlatform.Request;
 using tr_service.LinkedIn;
 using tr_core.DTO.LinkedIn;
 using tr_core.DTO.LinkedIn.Request;
+using tr_core.Enums;
 
 namespace tr_backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class LinkedInController(ILinkedInService linkedInService, IUserPlatformService userPlatformService,
-        LinkedInConfig enviromentalConfig, IConfiguration appsettingsConfig) : ControllerBase
+    public class LinkedInController(ILinkedInService linkedInService, IUserPlatformService userPlatformService, 
+        IPlatformService platformService, LinkedInConfig enviromentalConfig, IConfiguration appsettingsConfig) : ControllerBase
     {
 
         [HttpGet("authorize")]
-        public IActionResult GetAuthorizationUrl()
+        public async Task<IActionResult> GetAuthorizationUrl()
         {
             var redirect = enviromentalConfig.RedirectUri;
             var clientId = enviromentalConfig.ClientId;
             var scopes = "openid%20profile%20w_member_social%20email";
-            var state = $"{Guid.NewGuid()}|1";
+
+            var linkedinPlatform = await platformService.GetByPlatformTypeAsync(PlatformType.LinkedIn);
+
+            var state = $"{Guid.NewGuid()}|{linkedinPlatform.Id}";
 
             var url = $"{appsettingsConfig["LinkedIn:BaseUrl"]}authorization?response_type=code&client_id={clientId}" +
                 $"&redirect_uri={Uri.EscapeDataString(redirect)}&scope={scopes}&state={Uri.EscapeDataString(state)}";
@@ -44,40 +48,22 @@ namespace tr_backend.Controllers
                 return BadRequest("Invalid platform id in state");
 
             var accessToken = await linkedInService.ExchangeCodeForAccessToken(code, enviromentalConfig.RedirectUri);
-            var personId = await linkedInService.GetPersonId(accessToken);
+            var accountInfo = await linkedInService.GetAccountInfo(accessToken);
 
             var request = new UserPlatformRequest
             {
                 PlatformId = platformId,
                 AccessToken = accessToken,
-                ExternalAccountId = personId,
-                AccountUsername = personId,
-                AccountComment = ""
+                ExternalAccountId = accountInfo.Sub,
+                AccountUsername = accountInfo.Name,
+                AccountComment = "",
+                ProfilePictureLink = accountInfo.PFPurl
             };
 
-            var result = await userPlatformService.AddUserPlatformAsync(request, userId);
+            // Someday redirecting to frontend with UserPlatform object
+            _ = await userPlatformService.AddUserPlatformAsync(request, userId);
 
-            return Ok(result);
-        }
-
-        [HttpPost("post")]
-        public async Task<IActionResult> CreatePost([FromBody] LinkedInPostRequest request)
-        {
-            var userId = UserHelpers.GetUserIdFromClaims(User);
-            var userPlatform = await userPlatformService.GetUserPlatformByIdAsync(request.UserPlatformId, userId);
-
-            if (string.IsNullOrEmpty(userPlatform.AccessToken) || string.IsNullOrEmpty(userPlatform.ExternalAccountId))
-                return BadRequest("Missing access token or external account id for the selected platform");
-
-            var linkedInPostDTO = new LinkedInPostDTO
-            {
-                UserPlatform = userPlatform,
-                Request = request
-            };
-
-            await linkedInService.PostTextAsync(linkedInPostDTO);
-
-            return Ok();
+            return Redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1");
         }
 
     }

@@ -14,6 +14,7 @@ namespace tr_core.DTO.UserPlatform.Response
         public string? AccessToken { get; set; }
         public string? ExternalAccountId { get; set; }
         public required string AccountComment { get; set; }
+        public string? ProfilePictureLink { get; set; }
         public PlatformResponse Platform { get; set; } = new PlatformResponse();
     }
 }

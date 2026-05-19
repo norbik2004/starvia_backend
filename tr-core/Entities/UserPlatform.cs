@@ -24,6 +24,7 @@ namespace tr_core.Entities
         public string? ExternalAccountId { get; set; }
         public required string AccountUsername { get; set; }
         public required string AccountComment { get; set; }
+        public string? ProfilePictureLink { get; set; }
 
         public bool IsActive { get; set; } = true;
 

@@ -13,6 +13,7 @@ namespace tr_core.DTO.Post.Response
         public int Id { get; set; }
         public string Title { get; set; }
         public string PromptText { get; set; }
+        public string UserId { get; set; }
         public string Body { get; set; }
         public PostStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }

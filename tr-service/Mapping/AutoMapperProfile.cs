@@ -8,6 +8,7 @@ using tr_core.DTO.UserPlatform.Response;
 using tr_core.Entities;
 using tr_core.DTO.UserSetting.Request;
 using tr_core.DTO.UserSetting.Response;
+using tr_core.DTO.PostPublication.Response;
 
 namespace tr_service.Mapping
 {
@@ -28,6 +29,8 @@ namespace tr_service.Mapping
 
             CreateMap<UserSetting, UserSettingResponse>();
             CreateMap<UserSettingRequest, UserSetting>();
+
+            CreateMap<PostPublication, PostPublicationResponse>();
         }
     }
 }

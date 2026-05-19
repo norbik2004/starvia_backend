@@ -116,6 +116,8 @@ builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
 builder.Services.AddScoped<IUserPlatformRepository, UserPlatformRepository>();
 builder.Services.AddScoped<IUserPlatformService, UserPlatformService>();
 builder.Services.AddScoped<IStripeService, StripeService>();
+builder.Services.AddScoped<IPostPublicationRepository, PostPublicationRepository>();
+builder.Services.AddScoped<IPostPublishService, PostPublishService>();
 
 builder.Services.AddScoped<IGeminiService, GeminiService>();
 
