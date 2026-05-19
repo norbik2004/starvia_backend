@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using tr_repository;
@@ -11,9 +12,11 @@ using tr_repository;
 namespace tr_repository.Migrations
 {
     [DbContext(typeof(TrDbContext))]
-    partial class TrDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260516213116_PostLimit")]
+    partial class PostLimit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -236,8 +239,9 @@ namespace tr_repository.Migrations
                     b.Property<DateTime?>("PublishedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -302,6 +306,12 @@ namespace tr_repository.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime>("PostsCounterResetAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("PostsGeneratedThisMonth")
+                        .HasColumnType("integer");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -360,9 +370,6 @@ namespace tr_repository.Migrations
 
                     b.Property<int>("PlatformId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("ProfilePictureLink")
-                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.1.1" />
     <PackageReference Include="Google.GenAI" Version="1.6.1" />
+    <PackageReference Include="Stripe.net" Version="51.1.0" />
   </ItemGroup>
 
 	<ItemGroup>

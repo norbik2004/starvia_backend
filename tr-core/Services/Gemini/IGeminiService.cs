@@ -11,6 +11,6 @@ namespace tr_core.Services.Gemini
 {
     public interface IGeminiService
     {
-        public Task<GeminiResponse> SendRequestToGemini(GeminiRequest request);
+        public Task<GeminiResponse> SendRequestToGemini(string userId, GeminiRequest request);
     }
 }

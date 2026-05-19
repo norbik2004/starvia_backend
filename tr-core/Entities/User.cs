@@ -10,6 +10,7 @@ namespace tr_core.Entities
     public class User : IdentityUser, IAuditable
     {
         public bool IsSubscribed { get; set; }
+        public string? StripeCustomerId { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         //POSTY USERA

@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Stripe;
 using tr_core.Consts;
 using tr_core.DTO.User.Request;
 using tr_core.DTO.User.Response;
 using tr_core.Entities;
 using tr_core.Repositories;
 using tr_core.Services;
+using tr_repository.Migrations;
 using tr_service.Exceptions;
 
 namespace tr_service.Services
@@ -75,5 +78,59 @@ namespace tr_service.Services
             user.UserSettings = settings;
             await userRepository.SaveChangesAsync();
         }
+
+        public async Task SetStripeCustomerId(string userId, string customerId)
+        {
+            var user = await userRepository.GetByIdAsync(userId)
+                ?? throw new NotFoundException("User not found");
+
+            user.StripeCustomerId = customerId;
+
+            await userRepository.SaveChangesAsync();
+        }
+
+        public async Task UpdateSubsciptionStatus(string userId, bool status)
+        {
+            var user = await userRepository.GetByIdAsync(userId)
+                ?? throw new NotFoundException("User not found");
+
+            user.IsSubscribed = status;
+
+            await userRepository.SaveChangesAsync();
+        }
+
+        /*
+        public async Task<bool> CanGeneratePostAsync(string userId)
+        {
+            var user = await userRepository.GetByIdAsync(userId);
+            if (user is null) return false;
+
+            ResetCounterIfNewMonth(user);
+
+            var limit = user.IsSubscribed ? postLimits.Value.Subscribed : postLimits.Value.Free;
+            return user.PostsGeneratedThisMonth < limit;
+        }
+
+        public async Task IncrementPostCounterAsync(string userId)
+        {
+            var user = await userRepository.GetByIdAsync(userId);
+            if (user is null) return;
+
+            ResetCounterIfNewMonth(user);
+            user.PostsGeneratedThisMonth++;
+            await userRepository.SaveChangesAsync();
+        }
+
+        private static void ResetCounterIfNewMonth(User user)
+        {
+            var now = DateTime.UtcNow;
+            if (now.Month != user.PostsCounterResetAt.Month ||
+                now.Year != user.PostsCounterResetAt.Year)
+            {
+                user.PostsGeneratedThisMonth = 0;
+                user.PostsCounterResetAt = now;
+            }
+        }
+        */
     }
 }

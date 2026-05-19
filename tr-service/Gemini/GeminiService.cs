@@ -10,15 +10,21 @@ using System.Threading.Tasks;
 using tr_core.DTO.Gemini;
 using tr_core.DTO.Gemini.Request;
 using tr_core.Enums;
+using tr_core.Services;
 using tr_core.Services.Gemini;
 using tr_service.Exceptions;
 
 namespace tr_service.Gemini
 {
-    public class GeminiService(ILogger<IGeminiService> logger, Client geminiClient, GeminiLLMConfig config) : IGeminiService
+    public class GeminiService(ILogger<IGeminiService> logger, Client geminiClient, GeminiLLMConfig config, IUserService userService) : IGeminiService
     {
-        public async Task<GeminiResponse> SendRequestToGemini(GeminiRequest request)
+        public async Task<GeminiResponse> SendRequestToGemini(string userId, GeminiRequest request)
         {
+            if (!userService.CanGeneratePostAsync(userId).Result)
+            {
+                logger.LogWarning("User has reached the generation limit");
+                throw new BadRequestException("Generation limit reached for user");
+            }
             try
             {
                 logger.LogInformation("Sending request to Gemini");
@@ -43,6 +49,7 @@ namespace tr_service.Gemini
                 }
 
                 logger.LogInformation("Response received from Gemini");
+                await userService.IncrementPostCounterAsync(userId);
 
                 return new GeminiResponse
                 {
