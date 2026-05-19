@@ -13,7 +13,7 @@ using tr_service.Exceptions;
 
 namespace tr_service.Services
 {
-    public class UserService(UserManager<User> userManager, IUserRepository userRepository, IMapper mapper, IOptions<PostLimitConfig> postLimits) : IUserService
+    public class UserService(UserManager<User> userManager, IUserRepository userRepository, IMapper mapper) : IUserService
     {
         public async Task<List<UserResponse>> GetAllUsers(UserPaginatedParamsRequest request)
         {
@@ -99,6 +99,7 @@ namespace tr_service.Services
             await userRepository.SaveChangesAsync();
         }
 
+        /*
         public async Task<bool> CanGeneratePostAsync(string userId)
         {
             var user = await userRepository.GetByIdAsync(userId);
@@ -130,5 +131,6 @@ namespace tr_service.Services
                 user.PostsCounterResetAt = now;
             }
         }
+        */
     }
 }

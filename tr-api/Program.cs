@@ -16,73 +16,35 @@ using tr_service.Gemini;
 using tr_service.Mapping;
 using tr_service.Services;  
 using tr_service.LinkedIn;
-using Microsoft.AspNetCore.Http;
-using AspNet.Security.OAuth.LinkedIn;
 using Stripe;
 using tr_service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-DotEnv.Load();
-
-builder.Services.AddSingleton<StripeClient>(_ =>
-{
-    var apiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
-    if (string.IsNullOrWhiteSpace(apiKey))
-        throw new Exception("Missing STRIPE_SECRET_KEY in environmental variables");
-
-    return new StripeClient(apiKey);
-});
-
-builder.Services.AddSingleton<Client>(sp =>
-{
-    var apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
-
-    if (string.IsNullOrEmpty(apiKey))
-        throw new Exception("Missing GEMINI_API_KEY in enviromental variables");
-
-    return new Client(apiKey: apiKey);
-});
-
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var linkedinClientId = Environment.GetEnvironmentVariable("LINKEDIN_CLIENT_ID");
-var linkedinClientSecret = Environment.GetEnvironmentVariable("LINKEDIN_CLIENT_SECRET");
-var linkedinRedirect = Environment.GetEnvironmentVariable("LINKEDIN_REDIRECT_URI");
-
-if (string.IsNullOrEmpty(linkedinClientId) || string.IsNullOrEmpty(linkedinClientSecret) || string.IsNullOrEmpty(linkedinRedirect))
-    throw new Exception("Missing LINKEDIN_* environment variables");
-
-var linkedInConfig = new LinkedInConfig
-{
-    ClientId = linkedinClientId,
-    ClientSecret = linkedinClientSecret,
-    RedirectUri = linkedinRedirect
-};
-builder.Services.AddSingleton(linkedInConfig);
-
 builder.Services.AddAuthentication()
     .AddLinkedIn(options =>
     {
+        options.SaveTokens = true;
+        /*
         options.ClientId = linkedinClientId;
         options.ClientSecret = linkedinClientSecret;
         options.Scope.Add("openid");
         options.Scope.Add("profile");
         options.Scope.Add("email");
         options.Scope.Add("w_member_social");
-        options.SaveTokens = true;
         options.CallbackPath = new PathString("/signin-linkedin-mw-callback");
+        */
     });
 
-builder.Services.AddHttpClient<ILinkedInService, LinkedInService>();
+ProgramHelpers.AddSingletons(builder);
 
-builder.Services.Configure<PostLimitConfig>(
-    builder.Configuration.GetSection("PostLimits"));
+builder.Services.AddHttpClient<ILinkedInService, LinkedInService>();
 
 builder.Services.AddDbContext<TrDbContext>(options =>
     options.UseNpgsql(
@@ -156,7 +118,6 @@ builder.Services.AddScoped<IUserPlatformService, UserPlatformService>();
 builder.Services.AddScoped<IStripeService, StripeService>();
 
 builder.Services.AddScoped<IGeminiService, GeminiService>();
-builder.Services.AddSingleton<GeminiLLMConfig>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

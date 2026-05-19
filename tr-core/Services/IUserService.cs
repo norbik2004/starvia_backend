@@ -16,7 +16,9 @@ namespace tr_core.Services
         public Task<List<UserResponse>> GetAllUsers(UserPaginatedParamsRequest request);
         public Task SetStripeCustomerId(string userId, string customerId);
         public Task UpdateSubsciptionStatus(string userId, bool status);
+        /*
         public Task<bool> CanGeneratePostAsync(string userId);
         public Task IncrementPostCounterAsync(string userId);
+        */
     }
 }

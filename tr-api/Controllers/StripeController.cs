@@ -37,6 +37,7 @@ public class StripeController(IStripeService stripeService, UserManager<User> us
                 userEmail = user.Email!,
                 request = request
             };
+
             var result = await stripeService.CreateCheckoutSessionAsync(stripeCheckout);
             return Ok(new { sessionId = result.SessionId, url = result.Url });
         }
@@ -83,7 +84,7 @@ public class StripeController(IStripeService stripeService, UserManager<User> us
             await stripeService.HandleWebhookAsync(json, signatureHeader);
             return Ok();
         }
-        catch (Stripe.StripeException)
+        catch (StripeException)
         {
             return BadRequest();
         }
