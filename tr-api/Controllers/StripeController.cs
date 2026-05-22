@@ -14,7 +14,7 @@ namespace tr_backend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class StripeController(IStripeService stripeService) : ControllerBase
+public class StripeController(IStripeService stripeService, ILogger<StripeController> logger) : ControllerBase
 {
 
     [Authorize]
@@ -23,7 +23,11 @@ public class StripeController(IStripeService stripeService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateCheckoutSession()
     {
+        
+
         var userId = UserHelpers.GetUserIdFromClaims(User);
+
+        logger.LogInformation("Creating Stripe checkout session for user {UserId}", userId);
 
         var result = await stripeService.CreateCheckoutSessionAsync(userId);
 
@@ -61,6 +65,8 @@ public class StripeController(IStripeService stripeService) : ControllerBase
     {
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
         var signatureHeader = Request.Headers["Stripe-Signature"].ToString();
+
+        logger.LogInformation("Received Stripe webhook: {Json}", json);
 
         try
         {
