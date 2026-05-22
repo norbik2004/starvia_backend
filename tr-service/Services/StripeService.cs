@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Stripe;
 using Stripe.Checkout;
 using System;
@@ -11,58 +12,48 @@ using tr_core.DTO.Stripe.Request;
 using tr_core.DTO.Stripe.Response;
 using tr_core.Services;
 using tr_repository;
+using tr_service.Exceptions;
 
 
 namespace tr_service.Services
 {
-    public class StripeService(StripeClient stripeClient, IUserService userService) : IStripeService
+    public class StripeService(StripeClient stripeClient, StripeConfig stripeConfig, IUserService userService,
+         IConfiguration configuration) : IStripeService
     {
 
-        public async Task<CreateCheckoutSessionResponse> CreateCheckoutSessionAsync(StripeCheckoutDTO stripeCheckout)
+        public async Task<CreateCheckoutSessionResponse> CreateCheckoutSessionAsync(string userId)
         {
-            if (string.IsNullOrWhiteSpace(stripeCheckout.request.PriceId) && string.IsNullOrWhiteSpace(stripeCheckout.request.LookupKey))
-                throw new ArgumentException("Provide either priceId or lookupKey");
-
-            var priceId = stripeCheckout.request.PriceId;
-
-            if (string.IsNullOrWhiteSpace(priceId))
-            {
-                var priceService = new PriceService(stripeClient);
-                var prices = await priceService.ListAsync(new PriceListOptions
-                {
-                    LookupKeys = [stripeCheckout.request.LookupKey!],
-                    Limit = 1
-                });
-
-                priceId = prices.Data.Count > 0 ? prices.Data[0].Id : null;
-            }
-
-            if (string.IsNullOrWhiteSpace(priceId))
-                throw new ArgumentException("No Stripe price found for the provided lookupKey");
+            if (string.IsNullOrWhiteSpace(stripeConfig.PriceId))
+                throw new NotFoundException("PriceId key was not found");
 
             // Jeśli user ma już customerId w Stripe, przekazujemy go — Stripe nie stworzy duplikatu
-            var user = await userService.GetLoggedInUserInfoAsync(stripeCheckout.userId);
-            var existingCustomerId = user?.StripeCustomerId;
+            var user = await userService.GetLoggedInUserInfoAsync(userId);
+
+            if(user.IsSubscribed)
+                throw new BadRequestException("User already has an active subscription");
+
+            var existingCustomerId = user.StripeCustomerId;
 
             var sessionOptions = new SessionCreateOptions
             {
-                Mode = stripeCheckout.request.Mode,
+                Mode = "subscription",
                 LineItems =
                 [
                     new SessionLineItemOptions
                     {
-                        Price = priceId,
+                        Price = stripeConfig.PriceId,
                         Quantity = 1
                     }
                 ],
-                SuccessUrl = stripeCheckout.request.SuccessUrl,
-                CancelUrl = stripeCheckout.request.CancelUrl,
+                SuccessUrl = configuration["Stripe:SuccessUrl"],
+                CancelUrl = configuration["Stripe:CancelUrl"],
+
                 // Metadata pozwala nam powiązać subskrypcję z userem w webhooku
                 SubscriptionData = new SessionSubscriptionDataOptions
                 {
                     Metadata = new Dictionary<string, string>
                     {
-                        { "userId", stripeCheckout.userId }
+                        { "userId", userId }
                     }
                 }
             };
@@ -71,7 +62,7 @@ namespace tr_service.Services
             if (!string.IsNullOrWhiteSpace(existingCustomerId))
                 sessionOptions.Customer = existingCustomerId;
             else
-                sessionOptions.CustomerEmail = stripeCheckout.userEmail;
+                sessionOptions.CustomerEmail = user.Email;
 
             var sessionService = new SessionService(stripeClient);
             var session = await sessionService.CreateAsync(sessionOptions);
@@ -98,11 +89,7 @@ namespace tr_service.Services
 
         public async Task HandleWebhookAsync(string json, string stripeSignature)
         {
-            // Webhook secret waliduje że request faktycznie pochodzi od Stripe
-            var webhookSecret = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET")
-                ?? throw new InvalidOperationException("Missing Stripe webhook secret");
-
-            var stripeEvent = EventUtility.ConstructEvent(json, stripeSignature, webhookSecret);
+            var stripeEvent = EventUtility.ConstructEvent(json, stripeSignature, stripeConfig.WebhookSecret);
 
             switch (stripeEvent.Type)
             {
