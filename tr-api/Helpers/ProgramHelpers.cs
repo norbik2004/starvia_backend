@@ -52,6 +52,20 @@ namespace tr_backend.Helpers
                 RedirectUri = linkedinRedirect
             };
 
+
+            builder.Services.AddAuthentication()
+                .AddLinkedIn(options =>
+                {
+                    options.SaveTokens = true;
+                    options.ClientId = linkedinClientId;
+                    options.ClientSecret = linkedinClientSecret;
+                    options.Scope.Add("openid");
+                    options.Scope.Add("profile");
+                    options.Scope.Add("email");
+                    options.Scope.Add("w_member_social");
+                    options.CallbackPath = new PathString("/signin-linkedin-mw-callback");
+                });
+
             builder.Services.AddSingleton(linkedInConfig);
             builder.Services.AddSingleton<GeminiLLMConfig>();
 

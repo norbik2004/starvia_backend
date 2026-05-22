@@ -12,6 +12,6 @@ namespace tr_core.DTO.PostPublication.Request
     {
         public required int PostId {  get; set; }
         public required int UserPlatformId { get; set; }
-        public required PostPublicationStatus Status { get; set; }
+        public required PostPublicationStatus Status = PostPublicationStatus.Published;
     }
 }

@@ -19,7 +19,7 @@ namespace tr_repository.Repositories
 
         public async Task<UserSetting?> GetByIdAsync(string id)
         {
-            var setting = await dbContext.UserSettings.FirstOrDefaultAsync(s => s.Id.ToString() == id);
+            var setting = await dbContext.UserSettings.FirstOrDefaultAsync(s => s.UserId == id);
             return setting;
         }
 

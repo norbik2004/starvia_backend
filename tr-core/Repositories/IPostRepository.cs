@@ -9,5 +9,6 @@ namespace tr_core.Repositories
 {
     public interface IPostRepository : IRepository<Post>
     {
+        Task<IEnumerable<Post>> GetAllPostsByUserIdAsync(string userId);
     }
 }

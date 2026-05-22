@@ -18,7 +18,7 @@ namespace tr_service.Services
     {
         public async Task<PostPublicationResponse> PublishPostToLinkedInAsync(PostPublicationRequest request, string userId)
         {
-            var post = await postService.GetPostById(request.PostId);
+            var post = await postService.GetUserPostById(request.PostId, userId);
 
             if(post == null)
                 throw new NotFoundException("Post not found");
@@ -50,7 +50,7 @@ namespace tr_service.Services
                 PostId = post.Id,
                 UserPlatformId = userPlatform.Id,
                 PublishedAt = DateTime.UtcNow,
-                Status = PostPublicationStatus.Published,
+                Status = request.Status,
                 ExternalPostId = null // This would be set to the ID returned by LinkedIn after a successful post, if available
             };
 

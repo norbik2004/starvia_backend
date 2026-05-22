@@ -66,11 +66,13 @@ namespace tr_service.LinkedIn
                 using var doc = JsonDocument.Parse(json);
                 var root = doc.RootElement;
 
+                string? pfp = root.TryGetProperty("picture", out var picElem) ? picElem.GetString() : null;
+
                 LinkedInAccountInfoResponse response = new()
                 {
                     Name = root.GetProperty("name").ToString(),
                     Sub = root.GetProperty("sub").ToString(),
-                    PFPurl = root.GetProperty("picture").ToString()
+                    PFPurl = pfp
                 };
 
                 return response;

@@ -10,28 +10,40 @@ using System.Threading.Tasks;
 using tr_core.DTO.Gemini;
 using tr_core.DTO.Gemini.Request;
 using tr_core.Enums;
+using tr_core.Repositories;
 using tr_core.Services;
 using tr_core.Services.Gemini;
 using tr_service.Exceptions;
 
 namespace tr_service.Gemini
 {
-    public class GeminiService(ILogger<IGeminiService> logger, Client geminiClient, GeminiLLMConfig config, IUserService userService) : IGeminiService
+    public class GeminiService(ILogger<IGeminiService> logger, IUserService userService, IPostRepository postRepository,
+        Client geminiClient, GeminiLLMConfig config) : IGeminiService
     {
         public async Task<GeminiResponse> SendRequestToGemini(string userId, GeminiRequest request)
         {
-            if (!userService.CanGeneratePostAsync(userId).Result)
+            bool canUserAccessAi = await userService.CanUserAccessAi(userId);
+
+            if (!canUserAccessAi)
+                throw new BadRequestException("User has used hit limit, can't access Ai");
+
+            //validate post and check if user is the owner of the post
+
+            var post = await postRepository.GetByIdAsync(request.UserPrompt.PostId.ToString())
+                ?? throw new NotFoundException("Post was not found");
+
+            if (post.UserId != userId)
             {
-                logger.LogWarning("User has reached the generation limit");
-                throw new BadRequestException("Generation limit reached for user");
+                throw new UnauthorizedException("User cant access this post");
             }
+    
             try
             {
                 logger.LogInformation("Sending request to Gemini");
 
                 var response = await geminiClient.Models.GenerateContentAsync(
                     model: request.Model.ToModelString(),
-                    contents: request.Prompt,
+                    contents: request.UserPrompt.Prompt,
                     config: config.GetConfig()
                 );
 
@@ -49,7 +61,10 @@ namespace tr_service.Gemini
                 }
 
                 logger.LogInformation("Response received from Gemini");
-                await userService.IncrementPostCounterAsync(userId);
+
+                post.Status = PostStatus.Generated;
+                postRepository.Update(post);
+                await postRepository.SaveChangesAsync();
 
                 return new GeminiResponse
                 {

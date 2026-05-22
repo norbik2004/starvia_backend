@@ -28,7 +28,9 @@ namespace tr_repository.Repositories
 
             var user = await dbContext.Users
                 .Include(u => u.Posts)
+                .ThenInclude(p => p.PostPublications)
                 .Include(u => u.UserSettings)
+                .Include(u => u.UserPrompts)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             return user;

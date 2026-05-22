@@ -10,6 +10,6 @@ namespace tr_core.DTO.LinkedIn.Response
     {
         public required string Sub {  get; set; }
         public required string Name { get; set; }
-        public required string PFPurl { get; set; }
+        public string? PFPurl { get; set; }
     }
 }

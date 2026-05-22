@@ -15,9 +15,9 @@ namespace tr_core.Entities
         public string UserId { get; set; } = null!;
         public User User { get; set; } = null!;
         public string Title { get; set; } = null!;
-        public string PromptText { get; set; } = null!;
+        public string? PromptText { get; set; }
         public string Body { get; set; } = null!;
         public PostStatus Status { get; set; }
-        public ICollection<PostPublication> Publications { get; set; } = new List<PostPublication>();
+        public ICollection<PostPublication> PostPublications { get; set; } = [];
     }
 }

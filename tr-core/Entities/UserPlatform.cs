@@ -28,6 +28,6 @@ namespace tr_core.Entities
 
         public bool IsActive { get; set; } = true;
 
-        public ICollection<PostPublication> PostPublications { get; set; } = new List<PostPublication>();
+        public ICollection<PostPublication> PostPublications { get; set; } = [];
     }
 }

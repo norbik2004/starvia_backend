@@ -14,9 +14,10 @@ namespace tr_core.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         //POSTY USERA
-        public ICollection<Post> Posts { get; set; } = new List<Post>();
+        public ICollection<Post> Posts { get; set; } = [];
         //PLATFORMY USERA
-        public ICollection<UserPlatform> UserPlatforms { get; set; } = new List<UserPlatform>();
+        public ICollection<UserPlatform> UserPlatforms { get; set; } = [];
         public UserSetting? UserSettings { get; set; }
+        public ICollection<UserPrompt> UserPrompts { get; set; } = [];
     }
 }

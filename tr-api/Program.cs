@@ -27,21 +27,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthentication()
-    .AddLinkedIn(options =>
-    {
-        options.SaveTokens = true;
-        /*
-        options.ClientId = linkedinClientId;
-        options.ClientSecret = linkedinClientSecret;
-        options.Scope.Add("openid");
-        options.Scope.Add("profile");
-        options.Scope.Add("email");
-        options.Scope.Add("w_member_social");
-        options.CallbackPath = new PathString("/signin-linkedin-mw-callback");
-        */
-    });
-
 ProgramHelpers.AddSingletons(builder);
 
 builder.Services.AddHttpClient<ILinkedInService, LinkedInService>();

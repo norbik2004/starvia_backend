@@ -11,6 +11,6 @@ namespace tr_core.Entities
     public class Platform : BaseEntity, IAuditable
     {
         public PlatformType Type { get; set; }
-        public ICollection<UserPlatform> UserPlatforms { get; set; } = new List<UserPlatform>();
+        public ICollection<UserPlatform> UserPlatforms { get; set; } = [];
     }
 }

@@ -6,6 +6,7 @@ using tr_core.Consts;
 using tr_core.DTO.User.Request;
 using tr_core.DTO.User.Response;
 using tr_core.Entities;
+using tr_core.Enums;
 using tr_core.Repositories;
 using tr_core.Services;
 using tr_repository.Migrations;
@@ -13,8 +14,28 @@ using tr_service.Exceptions;
 
 namespace tr_service.Services
 {
-    public class UserService(UserManager<User> userManager, IUserRepository userRepository, IMapper mapper) : IUserService
+    public class UserService(UserManager<User> userManager, IUserRepository userRepository,
+        IMapper mapper) : IUserService
     {
+        
+        public async Task<bool> CanUserAccessAi(string userId)
+        {
+            var user = await userRepository.GetByIdAsync(userId);
+
+            if(user == null)
+                throw new BadRequestException($"User was not found, {nameof(user)}.");
+
+            int count = user.UserPrompts.Count(c =>
+                c.CreatedAt > DateTime.UtcNow.AddDays(-30));
+
+            var userLimit = user.IsSubscribed ? AiCallsLimits.Free : AiCallsLimits.Subscribed;
+
+            if (count >= userLimit)
+                return false;
+
+            return true;
+        }
+
         public async Task<List<UserResponse>> GetAllUsers(UserPaginatedParamsRequest request)
         {
             var users = await userRepository.GetAllAsync();
@@ -39,6 +60,11 @@ namespace tr_service.Services
 
             var userToReturn = mapper.Map<UserResponse>(user);
             userToReturn.Roles = roles;
+
+            var userPostsCount = user.Posts.Select(c => c.PostPublications.Where(p => p.Status == PostPublicationStatus.Published).Count()).Sum();
+
+            userToReturn.PostsPublished = userPostsCount;
+            userToReturn.PostsGenerated = user.Posts.Where(c => c.Status == PostStatus.Generated).Count();
 
             return userToReturn;
         }
