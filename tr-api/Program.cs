@@ -1,3 +1,5 @@
+using dotenv.net;
+using Google.GenAI;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -6,20 +8,28 @@ using tr_backend.Middlewares;
 using tr_core.Entities;
 using tr_core.Repositories;
 using tr_core.Services;
+using tr_core.Services.Gemini;
 using tr_repository;
 using tr_repository.Repositories;
 using tr_repository.Seeds;
+using tr_service.Gemini;
 using tr_service.Mapping;
-using tr_service.Services;
+using tr_service.Services;  
+using tr_service.LinkedIn;
+using Stripe;
+using tr_service;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+ProgramHelpers.AddSingletons(builder);
+
+builder.Services.AddHttpClient<ILinkedInService, LinkedInService>();
 
 builder.Services.AddDbContext<TrDbContext>(options =>
     options.UseNpgsql(
@@ -82,13 +92,19 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserSettingRepository, UserSettingRepository>();
+builder.Services.AddScoped<IUserSettingService, UserSettingService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPlatformService, PlatformService>();
 builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
 builder.Services.AddScoped<IUserPlatformRepository, UserPlatformRepository>();
 builder.Services.AddScoped<IUserPlatformService, UserPlatformService>();
+builder.Services.AddScoped<IStripeService, StripeService>();
+builder.Services.AddScoped<IPostPublicationRepository, PostPublicationRepository>();
+builder.Services.AddScoped<IPostPublishService, PostPublishService>();
 
+builder.Services.AddScoped<IGeminiService, GeminiService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -106,11 +122,16 @@ var app = builder.Build();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
+/*
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+*/
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 await DbMigrate.MigrateDatabase(app);
 using (var scope = app.Services.CreateScope())
@@ -124,10 +145,10 @@ app.UseRouting();
 
 app.UseCors("AllowAll");
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();

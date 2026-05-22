@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using tr_core.Entities;
+using tr_core.Enums;
 using tr_core.Repositories;
 
 namespace tr_repository.Repositories
@@ -24,6 +25,11 @@ namespace tr_repository.Repositories
         public async Task<Platform?> GetByIdAsync(string id)
         {
             return await dbContext.Platforms.FirstOrDefaultAsync(p => p.Id.ToString() == id);
+        }
+
+        public async Task<Platform?> GetPlatformByTypeAsync(PlatformType platformType)
+        {
+            return await dbContext.Platforms.FirstOrDefaultAsync(p => p.Type == platformType);
         }
 
         public void Remove(Platform entity)

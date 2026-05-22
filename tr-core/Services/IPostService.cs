@@ -11,7 +11,8 @@ namespace tr_core.Services
     public interface IPostService
     {
         public Task<List<PostResponse>> GetAllPostsAsync(PostPaginatedParamsRequest request);
-        public Task<PostResponse> GetPostById(int postId);
+        public Task<List<PostResponse>> GetAllPostsPerUserAsync(PostPaginatedParamsRequest request, string userId);
+        public Task<PostResponse> GetUserPostById(int postId, string userId);
         public Task<PostResponse> CreatePostAsync(PostRequest request, string userId);
         public Task DeletePost(int postId, string userId);
         public Task<PostResponse> UpdatePostAsync(int postId, PostRequest request, string userId);

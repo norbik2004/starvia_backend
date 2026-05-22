@@ -13,7 +13,5 @@ namespace tr_core.DTO.Post.Request
         [MaxLength(200)]
         public string Title { get; set; } = null!;
         public string Body { get; set; } = null!;
-        public string? PromptText { get; set; }
-        public PostStatus Status { get; set; } = PostStatus.Draft;
     }
 }

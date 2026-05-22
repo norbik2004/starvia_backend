@@ -20,6 +20,7 @@ namespace tr_service.Services
         {
             var postEntity = mapper.Map<Post>(request);
             postEntity.UserId = userId;
+            postEntity.Status = PostStatus.Draft;
 
             await postRepository.AddAsync(postEntity);
             await postRepository.SaveChangesAsync();
@@ -46,12 +47,22 @@ namespace tr_service.Services
             return mapper.Map<List<PostResponse>>(posts);
         }
 
-        public async Task<PostResponse> GetPostById(int postId)
+        public async Task<List<PostResponse>> GetAllPostsPerUserAsync(PostPaginatedParamsRequest request, string userId)
+        {
+            var posts = await postRepository.GetAllPostsByUserIdAsync(userId);
+
+            return mapper.Map<List<PostResponse>>(posts);
+        }
+
+        public async Task<PostResponse> GetUserPostById(int postId, string userId)
         {
             var post = await postRepository.GetByIdAsync(postId.ToString());
 
             if (post == null)
                 throw new BadRequestException("Post was not found");
+
+            if (post.UserId != userId)
+                throw new UnauthorizedException("User is not the owner of the post");
 
             return mapper.Map<PostResponse>(post);
         }

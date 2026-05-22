@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using tr_backend.Helpers;
+using tr_core.Consts;
 using tr_core.DTO.Post.Request;
 using tr_core.DTO.Post.Response;
 using tr_core.DTO.User.Response;
@@ -20,7 +21,7 @@ namespace tr_backend.Controllers
     [Authorize]
     public class PostController(IPostService postService, IMapper mapper) : ControllerBase
     {
-
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet("posts")]
         [ProducesResponseType(typeof(PaginatedList<PostResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -31,13 +32,26 @@ namespace tr_backend.Controllers
             return await PaginatedList<PostResponse>.CreateAsync(posts.AsQueryable(), mapper, request.PageIndex, request.PageSize);
         }
 
+        [HttpGet("myPosts")]
+        [ProducesResponseType(typeof(PaginatedList<PostResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<PaginatedList<PostResponse>> GetAllUserPosts([FromQuery] PostPaginatedParamsRequest request)
+        {
+            var userId = UserHelpers.GetUserIdFromClaims(User);
+
+            var posts = await postService.GetAllPostsPerUserAsync(request, userId);
+
+            return await PaginatedList<PostResponse>.CreateAsync(posts.AsQueryable(), mapper, request.PageIndex, request.PageSize);
+        }
+
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<PostResponse> GetPostById(int id)
         {
-            var post = await postService.GetPostById(id);
+            string userId = UserHelpers.GetUserIdFromClaims(User);
+            var post = await postService.GetUserPostById(id, userId);
             return post;
         }
 

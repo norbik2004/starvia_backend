@@ -27,6 +27,11 @@ namespace tr_repository.Seeds
                     UserName = "uzytkownikTest1",
                     NormalizedEmail = "uzytkownik@test1.com".ToUpper(),
                     NormalizedUserName = "uzytkownikTest1".ToUpper(),
+                    UserSettings = new UserSetting
+                    {
+                        IsDarkMode = false,
+                        ReceiveNotifications = true
+                    }
                 };
 
                 await userManager.CreateAsync(user, "Uzytkownik1");
@@ -41,6 +46,11 @@ namespace tr_repository.Seeds
                     UserName = "adminTest1",
                     NormalizedEmail = "admin@test1.com".ToUpper(),
                     NormalizedUserName = "adminTest1".ToUpper(),
+                    UserSettings = new UserSetting
+                    {
+                        IsDarkMode = false,
+                        ReceiveNotifications = true
+                    }
                 };
 
                 await userManager.CreateAsync(user, "Admin1");

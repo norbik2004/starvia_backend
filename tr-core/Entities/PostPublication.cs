@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using tr_core.Enums;
 
 namespace tr_core.Entities
 {
@@ -15,8 +16,8 @@ namespace tr_core.Entities
 
         [ForeignKey(nameof(UserPlatform))]
         public int UserPlatformId { get; set; }
-        public UserPlatform UserPlatform { get; set; } = null!;
-        public string Status { get; set; } = null!;
+        public UserPlatform UserPlatform { get; set; }
+        public required PostPublicationStatus Status { get; set; }
         public DateTime? PublishedAt { get; set; }
         public string? ExternalPostId { get; set; }
     }

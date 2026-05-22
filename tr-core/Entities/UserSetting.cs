@@ -11,7 +11,7 @@ namespace tr_core.Entities
     public class UserSetting : BaseEntity, IAuditable
     {
         [ForeignKey(nameof(User))]
-        public required string UserId { get; set; }
+        public string UserId { get; set; }
         public User User { get; set; } = null!;
         public bool IsDarkMode { get; set; }
         public bool ReceiveNotifications { get; set; }

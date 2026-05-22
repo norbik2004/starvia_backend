@@ -21,6 +21,11 @@ namespace tr_repository.Repositories
             return await dbContext.Posts.ToListAsync();
         }
 
+        public async Task<IEnumerable<Post>> GetAllPostsByUserIdAsync(string userId)
+        {
+            return await dbContext.Posts.Where(p => p.UserId == userId).ToListAsync();
+        }
+
         public async Task<Post?> GetByIdAsync(string id)
         {
             int identifier = Int32.Parse(id);

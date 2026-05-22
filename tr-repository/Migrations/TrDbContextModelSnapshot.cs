@@ -192,7 +192,6 @@ namespace tr_repository.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PromptText")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Status")
@@ -236,9 +235,8 @@ namespace tr_repository.Migrations
                     b.Property<DateTime?>("PublishedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -306,6 +304,9 @@ namespace tr_repository.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
+                    b.Property<string>("StripeCustomerId")
+                        .HasColumnType("text");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
@@ -359,6 +360,9 @@ namespace tr_repository.Migrations
                     b.Property<int>("PlatformId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("ProfilePictureLink")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -373,6 +377,40 @@ namespace tr_repository.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserPlatforms");
+                });
+
+            modelBuilder.Entity("tr_core.Entities.UserPrompt", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Prompt")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserPrompt");
                 });
 
             modelBuilder.Entity("tr_core.Entities.UserSetting", b =>
@@ -472,7 +510,7 @@ namespace tr_repository.Migrations
             modelBuilder.Entity("tr_core.Entities.PostPublication", b =>
                 {
                     b.HasOne("tr_core.Entities.Post", "Post")
-                        .WithMany("Publications")
+                        .WithMany("PostPublications")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -507,6 +545,25 @@ namespace tr_repository.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("tr_core.Entities.UserPrompt", b =>
+                {
+                    b.HasOne("tr_core.Entities.Post", "Post")
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("tr_core.Entities.User", "User")
+                        .WithMany("UserPrompts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("tr_core.Entities.UserSetting", b =>
                 {
                     b.HasOne("tr_core.Entities.User", "User")
@@ -525,7 +582,7 @@ namespace tr_repository.Migrations
 
             modelBuilder.Entity("tr_core.Entities.Post", b =>
                 {
-                    b.Navigation("Publications");
+                    b.Navigation("PostPublications");
                 });
 
             modelBuilder.Entity("tr_core.Entities.User", b =>
@@ -533,6 +590,8 @@ namespace tr_repository.Migrations
                     b.Navigation("Posts");
 
                     b.Navigation("UserPlatforms");
+
+                    b.Navigation("UserPrompts");
 
                     b.Navigation("UserSettings");
                 });

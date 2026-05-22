@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 minio-data/
+
+.env
+*.env

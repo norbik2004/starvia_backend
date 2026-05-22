@@ -13,5 +13,6 @@ namespace tr_core.DTO.UserPlatform.Request
         public string? ExternalAccountId { get; set; }
         public required string AccountUsername { get; set; }
         public required string AccountComment { get; set; }
+        public string? ProfilePictureLink { get; set; }
     }
 }
