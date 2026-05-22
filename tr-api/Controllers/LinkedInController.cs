@@ -63,7 +63,7 @@ namespace tr_backend.Controllers
             // Someday redirecting to frontend with UserPlatform object
             _ = await userPlatformService.AddUserPlatformAsync(request, userId);
 
-            return Redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1");
+            return Redirect(appsettingsConfig["LinkedIn:SuccessRedirectUrl"]!);
         }
 
     }
