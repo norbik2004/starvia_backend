@@ -11,7 +11,7 @@ namespace tr_core.Services
 {
     public interface IStripeService
     {
-        Task<CreateCheckoutSessionResponse> CreateCheckoutSessionAsync(StripeCheckoutDTO stripeCheckout);
+        Task<CreateCheckoutSessionResponse> CreateCheckoutSessionAsync(string userId);
         Task<CreatePortalSessionResponse> CreatePortalSessionAsync(string userId, string returnUrl);
         Task HandleWebhookAsync(string json, string stripeSignature);
     }

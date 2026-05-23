@@ -1,12 +1,14 @@
 ﻿using dotenv.net;
 using Google.GenAI;
 using Stripe;
+using tr_core.DTO.Stripe;
+using tr_service.Exceptions;
 using tr_service.Gemini;
 using tr_service.LinkedIn;
 
 namespace tr_backend.Helpers
 {
-    public class ProgramHelpers()
+    public static class ProgramHelpers
     {
         public static void AddSingletons(WebApplicationBuilder builder)
         {
@@ -14,24 +16,28 @@ namespace tr_backend.Helpers
 
             var stripeApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
             var stripeWebhookKey = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET");
+            var stripePriceId = Environment.GetEnvironmentVariable("STRIPE_PRICE_ID");
             var geminiApiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
             var linkedinClientId = Environment.GetEnvironmentVariable("LINKEDIN_CLIENT_ID");
             var linkedinClientSecret = Environment.GetEnvironmentVariable("LINKEDIN_CLIENT_SECRET");
             var linkedinRedirect = Environment.GetEnvironmentVariable("LINKEDIN_REDIRECT_URI");
             
-            if(string.IsNullOrWhiteSpace(stripeApiKey))
-                throw new Exception("Missing STRIPE_SECRET_KEY in environmental variables");
-            if(string.IsNullOrWhiteSpace(stripeWebhookKey))
-                throw new Exception("Missing STRIPE_WEBHOOK_SECRET in environmental variables");
-            if(string.IsNullOrWhiteSpace(geminiApiKey))
-                throw new Exception("Missing GEMINI_API_KEY in environmental variables");
-            if(string.IsNullOrWhiteSpace(linkedinClientId))
-                throw new Exception("Missing LINKEDIN_CLIENT_ID in environmental variables");
-            if(string.IsNullOrWhiteSpace(linkedinClientSecret))
-                throw new Exception("Missing LINKEDIN_CLIENT_SECRET in environmental variables");
-            if(string.IsNullOrWhiteSpace(linkedinRedirect))
-                throw new Exception("Missing LINKEDIN_REDIRECT_URI in environmental variables");
             
+            if(string.IsNullOrWhiteSpace(stripeApiKey))
+                throw new NotFoundException("Missing STRIPE_SECRET_KEY in environmental variables");
+            if(string.IsNullOrWhiteSpace(stripeWebhookKey))
+                throw new NotFoundException("Missing STRIPE_WEBHOOK_SECRET in environmental variables");
+            if(string.IsNullOrWhiteSpace(geminiApiKey))
+                throw new NotFoundException("Missing GEMINI_API_KEY in environmental variables");
+            if(string.IsNullOrWhiteSpace(linkedinClientId))
+                throw new NotFoundException("Missing LINKEDIN_CLIENT_ID in environmental variables");
+            if(string.IsNullOrWhiteSpace(linkedinClientSecret))
+                throw new NotFoundException("Missing LINKEDIN_CLIENT_SECRET in environmental variables");
+            if(string.IsNullOrWhiteSpace(linkedinRedirect))
+                throw new NotFoundException("Missing LINKEDIN_REDIRECT_URI in environmental variables");
+            if (string.IsNullOrWhiteSpace(stripePriceId))
+                throw new NotFoundException("Missing STRIPE_PRICE_ID in environmental variables");
+
             //STRIPE
             builder.Services.AddSingleton<StripeClient>(_ =>
             {
@@ -52,6 +58,14 @@ namespace tr_backend.Helpers
                 RedirectUri = linkedinRedirect
             };
 
+            //StripeConfig
+            var stripeConfig = new StripeConfig
+            {
+                ApiKey = stripeApiKey,
+                WebhookSecret = stripeWebhookKey,
+                PriceId = stripePriceId
+            };
+
 
             builder.Services.AddAuthentication()
                 .AddLinkedIn(options =>
@@ -67,6 +81,7 @@ namespace tr_backend.Helpers
                 });
 
             builder.Services.AddSingleton(linkedInConfig);
+            builder.Services.AddSingleton(stripeConfig);
             builder.Services.AddSingleton<GeminiLLMConfig>();
 
         }

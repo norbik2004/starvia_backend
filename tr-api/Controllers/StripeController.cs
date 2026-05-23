@@ -14,37 +14,24 @@ namespace tr_backend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class StripeController(IStripeService stripeService, UserManager<User> userManager) : ControllerBase
+public class StripeController(IStripeService stripeService, ILogger<StripeController> logger) : ControllerBase
 {
 
     [Authorize]
-    [HttpPost("create-checkout-session")]
+    [HttpPost("subscripe-to-postly")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateCheckoutSession([FromBody] CreateCheckoutSessionRequest request)
+    public async Task<IActionResult> CreateCheckoutSession()
     {
+        
+
         var userId = UserHelpers.GetUserIdFromClaims(User);
-        var user = await userManager.FindByIdAsync(userId);
 
-        if (user is null)
-            return Unauthorized();
+        logger.LogInformation("Creating Stripe checkout session for user {UserId}", userId);
 
-        try
-        {
-            var stripeCheckout = new StripeCheckoutDTO
-            {
-                userId = userId,
-                userEmail = user.Email!,
-                request = request
-            };
+        var result = await stripeService.CreateCheckoutSessionAsync(userId);
 
-            var result = await stripeService.CreateCheckoutSessionAsync(stripeCheckout);
-            return Ok(new { sessionId = result.SessionId, url = result.Url });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        return Ok(new { sessionId = result.SessionId, url = result.Url });
     }
 
     [Authorize]
@@ -78,6 +65,8 @@ public class StripeController(IStripeService stripeService, UserManager<User> us
     {
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
         var signatureHeader = Request.Headers["Stripe-Signature"].ToString();
+
+        logger.LogInformation("Received Stripe webhook: {Json}", json);
 
         try
         {
