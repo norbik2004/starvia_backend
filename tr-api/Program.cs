@@ -2,6 +2,7 @@ using dotenv.net;
 using Google.GenAI;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 using System.Text.Json.Serialization;
 using tr_backend.Helpers;
 using tr_backend.Middlewares;
@@ -12,12 +13,12 @@ using tr_core.Services.Gemini;
 using tr_repository;
 using tr_repository.Repositories;
 using tr_repository.Seeds;
+using tr_service;
+using tr_service.EmailSender;
 using tr_service.Gemini;
+using tr_service.LinkedIn;
 using tr_service.Mapping;
 using tr_service.Services;  
-using tr_service.LinkedIn;
-using Stripe;
-using tr_service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +71,8 @@ builder.Services.AddCors(options =>
         });
 });
 
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;

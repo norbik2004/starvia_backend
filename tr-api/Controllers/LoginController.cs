@@ -19,18 +19,21 @@ namespace tr_backend.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> LogIn([FromBody] UserLoginRequest request)
         {
-            if(User.Identities.Any(i => i.IsAuthenticated))
+            if (User.Identities.Any(i => i.IsAuthenticated))
                 throw new BadRequestException("User is arelady logged in");
 
+            var user = await signInManager.UserManager.FindByEmailAsync(request.Email)
+                ?? throw new UnauthorizedException("Wrong password or email");
+
             var result = await signInManager.PasswordSignInAsync(
-                request.UserName,
+                user,
                 request.Password,
                 isPersistent: true,
                 lockoutOnFailure: false
             );
 
             if (!result.Succeeded)
-                throw new UnauthorizedException("Wrong password or username");
+                throw new UnauthorizedException("Wrong password or email");
 
             return Ok();
         }

@@ -83,6 +83,7 @@ namespace tr_service.Services
                 UserName = request.UserName,
                 NormalizedEmail = request.Email.ToUpper(),
                 NormalizedUserName = request.UserName.ToUpper(),
+                EmailConfirmed = false
             };
 
             var result = await userManager.CreateAsync(user, request.Password);
