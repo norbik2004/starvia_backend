@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tr_service.EmailSender
+namespace tr_service.Email
 {
     public class MailSettings
     {

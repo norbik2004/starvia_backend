@@ -2,6 +2,8 @@
 using Google.GenAI;
 using Stripe;
 using tr_core.DTO.Stripe;
+using tr_core.Services.Email;
+using tr_service.Email;
 using tr_service.Exceptions;
 using tr_service.Gemini;
 using tr_service.LinkedIn;
@@ -83,7 +85,7 @@ namespace tr_backend.Helpers
             builder.Services.AddSingleton(linkedInConfig);
             builder.Services.AddSingleton(stripeConfig);
             builder.Services.AddSingleton<GeminiLLMConfig>();
-
+            builder.Services.AddSingleton<IEmailSender, EmailSender>();
         }
     }
 }

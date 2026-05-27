@@ -10,13 +10,14 @@ using tr_core.Entities;
 using tr_core.Enums;
 using tr_core.Repositories;
 using tr_core.Services;
+using tr_core.Services.Email;
 using tr_repository.Migrations;
 using tr_service.Exceptions;
 
 namespace tr_service.Services
 {
     public class UserService(UserManager<User> userManager, IUserRepository userRepository,
-        IMapper mapper) : IUserService
+        IMapper mapper, IEmailSender emailSender) : IUserService
     {
         
         public async Task<bool> CanUserAccessAi(string userId)
@@ -105,6 +106,10 @@ namespace tr_service.Services
 
             user.UserSettings = settings;
             await userRepository.SaveChangesAsync();
+
+            var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            await emailSender.SendEmailAsync(user.Email, "Email Confirmation", $"Conirm email with this code {code}");
         }
 
         public async Task SetStripeCustomerId(string userId, string customerId)

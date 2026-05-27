@@ -14,7 +14,7 @@ using tr_repository;
 using tr_repository.Repositories;
 using tr_repository.Seeds;
 using tr_service;
-using tr_service.EmailSender;
+using tr_service.Email;
 using tr_service.Gemini;
 using tr_service.LinkedIn;
 using tr_service.Mapping;
@@ -106,7 +106,6 @@ builder.Services.AddScoped<IUserPlatformService, UserPlatformService>();
 builder.Services.AddScoped<IStripeService, StripeService>();
 builder.Services.AddScoped<IPostPublicationRepository, PostPublicationRepository>();
 builder.Services.AddScoped<IPostPublishService, PostPublishService>();
-
 builder.Services.AddScoped<IGeminiService, GeminiService>();
 
 builder.Services.AddControllers()
