@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Stripe;
 using tr_core.Consts;
+using tr_core.DTO.Email.Models;
 using tr_core.DTO.User.Request;
 using tr_core.DTO.User.Response;
 using tr_core.Entities;
@@ -19,12 +20,12 @@ namespace tr_service.Services
     public class UserService(UserManager<User> userManager, IUserRepository userRepository,
         IMapper mapper, IEmailSender emailSender) : IUserService
     {
-        
+
         public async Task<bool> CanUserAccessAi(string userId)
         {
             var user = await userRepository.GetByIdAsync(userId);
 
-            if(user == null)
+            if (user == null)
                 throw new BadRequestException($"User was not found, {nameof(user)}.");
 
             int count = user.UserPrompts.Count(c =>
@@ -38,13 +39,26 @@ namespace tr_service.Services
             return true;
         }
 
+        public async Task ConfirmEmailAsync(string userId, string token)
+        {
+            var user = await userRepository.GetByIdAsync(userId)
+                ?? throw new NotFoundException("Bad request");
+
+            var result = await userManager.ConfirmEmailAsync(user, token);
+
+            if (!result.Succeeded)
+            {
+                throw new BadRequestException("Error, contact support");
+            }
+        }
+
         public async Task<List<UserResponse>> GetAllUsers(UserPaginatedParamsRequest request)
         {
             var users = await userRepository.GetAllAsync();
 
             var usersToReturn = mapper.Map<List<UserResponse>>(users);
 
-            for(int i = 0; i < usersToReturn.Count; i++)
+            for (int i = 0; i < usersToReturn.Count; i++)
             {
                 List<string> roles = [.. await userManager.GetRolesAsync(users[i])];
                 usersToReturn[i].Roles = roles;
@@ -63,16 +77,16 @@ namespace tr_service.Services
             var userToReturn = mapper.Map<UserResponse>(user);
             userToReturn.Roles = roles;
 
-            var userPostsCount = user.Posts.Select(c => c.PostPublications.Where(p => p.Status == PostPublicationStatus.Published).Count()).Sum();
+            var userPostsCount = user.Posts.Select(c => c.PostPublications.Count(p => p.Status == PostPublicationStatus.Published)).Sum();
 
             userToReturn.PostsPublished = userPostsCount;
-            userToReturn.PostsGenerated = user.Posts.Where(c => c.Status == PostStatus.Generated).Count();
+            userToReturn.PostsGenerated = user.Posts.Count(c => c.Status == PostStatus.Generated);
 
             return userToReturn;
         }
 
         public async Task RegisterUserAsync(UserRegisterRequest request)
-        { 
+        {
             var existingUser = await userManager.FindByEmailAsync(request.Email);
 
             if (existingUser != null)
@@ -88,7 +102,7 @@ namespace tr_service.Services
             };
 
             var result = await userManager.CreateAsync(user, request.Password);
-           
+
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
@@ -107,9 +121,18 @@ namespace tr_service.Services
             user.UserSettings = settings;
             await userRepository.SaveChangesAsync();
 
-            var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+            await SendConfirmationEmailAsync(user);
+        }
 
-            await emailSender.SendEmailAsync(user.Email, "Email Confirmation", $"Conirm email with this code {code}");
+        public async Task ResendConfirmationEmailAsync(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email)
+                ?? throw new NotFoundException("User not found");
+
+            if (user.EmailConfirmed)
+                throw new BadRequestException("Email is already confirmed");
+
+            await SendConfirmationEmailAsync(user);
         }
 
         public async Task SetStripeCustomerId(string userId, string customerId)
@@ -132,38 +155,19 @@ namespace tr_service.Services
             await userRepository.SaveChangesAsync();
         }
 
-        /*
-        public async Task<bool> CanGeneratePostAsync(string userId)
+        private async Task SendConfirmationEmailAsync(User user)
         {
-            var user = await userRepository.GetByIdAsync(userId);
-            if (user is null) return false;
+            var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            ResetCounterIfNewMonth(user);
-
-            var limit = user.IsSubscribed ? postLimits.Value.Subscribed : postLimits.Value.Free;
-            return user.PostsGeneratedThisMonth < limit;
-        }
-
-        public async Task IncrementPostCounterAsync(string userId)
-        {
-            var user = await userRepository.GetByIdAsync(userId);
-            if (user is null) return;
-
-            ResetCounterIfNewMonth(user);
-            user.PostsGeneratedThisMonth++;
-            await userRepository.SaveChangesAsync();
-        }
-
-        private static void ResetCounterIfNewMonth(User user)
-        {
-            var now = DateTime.UtcNow;
-            if (now.Month != user.PostsCounterResetAt.Month ||
-                now.Year != user.PostsCounterResetAt.Year)
+            ConfirmEmailRequest emailRequest = new()
             {
-                user.PostsGeneratedThisMonth = 0;
-                user.PostsCounterResetAt = now;
-            }
+                To = user.Email!,
+                Token = token,
+                UserId = user.Id,
+                EmailType = EmailForm.EmailConfirmation,
+            };
+            await emailSender.SendConfirmationEmail(emailRequest);
         }
-        */
+
     }
 }

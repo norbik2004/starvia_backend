@@ -17,5 +17,7 @@ namespace tr_core.Services
         public Task SetStripeCustomerId(string userId, string customerId);
         public Task UpdateSubsciptionStatus(string userId, bool status);
         public Task<bool> CanUserAccessAi(string userId);
+        public Task ConfirmEmailAsync(string userId, string token);
+        public Task ResendConfirmationEmailAsync(string email);
     }
 }

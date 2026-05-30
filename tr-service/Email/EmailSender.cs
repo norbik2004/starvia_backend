@@ -3,12 +3,31 @@ using MimeKit;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Logging;
 using tr_core.Services.Email;
+using tr_core.DTO.Email.Models;
+using tr_service.Email.Forms;
+using tr_core;
 
 namespace tr_service.Email
 {
-    public class EmailSender(IOptions<MailSettings> settings, ILogger<EmailSender> logger) : IEmailSender
+    public class EmailSender(IOptions<MailSettings> settings, ILogger<EmailSender> logger, IOptions<ApplicationSettings> appSettings) : IEmailSender
     {
-        public async Task SendEmailAsync(string to, string subject, string htmlBody)
+        public async Task<bool> SendConfirmationEmail(ConfirmEmailRequest request)
+        {
+            try
+            {
+                var htmlBody = ConfirmEmailTemplate.GenerateUserMessageTemplate(request, appSettings.Value.BackendURL);
+
+                await SendEmailAsync(request.To, request.Subject, htmlBody);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error while sending confirmation email");
+                return false;
+            }
+        }
+
+        private async Task SendEmailAsync(string to, string subject, string htmlBody)
         {
             try
             {

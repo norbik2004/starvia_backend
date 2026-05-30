@@ -1,11 +1,14 @@
 using dotenv.net;
 using Google.GenAI;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using tr_backend.Helpers;
 using tr_backend.Middlewares;
+using tr_core;
 using tr_core.Entities;
 using tr_core.Repositories;
 using tr_core.Services;
@@ -46,16 +49,65 @@ builder.Services.AddDbContext<TrDbContext>(options =>
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
-    options.Password.RequireDigit = false;
+    options.Password.RequireDigit = true;
     options.Password.RequireLowercase = false;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequiredLength = 6;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 8;
     options.User.RequireUniqueEmail = true;
+
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
+
+    options.User.AllowedUserNameCharacters =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+
+    options.SignIn.RequireConfirmedEmail = true;
 })
     .AddEntityFrameworkStores<TrDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.ContentType = "application/json";
+
+        var response = new
+        {
+            StatusCode = 429,
+            Description = "Too many confirmation email requests. Please wait before trying again.",
+        };
+
+        await context.HttpContext.Response.WriteAsJsonAsync(response, cancellationToken);
+    };
+
+    options.AddPolicy("email-confirm", httpContext =>
+    {
+        var email = httpContext.Request.Query["email"]
+            .ToString()
+            ?.ToLowerInvariant()
+            ?? "unknown";
+
+        var ip = httpContext.Connection.RemoteIpAddress?.ToString()
+            ?? "unknown-ip";
+
+        var partitionKey = $"{email}:{ip}";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 1,
+                Window = TimeSpan.FromMinutes(20),
+                QueueLimit = 0
+            });
+    });
+});
 
 // to do modyfikacji pozniej
 builder.Services.AddCors(options =>
@@ -73,11 +125,16 @@ builder.Services.AddCors(options =>
 
 
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("ApplicationSettings"));
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.None;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.Name = "ContentForge_Cookie";
+    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    options.SlidingExpiration = true;
 
     options.Events.OnRedirectToLogin = context =>
     {
@@ -91,6 +148,17 @@ builder.Services.ConfigureApplicationCookie(options =>
         return Task.CompletedTask;
     };
 
+});
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+{
+    options.TokenLifespan = TimeSpan.FromDays(3);
+    options.Name = "ContentForgeTokenProvider";
+});
+
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.FromMinutes(5);
 });
 
 builder.Services.AddScoped<IUserService, UserService>();
@@ -150,6 +218,7 @@ app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapControllers();
 

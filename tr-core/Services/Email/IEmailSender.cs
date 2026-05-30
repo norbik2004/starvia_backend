@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using tr_core.DTO.Email.Models;
 
 namespace tr_core.Services.Email
 {
     public interface IEmailSender
     {
-        public Task SendEmailAsync(string to, string subject, string htmlBody);
+        public Task<bool> SendConfirmationEmail(ConfirmEmailRequest request);
     }
 }

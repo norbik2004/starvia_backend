@@ -25,9 +25,6 @@ namespace tr_backend.Controllers
             var user = await signInManager.UserManager.FindByEmailAsync(request.Email)
                 ?? throw new UnauthorizedException("Wrong password or email");
 
-            if(!user.EmailConfirmed)
-                throw new UnauthorizedException("Email is not confirmed");
-
             var result = await signInManager.PasswordSignInAsync(
                 user,
                 request.Password,
