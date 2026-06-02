@@ -53,7 +53,7 @@ namespace tr_repository.Seeds
                     }
                 };
 
-                await userManager.CreateAsync(user, "Admin1");
+                await userManager.CreateAsync(user, "AdminTest1");
                 await userManager.AddToRoleAsync(user, Roles.Admin);
             }
         }
