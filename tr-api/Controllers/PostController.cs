@@ -29,7 +29,7 @@ namespace tr_backend.Controllers
         {
             var posts = await postService.GetAllPostsAsync(request);
 
-            return await PaginatedList<PostResponse>.CreateAsync(posts.AsQueryable(), mapper, request.PageIndex, request.PageSize);
+            return await PaginatedList<PostResponse>.CreateAsync(posts.AsQueryable(), mapper, request.PageNumber, request.PageSize);
         }
 
         [HttpGet("myPosts")]
@@ -41,7 +41,7 @@ namespace tr_backend.Controllers
 
             var posts = await postService.GetAllPostsPerUserAsync(request, userId);
 
-            return await PaginatedList<PostResponse>.CreateAsync(posts.AsQueryable(), mapper, request.PageIndex, request.PageSize);
+            return await PaginatedList<PostResponse>.CreateAsync(posts.AsQueryable(), mapper, request.PageNumber, request.PageSize);
         }
 
         [HttpGet("{id:int}")]

@@ -175,6 +175,8 @@ builder.Services.AddScoped<IStripeService, StripeService>();
 builder.Services.AddScoped<IPostPublicationRepository, PostPublicationRepository>();
 builder.Services.AddScoped<IPostPublishService, PostPublishService>();
 builder.Services.AddScoped<IGeminiService, GeminiService>();
+builder.Services.AddScoped<IUserPromptRepository, UserPromptRepository>();
+builder.Services.AddScoped<IUserPromptService, UserPromptService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

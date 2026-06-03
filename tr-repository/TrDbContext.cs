@@ -21,6 +21,7 @@ namespace tr_repository
         public DbSet<PostPublication> PostPublications { get; set; }
         public DbSet<Platform> Platforms { get; set; }
         public DbSet<UserPlatform> UserPlatforms { get; set; }
+        public DbSet<UserPrompt> UserPrompts { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

@@ -13,6 +13,7 @@
     <PackageReference Include="MailKit" Version="4.17.0" />
     <PackageReference Include="MimeKit" Version="4.17.0" />
     <PackageReference Include="Stripe.net" Version="51.1.0" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.7.2" />
   </ItemGroup>
 
 	<ItemGroup>

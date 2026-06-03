@@ -27,6 +27,7 @@ namespace tr_repository.Seeds
                     UserName = "uzytkownikTest1",
                     NormalizedEmail = "uzytkownik@test1.com".ToUpper(),
                     NormalizedUserName = "uzytkownikTest1".ToUpper(),
+                    EmailConfirmed = true,
                     UserSettings = new UserSetting
                     {
                         IsDarkMode = false,
@@ -46,6 +47,7 @@ namespace tr_repository.Seeds
                     UserName = "adminTest1",
                     NormalizedEmail = "admin@test1.com".ToUpper(),
                     NormalizedUserName = "adminTest1".ToUpper(),
+                    EmailConfirmed = true,
                     UserSettings = new UserSetting
                     {
                         IsDarkMode = false,
