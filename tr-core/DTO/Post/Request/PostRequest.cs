@@ -10,8 +10,8 @@ namespace tr_core.DTO.Post.Request
 {
     public class PostRequest
     {
-        [MaxLength(200)]
+        [MaxLength(50)]
         public string Title { get; set; } = null!;
-        public string Body { get; set; } = null!;
+        public string? Body { get; set; }
     }
 }

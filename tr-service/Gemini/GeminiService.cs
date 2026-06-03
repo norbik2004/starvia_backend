@@ -63,6 +63,8 @@ namespace tr_service.Gemini
                 logger.LogInformation("Response received from Gemini");
 
                 post.Status = PostStatus.Generated;
+                post.PromptText = request.UserPrompt.Prompt;
+                post.Body += $"\n\n Generated text: \n\n{text}";
                 postRepository.Update(post);
                 await postRepository.SaveChangesAsync();
 

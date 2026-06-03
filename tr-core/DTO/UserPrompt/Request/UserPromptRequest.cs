@@ -9,7 +9,7 @@ namespace tr_core.DTO.UserPrompt.Request
 {
     public class UserPromptRequest
     {
-        [MaxLength(50)]
+        [MaxLength(100)]
         public required string Prompt { get; set; }
         public required int PostId { get; set; }
     }
