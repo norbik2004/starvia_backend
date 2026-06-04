@@ -9,6 +9,5 @@ namespace tr_core.Repositories
 {
     public interface IPostPublicationRepository : IRepository<PostPublication>
     {
-        public Task<List<PostPublication>> GetPostPublicationsPerUser(string userId);
     }
 }

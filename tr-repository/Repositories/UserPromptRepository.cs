@@ -17,6 +17,16 @@ namespace tr_repository.Repositories
             await dbContext.AddAsync(entity);
         }
 
+        public IQueryable<UserPrompt> GetAllAsQueryAsync()
+        {
+            return dbContext.UserPrompts.AsNoTracking();
+        }
+
+        public IQueryable<UserPrompt> GetAllAsQueryPerUserIdAsync(string userId)
+        {
+            return dbContext.UserPrompts.Where(up => up.UserId == userId).AsNoTracking();
+        }
+
         public Task<List<UserPrompt>> GetAllAsync()
         {
             return dbContext.UserPrompts.ToListAsync();
@@ -25,16 +35,6 @@ namespace tr_repository.Repositories
         public async Task<UserPrompt?> GetByIdAsync(string id)
         {
             return await dbContext.UserPrompts.FirstOrDefaultAsync(up => up.Id == Int32.Parse(id));
-        }
-
-        public IQueryable<UserPrompt> GetUserPromptsAsQuery()
-        {
-            return dbContext.UserPrompts.AsQueryable();
-        }
-
-        public IQueryable<UserPrompt> GetUserPromptsAsQueryPerUser(string userId)
-        {
-            return dbContext.UserPrompts.Where(up => up.UserId == userId).AsQueryable();
         }
 
         public void Remove(UserPrompt entity)

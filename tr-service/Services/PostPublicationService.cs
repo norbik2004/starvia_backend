@@ -1,29 +1,30 @@
 ﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using tr_core.DTO.LinkedIn.Request;
 using tr_core.DTO.PostPublication.Request;
 using tr_core.DTO.PostPublication.Response;
+using tr_core.Entities;
 using tr_core.Enums;
+using tr_core.Helpers;
+using tr_core.Repositories;
 using tr_core.Services;
 using tr_service.Exceptions;
 
 namespace tr_service.Services
 {
-    public class PostPublishService(IMapper mapper, IPostService postService, IUserPlatformService userPlatformService,
-        ILinkedInService linkedInService) : IPostPublishService
+    public class PostPublicationService(IMapper mapper, IPostService postService, IUserPlatformService userPlatformService,
+        IPostPublicationRepository postPublicationRepository, ILinkedInService linkedInService) : BaseHelpers, IPostPublishService
     {
-        public async Task<PostPublicationResponse> PublishPostToLinkedInAsync(PostPublicationRequest request, string userId)
+        public async Task<PostPublicationResponse> PublishPostToLinkedInAsync(PublishPostRequest request, string userId)
         {
             var post = await postService.GetUserPostById(request.PostId, userId);
 
             if(post == null)
                 throw new NotFoundException("Post not found");
 
-            if(post.UserId != userId)
+            if(post.Body == null)
+                throw new BadRequestException("Post body cannot be null");
+
+            if (post.UserId != userId)
             {
                 throw new UnauthorizedException("User is not the owner of the post");
             }
@@ -42,19 +43,24 @@ namespace tr_service.Services
                 Content = post.Body,
                 ExternalAccountId = userPlatform.ExternalAccountId
             };
+            
 
-            await linkedInService.PostTextAsync(linkedInPostRequest);
+            var code = await linkedInService.PostTextAsync(linkedInPostRequest);
 
-            PostPublicationResponse response = new PostPublicationResponse
-            {
-                PostId = post.Id,
-                UserPlatformId = userPlatform.Id,
-                PublishedAt = DateTime.UtcNow,
-                Status = request.Status,
-                ExternalPostId = null // This would be set to the ID returned by LinkedIn after a successful post, if available
-            };
+            var postPublicationEntity = mapper.Map<PostPublication>(request);
+
+            postPublicationEntity.Status = PostPublicationStatus.Published;
+            postPublicationEntity.PublishedAt = DateTime.UtcNow;
+            postPublicationEntity.ExternalPostId = code;
+
+            await postPublicationRepository.AddAsync(postPublicationEntity);
+            await postPublicationRepository.SaveChangesAsync();
+
+            var response = mapper.Map<PostPublicationResponse>(postPublicationEntity);
 
             return response;
         }
+
+        // TODO : implement scheduling and other platforms
     }
 }

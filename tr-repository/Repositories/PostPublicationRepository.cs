@@ -16,6 +16,18 @@ namespace tr_repository.Repositories
             await dbContext.PostPublications.AddAsync(entity);
         }
 
+        public IQueryable<PostPublication> GetAllAsQueryAsync()
+        {
+            return dbContext.PostPublications.AsNoTracking();
+        }
+
+        public IQueryable<PostPublication> GetAllAsQueryPerUserIdAsync(string userId)
+        {
+            return dbContext.PostPublications
+                .Include(pp => pp.UserPlatform)
+                .Where(pb => pb.UserPlatform.UserId == userId).AsNoTracking();
+        }
+
         public async Task<List<PostPublication>> GetAllAsync()
         {
             return await dbContext.PostPublications.ToListAsync();
@@ -24,12 +36,6 @@ namespace tr_repository.Repositories
         public async Task<PostPublication?> GetByIdAsync(string id)
         {
             return await dbContext.PostPublications.FirstOrDefaultAsync(pb => pb.Id.ToString() == id);
-        }
-
-        public async Task<List<PostPublication>> GetPostPublicationsPerUser(string userId)
-        {
-            return await dbContext.PostPublications.Where(pb => pb.UserPlatform.UserId == userId)
-                .ToListAsync();
         }
 
         public void Remove(PostPublication entity)

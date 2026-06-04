@@ -12,7 +12,7 @@ namespace tr_backend.Controllers
     public class PostPublishController(IPostPublishService postPublishService) : ControllerBase
     {
         [HttpPost("publish/linkedin")]
-        public async Task<IActionResult> PublishPostToLinkedIn([FromBody] PostPublicationRequest postRequest)
+        public async Task<IActionResult> PublishPostToLinkedIn([FromBody] PublishPostRequest postRequest)
         {
             var userId = UserHelpers.GetUserIdFromClaims(User);
 

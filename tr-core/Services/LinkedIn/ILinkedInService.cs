@@ -9,6 +9,6 @@ namespace tr_core.Services
     {
         Task<string> ExchangeCodeForAccessToken(string code, string redirectUri);
         Task<LinkedInAccountInfoResponse> GetAccountInfo(string accessToken);
-        Task PostTextAsync(LinkedInPostRequest request);
+        Task<string> PostTextAsync(LinkedInPostRequest request);
     }
 }

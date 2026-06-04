@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,13 +10,14 @@ using tr_core.DTO.Post.Request;
 using tr_core.DTO.Post.Response;
 using tr_core.Entities;
 using tr_core.Enums;
+using tr_core.Helpers;
 using tr_core.Repositories;
 using tr_core.Services;
 using tr_service.Exceptions;
 
 namespace tr_service.Services
 {
-    public class PostService(IPostRepository postRepository, IMapper mapper) : IPostService
+    public class PostService(IPostRepository postRepository, IMapper mapper) : BaseHelpers, IPostService
     {
         public async Task<PostResponse> CreatePostAsync(PostRequest request, string userId)
         {
@@ -42,16 +45,28 @@ namespace tr_service.Services
 
         public async Task<List<PostResponse>> GetAllPostsAsync(PostPaginatedParamsRequest request)
         {
-            var posts = await postRepository.GetAllAsync();
+            var posts = postRepository.GetAllAsQueryAsync();
 
-            return mapper.Map<List<PostResponse>>(posts);
+            ValidateQueryParamsDates(request.CreatedBefore, request.CreatedAfter);
+
+            posts = ApplyFilters(request, posts);
+
+            return await posts
+                .ProjectTo<PostResponse>(mapper.ConfigurationProvider)
+                .ToListAsync();
         }
 
         public async Task<List<PostResponse>> GetAllPostsPerUserAsync(PostPaginatedParamsRequest request, string userId)
         {
-            var posts = await postRepository.GetAllPostsByUserIdAsync(userId);
+            var posts = postRepository.GetAllAsQueryPerUserIdAsync(userId);
 
-            return mapper.Map<List<PostResponse>>(posts);
+            ValidateQueryParamsDates(request.CreatedBefore, request.CreatedAfter);
+
+            posts = ApplyFilters(request, posts);
+
+            return await posts
+                .ProjectTo<PostResponse>(mapper.ConfigurationProvider)
+                .ToListAsync();
         }
 
         public async Task<PostResponse> GetUserPostById(int postId, string userId)
@@ -81,6 +96,41 @@ namespace tr_service.Services
             await postRepository.SaveChangesAsync();
 
             return mapper.Map<PostResponse>(post);
+        }
+
+        private static IQueryable<Post> ApplyFilters(PostPaginatedParamsRequest request, IQueryable<Post> posts)
+        {
+            if (request.CreatedAfter != null)
+                posts = posts.Where(p => p.CreatedAt >= request.CreatedAfter);
+
+            if (request.CreatedBefore != null)
+                posts = posts.Where(p => p.CreatedAt <= request.CreatedBefore);
+
+            if (request.Status != null)
+                posts = posts.Where(p => p.Status == request.Status);
+
+            if (request.UserId != null)
+                posts = posts.Where(p => p.UserId == request.UserId);
+
+            if (request.PublishedOn != null)
+                posts = posts.Where(p => p.PostPublications.Any(p => p.UserPlatform.Platform.Type == request.PublishedOn));
+
+            if (request.HasPublication == true)
+            {
+                posts = posts.Where(p => p.PostPublications.Any());
+            }
+            else if (request.HasPublication == false)
+            {
+                posts = posts.Where(p => !p.PostPublications.Any());
+            }
+
+            if (request.TitleContains != null)
+                posts = posts.Where(p => p.Title.Contains(request.TitleContains));
+
+            if (request.BodyContains != null)
+                posts = posts.Where(p => p.Body != null && p.Body.Contains(request.BodyContains));
+
+            return posts;
         }
     }
 }

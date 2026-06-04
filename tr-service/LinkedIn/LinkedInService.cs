@@ -84,7 +84,7 @@ namespace tr_service.LinkedIn
             }
         }
 
-        public async Task PostTextAsync(LinkedInPostRequest request)
+        public async Task<string> PostTextAsync(LinkedInPostRequest request)
         {
             var accessToken = request.AccessToken;
             var authorUrn = $"urn:li:person:{request.ExternalAccountId}";
@@ -124,6 +124,15 @@ namespace tr_service.LinkedIn
             {
                 throw new BadRequestException($"LinkedIn post failed: {resp.StatusCode} - {json}");
             }
+
+            var response = JsonSerializer.Deserialize<LinkedInPostResponse>(json);
+
+            if(response == null)
+            {
+                throw new BadRequestException("Failed to parse LinkedIn post response.");
+            }
+
+            return response.Id;
         }
     }
 }

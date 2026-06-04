@@ -10,6 +10,6 @@ namespace tr_core.Services
 {
     public interface IPostPublishService
     {
-        public Task<PostPublicationResponse> PublishPostToLinkedInAsync(PostPublicationRequest request, string userId);
+        public Task<PostPublicationResponse> PublishPostToLinkedInAsync(PublishPostRequest request, string userId);
     }
 }

@@ -22,6 +22,18 @@ namespace tr_repository.Repositories
                 .AnyAsync(up => up.UserId == userId && up.PlatformId == platformId);
         }
 
+        public IQueryable<UserPlatform> GetAllAsQueryAsync()
+        {
+            return dbContext.UserPlatforms.AsNoTracking();
+        }
+
+        public IQueryable<UserPlatform> GetAllAsQueryPerUserIdAsync(string userId)
+        {
+            return dbContext.UserPlatforms
+                .Include(p => p.Platform)
+                .Where(up => up.UserId == userId).AsNoTracking();
+        }
+
         public async Task<List<UserPlatform>> GetAllAsync()
         {
             return await dbContext.UserPlatforms.ToListAsync();

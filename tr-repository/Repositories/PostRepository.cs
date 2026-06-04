@@ -16,14 +16,19 @@ namespace tr_repository.Repositories
             await dbContext.Posts.AddAsync(entity);
         }
 
+        public IQueryable<Post> GetAllAsQueryAsync()
+        {
+            return dbContext.Posts.AsNoTracking();
+        }
+
+        public IQueryable<Post> GetAllAsQueryPerUserIdAsync(string userId)
+        {
+            return dbContext.Posts.Where(p => p.UserId == userId).AsNoTracking();
+        }
+
         public async Task<List<Post>> GetAllAsync()
         {
             return await dbContext.Posts.ToListAsync();
-        }
-
-        public async Task<IEnumerable<Post>> GetAllPostsByUserIdAsync(string userId)
-        {
-            return await dbContext.Posts.Where(p => p.UserId == userId).ToListAsync();
         }
 
         public async Task<Post?> GetByIdAsync(string id)

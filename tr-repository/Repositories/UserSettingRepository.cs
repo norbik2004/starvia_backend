@@ -12,6 +12,16 @@ namespace tr_repository.Repositories
             await dbContext.UserSettings.AddAsync(entity);
         }
 
+        public IQueryable<UserSetting> GetAllAsQueryAsync()
+        {
+            return dbContext.UserSettings.AsNoTracking();
+        }
+
+        public IQueryable<UserSetting> GetAllAsQueryPerUserIdAsync(string userId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<UserSetting>> GetAllAsync()
         {
             return await dbContext.UserSettings.ToListAsync();

@@ -5,14 +5,15 @@ using tr_core.DTO.UserPrompt.Response;
 using tr_core.Repositories;
 using tr_core.Services;
 using System.Linq.Dynamic.Core;
+using tr_core.Helpers;
 namespace tr_service.Services
 {
-    public class UserPromptService(IUserPromptRepository userPromptRepository, IMapper mapper) : IUserPromptService
+    public class UserPromptService(IUserPromptRepository userPromptRepository, IMapper mapper) : BaseHelpers, IUserPromptService
     {
         public async Task<List<UserPromptResponse>> GetAllPerUserWithParamsAsync(UserPromptQueryParams queryParams, string userId)
         {
 
-            var prompts = userPromptRepository.GetUserPromptsAsQueryPerUser(userId);
+            var prompts = userPromptRepository.GetAllAsQueryPerUserIdAsync(userId);
 
             if(queryParams.PromptContains != null)
             {

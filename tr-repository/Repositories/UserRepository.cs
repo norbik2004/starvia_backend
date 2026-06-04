@@ -16,6 +16,16 @@ namespace tr_repository.Repositories
             throw new NotImplementedException();
         }
 
+        public IQueryable<User> GetAllAsQueryAsync()
+        {
+            return dbContext.Users.AsNoTracking();
+        }
+
+        public IQueryable<User> GetAllAsQueryPerUserIdAsync(string userId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<User>> GetAllAsync()
         {
             return await dbContext.Users.ToListAsync();

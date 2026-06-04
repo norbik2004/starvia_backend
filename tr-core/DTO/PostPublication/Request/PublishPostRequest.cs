@@ -8,10 +8,9 @@ using tr_core.Enums;
 
 namespace tr_core.DTO.PostPublication.Request
 {
-    public class PostPublicationRequest
+    public class PublishPostRequest
     {
         public required int PostId {  get; set; }
         public required int UserPlatformId { get; set; }
-        public required PostPublicationStatus Status = PostPublicationStatus.Published;
     }
 }

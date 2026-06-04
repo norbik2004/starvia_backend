@@ -17,6 +17,16 @@ namespace tr_repository.Repositories
             await dbContext.Platforms.AddAsync(entity);
         }
 
+        public IQueryable<Platform> GetAllAsQueryAsync()
+        {
+            return dbContext.Platforms.AsNoTracking();
+        }
+
+        public IQueryable<Platform> GetAllAsQueryPerUserIdAsync(string userId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<Platform>> GetAllAsync()
         {
             return await dbContext.Platforms.ToListAsync();

@@ -19,12 +19,13 @@ namespace tr_backend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public class PostController(IPostService postService, IMapper mapper) : ControllerBase
     {
+        
+        [HttpGet("Admin")]
         [Authorize(Roles = Roles.Admin)]
-        [HttpGet("posts")]
         [ProducesResponseType(typeof(PaginatedList<PostResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<PaginatedList<PostResponse>> GetAllPosts([FromQuery] PostPaginatedParamsRequest request)
         {
             var posts = await postService.GetAllPostsAsync(request);
@@ -32,9 +33,8 @@ namespace tr_backend.Controllers
             return await PaginatedList<PostResponse>.CreateAsync(posts.AsQueryable(), mapper, request.PageNumber, request.PageSize);
         }
 
-        [HttpGet("myPosts")]
+        [HttpGet]
         [ProducesResponseType(typeof(PaginatedList<PostResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<PaginatedList<PostResponse>> GetAllUserPosts([FromQuery] PostPaginatedParamsRequest request)
         {
             var userId = UserHelpers.GetUserIdFromClaims(User);
@@ -46,7 +46,6 @@ namespace tr_backend.Controllers
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<PostResponse> GetPostById(int id)
         {
@@ -55,9 +54,8 @@ namespace tr_backend.Controllers
             return post;
         }
 
-        [HttpPost("add")]
+        [HttpPost()]
         [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<PostResponse> CreatePost([FromBody] PostRequest request)
         {
             var userId = UserHelpers.GetUserIdFromClaims(User);
@@ -67,7 +65,6 @@ namespace tr_backend.Controllers
 
         [HttpPut("{id:int}")]
         [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<PostResponse> UpdatePost(int id, [FromBody] PostRequest request)
         {
@@ -78,7 +75,6 @@ namespace tr_backend.Controllers
 
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeletePost(int id)
         {

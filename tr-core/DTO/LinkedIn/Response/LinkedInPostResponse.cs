@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using tr_core.Entities;
 
-namespace tr_core.Repositories
+namespace tr_core.DTO.LinkedIn.Response
 {
-    public interface IPostRepository : IRepository<Post>
+    public class LinkedInPostResponse
     {
+        public string Id { get; set; }
     }
 }
