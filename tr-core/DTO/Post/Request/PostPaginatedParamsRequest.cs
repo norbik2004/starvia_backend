@@ -18,5 +18,14 @@ namespace tr_core.DTO.Post.Request
         public PlatformType? PublishedOn { get; set; }
         public DateTime? CreatedBefore { get; set; }
         public DateTime? CreatedAfter { get; set; }
+        public PostSortBy? SortBy { get; set; }
+    }
+
+    public enum PostSortBy
+    {
+        Id,
+        CreatedBy,
+        Status,
+        UpdatedBy,
     }
 }
