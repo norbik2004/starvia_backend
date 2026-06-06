@@ -13,11 +13,18 @@ namespace tr_backend.Controllers
     [Route("api/[controller]")]
     public class GeminiController(IGeminiService geminiService) : ControllerBase
     {
-        [HttpPost("ask-gemini")]
-        public async Task<GeminiResponse> TestGemini( [FromForm] GeminiRequest request)
+        [HttpPost("generate-post")]
+        public async Task GeneratePost( [FromForm] GeminiRequest request)
         {
             var userId = UserHelpers.GetUserIdFromClaims(User);
-            return await geminiService.SendRequestToGemini(userId, request);
+            await geminiService.GeneratePost(userId, request);
+        }
+
+        [HttpPost("ask-gemini")]
+        public async Task<GeminiResponse> AskGemini([FromForm] GeminiRequest request)
+        {
+            var userId = UserHelpers.GetUserIdFromClaims(User);
+            return await geminiService.AskGemini(userId, request);
         }
     }
 }

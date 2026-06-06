@@ -7,6 +7,7 @@ using tr_core.DTO.PostPublication.Response;
 using tr_core.DTO.User.Response;
 using tr_core.DTO.UserPlatform.Request;
 using tr_core.DTO.UserPlatform.Response;
+using tr_core.DTO.UserPrompt.Response;
 using tr_core.DTO.UserSetting.Request;
 using tr_core.DTO.UserSetting.Response;
 using tr_core.Entities;
@@ -30,6 +31,8 @@ namespace tr_service.Mapping
 
             CreateMap<UserSetting, UserSettingResponse>();
             CreateMap<UserSettingRequest, UserSetting>();
+
+            CreateMap<UserPrompt, UserPromptResponse>();
 
             CreateMap<PostPublication, PostPublicationResponse>();
             CreateMap<PublishPostRequest, PostPublication>();

@@ -27,13 +27,14 @@ namespace tr_service.Gemini
     /// - styl dopasowany do social media (emoji, hashtagi)
     /// - gotowy post do publikacji
     /// </summary>
-    public class GeminiLLMConfig
+    public class GeminiLlMConfig
     {
-        private GenerateContentConfig Config {  get; set; }
+        private GenerateContentConfig PostGenerationConfig { get; set; }
+        private GenerateContentConfig AskGenerationConfig { get; set; }
 
-        public GeminiLLMConfig()
+        public GeminiLlMConfig()
         {
-            Config = new GenerateContentConfig
+            PostGenerationConfig = new GenerateContentConfig
             {
                 Temperature = 0.8f,
                 TopP = 0.9f,
@@ -68,15 +69,54 @@ namespace tr_service.Gemini
                     }
                 },
             };
+
+            AskGenerationConfig = new GenerateContentConfig
+            {
+                Temperature = 0.8f,
+                TopP = 0.9f,
+                TopK = 40,
+                MaxOutputTokens = 5000,
+                CandidateCount = 1,
+                SystemInstruction = new Content
+                {
+                    Parts = new List<Part>
+                    {
+                        new Part
+                        {
+                            Text = @"
+                                    Jesteś profesjonalnym copywriterem social media.
+                                    
+                                    Odpowiadasz wyłącznie w języku polskim.
+                                    
+                                    Wymagania:
+                                    - odpowiadaj zwięźle i na temat
+                                    - możesz używać emoji i hashtagów
+                                    - NIE dodawaj komentarzy ani wyjaśnień
+                                   "
+                        }
+                    }
+                },
+            };
         }
 
         /// <summary>
         /// Zwraca skonfigurowany obiekt GenerateContentConfig.
         /// </summary>
-        public GenerateContentConfig GetConfig()
+        public GenerateContentConfig GetPostGenerationConfig()
         {
-            return Config;
+            return PostGenerationConfig;
         }
 
+        /// <summary>
+        /// Zwraca skonfigurowany obiekt GenerateContentConfig dla funkcji AskGemini,
+        /// który jest bardziej zwięzły i dostosowany do odpowiadania na pytania,
+        /// a nie generowania pełnych postów.
+        /// </summary>
+        /// <returns></returns>
+        public GenerateContentConfig GetAskGenerationConfig()
+        {
+            return AskGenerationConfig;
+
+        }
     }
 }

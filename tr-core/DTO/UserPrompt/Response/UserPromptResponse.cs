@@ -10,8 +10,8 @@ namespace tr_core.DTO.UserPrompt.Response
     {
         public required int Id { get; set; }
         public required string Prompt { get; set; }
+        public required string Response { get; set; }
         public required int PostId { get; set; }
         public required DateTime CreatedAt { get; set; }
-        public required DateTime UpdatedAt { get; set; }
     }
 }

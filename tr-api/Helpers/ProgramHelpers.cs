@@ -84,7 +84,7 @@ namespace tr_backend.Helpers
 
             builder.Services.AddSingleton(linkedInConfig);
             builder.Services.AddSingleton(stripeConfig);
-            builder.Services.AddSingleton<GeminiLLMConfig>();
+            builder.Services.AddSingleton<GeminiLlMConfig>();
             builder.Services.AddSingleton<IEmailSender, EmailSender>();
         }
     }

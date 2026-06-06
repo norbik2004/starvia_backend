@@ -10,13 +10,14 @@ namespace tr_core.Entities
     public class UserPrompt : BaseEntity, IAuditable
     {
         public required string Prompt { get; set; }
-        public required User User { get; set; }
+        public required string Response { get; set; }
+        public User User { get; set; }
 
         [ForeignKey(nameof(User))]
         public required string UserId { get; set; }
-        public required Post Post { get; set; }
+        public Post Post { get; set; }
 
         [ForeignKey(nameof(Post))]
-        public required int PostId { get; set; }
+        public int? PostId { get; set; }
     }
 }
