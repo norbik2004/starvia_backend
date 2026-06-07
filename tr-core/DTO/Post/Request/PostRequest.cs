@@ -11,7 +11,7 @@ namespace tr_core.DTO.Post.Request
     public class PostRequest
     {
         [MaxLength(75)]
-        public string Title { get; set; } = null!;
+        public required string Title { get; set; }
         [MaxLength(500)]
         public string? Body { get; set; }
     }

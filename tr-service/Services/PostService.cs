@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 using tr_core.DTO.Post.Request;
@@ -63,6 +64,11 @@ namespace tr_service.Services
             ValidateQueryParamsDates(request.CreatedBefore, request.CreatedAfter);
 
             posts = ApplyFilters(request, posts);
+
+            var sortColumn = request.SortBy?.ToString() ?? "Id";
+            var direction = request.IsAscending ? "asc" : "desc";
+
+            posts = posts.OrderBy($"{sortColumn} {direction}");
 
             return await posts
                 .ProjectTo<PostResponse>(mapper.ConfigurationProvider)
@@ -125,10 +131,10 @@ namespace tr_service.Services
             }
 
             if (request.TitleContains != null)
-                posts = posts.Where(p => p.Title.Contains(request.TitleContains));
+                posts = posts.Where(p => p.Title.Contains(request.TitleContains, StringComparison.CurrentCultureIgnoreCase));
 
             if (request.BodyContains != null)
-                posts = posts.Where(p => p.Body != null && p.Body.Contains(request.BodyContains));
+                posts = posts.Where(p => p.Body != null && p.Body.Contains(request.BodyContains, StringComparison.CurrentCultureIgnoreCase));
 
             return posts;
         }

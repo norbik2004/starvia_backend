@@ -24,8 +24,8 @@ namespace tr_core.DTO.Post.Request
     public enum PostSortBy
     {
         Id,
-        CreatedBy,
+        CreatedAt,
         Status,
-        UpdatedBy,
+        UpdatedAt,
     }
 }
