@@ -92,12 +92,14 @@ namespace tr_service.Services
             if (existingUser != null)
                 throw new BadRequestException("Account with this email address arelady exists");
 
+            var userName = request.Email.Split('@')[0];
+
             var user = new User
             {
                 Email = request.Email,
-                UserName = request.UserName,
+                UserName = userName,
                 NormalizedEmail = request.Email.ToUpper(),
-                NormalizedUserName = request.UserName.ToUpper(),
+                NormalizedUserName = userName.ToUpper(),
                 EmailConfirmed = false
             };
 
@@ -105,8 +107,7 @@ namespace tr_service.Services
 
             if (!result.Succeeded)
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new BadRequestException(errors);
+                throw new BadRequestException("Couldn't register user");
             }
 
             await userManager.AddToRoleAsync(user, Roles.User);

@@ -19,6 +19,7 @@
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="NetArchTest.Rules" Version="1.3.2" />
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
@@ -26,14 +27,13 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\tr-core\tr-core.csproj" />
+		<ProjectReference Include="..\tr-repository\tr-repository.csproj" />
+		<ProjectReference Include="..\tr-service\tr-service.csproj" />
+		<ProjectReference Include="..\tr-api\tr-api.csproj" />
 	</ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>

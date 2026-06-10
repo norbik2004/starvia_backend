@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>tr_backend</RootNamespace>
+    <RootNamespace>tr_api</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
