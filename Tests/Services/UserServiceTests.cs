@@ -24,8 +24,8 @@ namespace tr_tests.Services
                 Mock.Of<IUserStore<User>>(),
                 null, null, null, null, null, null, null, null);
 
-            _userServiceMock = new Mock<IUserService>(_userManagerMock.Object,
-                );
+            //_userServiceMock = new Mock<IUserService>(_userManagerMock.Object,
+               // );
 
         }
     }

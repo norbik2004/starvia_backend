@@ -14,7 +14,7 @@ namespace tr_tests
         public void Core_Should_Not_HaveDependencyOnOtherProjects()
         {
             // Arrange
-            var assembly = typeof(tr_core.ApplicationSettings).Assembly;
+            var assembly = typeof(tr_core.AssemblyReference).Assembly;
 
             var otherProjects = new[]
             {
@@ -38,7 +38,7 @@ namespace tr_tests
         public void Repository_Should_Not_HaveDependencyOnOtherProjects()
         {
             // Arrange
-            var assembly = typeof(tr_repository.TrDbContext).Assembly;
+            var assembly = typeof(tr_repository.AssemblyReference).Assembly;
 
             var otherProjects = new[]
             {
@@ -61,7 +61,7 @@ namespace tr_tests
         public void Service_Should_Not_HaveDependencyOnOtherProjects()
         {
             // Arrange
-            var assembly = typeof(tr_service.Email.EmailSender).Assembly;
+            var assembly = typeof(tr_service.AssemblyReference).Assembly;
 
             var otherProjects = new[]
             {
