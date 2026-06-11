@@ -2,10 +2,10 @@
 using MimeKit;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Logging;
-using Core.Services.Email;
-using Core.DTO.Email.Models;
+using Core.Application.Services.Email;
+using Core.Application.DTO.Email.Models;
 using Service.Email.Forms;
-using Core;
+using Core.Application;
 
 namespace Service.Email
 {

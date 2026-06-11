@@ -1,5 +1,4 @@
-﻿using dotenv.net;
-using Google.GenAI;
+﻿using Google.GenAI;
 using Google.GenAI.Types;
 using Microsoft.Extensions.Logging;
 using System;
@@ -7,13 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Core.DTO.Gemini;
-using Core.DTO.Gemini.Request;
-using Core.Entities;
-using Core.Enums;
-using Core.Repositories;
-using Core.Services;
-using Core.Services.Gemini;
+using Core.Application.DTO.Gemini;
+using Core.Application.DTO.Gemini.Request;
+using Core.Domain.Entities;
+using Core.Domain.Enums;
+using Core.Infrastructure.Repositories;
+using Core.Application.Services;
+using Core.Application.Services.Gemini;
 using Service.Exceptions;
 
 namespace Service.Gemini

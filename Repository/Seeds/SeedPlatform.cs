@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Core.Entities;
-using Core.Enums;
+using Core.Domain.Entities;
+using Core.Domain.Enums;
 
 namespace Repository.Seeds
 {

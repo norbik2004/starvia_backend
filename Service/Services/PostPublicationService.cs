@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using Core.DTO.LinkedIn.Request;
-using Core.DTO.PostPublication.Request;
-using Core.DTO.PostPublication.Response;
-using Core.Entities;
-using Core.Enums;
-using Core.Helpers;
-using Core.Repositories;
-using Core.Services;
+using Core.Application.DTO.LinkedIn.Request;
+using Core.Application.DTO.PostPublication.Request;
+using Core.Application.DTO.PostPublication.Response;
+using Core.Domain.Entities;
+using Core.Domain.Enums;
+using Core.Application.Helpers;
+using Core.Infrastructure.Repositories;
+using Core.Application.Services;
 using Service.Exceptions;
 
 namespace Service.Services

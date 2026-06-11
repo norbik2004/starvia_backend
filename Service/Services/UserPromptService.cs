@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Core.DTO.UserPrompt.Request;
-using Core.DTO.UserPrompt.Response;
-using Core.Repositories;
-using Core.Services;
+using Core.Application.DTO.UserPrompt.Request;
+using Core.Application.DTO.UserPrompt.Response;
+using Core.Infrastructure.Repositories;
+using Core.Application.Services;
 using System.Linq.Dynamic.Core;
-using Core.Helpers;
+using Core.Application.Helpers;
 namespace Service.Services
 {
     public class UserPromptService(IUserPromptRepository userPromptRepository, IMapper mapper) : BaseHelpers, IUserPromptService

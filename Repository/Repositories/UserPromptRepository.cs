@@ -5,8 +5,8 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
-using Core.Entities;
-using Core.Repositories;
+using Core.Domain.Entities;
+using Core.Infrastructure.Repositories;
 
 namespace Repository.Repositories
 {

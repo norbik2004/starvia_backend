@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Web.Helpers;
-using Core.DTO.UserPrompt.Request;
-using Core.DTO.UserPrompt.Response;
-using Core.Services;
+using Core.Application.DTO.UserPrompt.Request;
+using Core.Application.DTO.UserPrompt.Response;
+using Core.Application.Services;
 using Service.Mapping;
 
 namespace Web.Controllers

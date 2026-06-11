@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Core.Entities;
-using Core.Enums;
-using Core.Repositories;
+using Core.Domain.Entities;
+using Core.Domain.Enums;
+using Core.Infrastructure.Repositories;
 
 namespace Repository.Repositories
 {

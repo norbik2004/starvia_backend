@@ -1,8 +1,8 @@
 ﻿using dotenv.net;
 using Google.GenAI;
 using Stripe;
-using Core.DTO.Stripe;
-using Core.Services.Email;
+using Core.Application.DTO.Stripe;
+using Core.Application.Services.Email;
 using Service.Email;
 using Service.Exceptions;
 using Service.Gemini;

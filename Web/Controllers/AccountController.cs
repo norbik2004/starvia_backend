@@ -5,12 +5,13 @@ using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using Web.Helpers;
 using Core;
-using Core.Consts;
-using Core.DTO.User.Request;
-using Core.DTO.User.Response;
-using Core.Services;
+using Core.Domain.Consts;
+using Core.Application.DTO.User.Request;
+using Core.Application.DTO.User.Response;
+using Core.Application.Services;
 using Service.Exceptions;
 using Service.Mapping;
+using Core.Application;
 
 namespace Web.Controllers
 {

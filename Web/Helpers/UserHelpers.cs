@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Core.Entities;
+using Core.Domain.Entities;
 using Service.Exceptions;
 
 namespace Web.Helpers

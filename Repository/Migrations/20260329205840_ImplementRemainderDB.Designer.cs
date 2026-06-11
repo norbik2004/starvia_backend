@@ -157,7 +157,7 @@ namespace Repository.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Entities.Platform", b =>
+            modelBuilder.Entity("Core.Domain.Entities.Platform", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -174,7 +174,7 @@ namespace Repository.Migrations
                     b.ToTable("Platforms");
                 });
 
-            modelBuilder.Entity("Core.Entities.Post", b =>
+            modelBuilder.Entity("Core.Domain.Entities.Post", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -204,7 +204,7 @@ namespace Repository.Migrations
                     b.ToTable("Posts");
                 });
 
-            modelBuilder.Entity("Core.Entities.PostPlatform", b =>
+            modelBuilder.Entity("Core.Domain.Entities.PostPlatform", b =>
                 {
                     b.Property<int>("PostId")
                         .HasColumnType("integer");
@@ -223,7 +223,7 @@ namespace Repository.Migrations
                     b.ToTable("PostPlatforms");
                 });
 
-            modelBuilder.Entity("Core.Entities.User", b =>
+            modelBuilder.Entity("Core.Domain.Entities.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -293,7 +293,7 @@ namespace Repository.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Entities.UserSetting", b =>
+            modelBuilder.Entity("Core.Domain.Entities.UserSetting", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("text");
@@ -320,7 +320,7 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Core.Entities.User", null)
+                    b.HasOne("Core.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -329,7 +329,7 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Core.Entities.User", null)
+                    b.HasOne("Core.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -344,7 +344,7 @@ namespace Repository.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Entities.User", null)
+                    b.HasOne("Core.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -353,16 +353,16 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Core.Entities.User", null)
+                    b.HasOne("Core.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Core.Entities.Post", b =>
+            modelBuilder.Entity("Core.Domain.Entities.Post", b =>
                 {
-                    b.HasOne("Core.Entities.User", "User")
+                    b.HasOne("Core.Domain.Entities.User", "User")
                         .WithMany("Posts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -371,15 +371,15 @@ namespace Repository.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Entities.PostPlatform", b =>
+            modelBuilder.Entity("Core.Domain.Entities.PostPlatform", b =>
                 {
-                    b.HasOne("Core.Entities.Platform", "Platform")
+                    b.HasOne("Core.Domain.Entities.Platform", "Platform")
                         .WithMany("PostPlatforms")
                         .HasForeignKey("PlatformId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Entities.Post", "Post")
+                    b.HasOne("Core.Domain.Entities.Post", "Post")
                         .WithMany("PostPlatforms")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -390,28 +390,28 @@ namespace Repository.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("Core.Entities.UserSetting", b =>
+            modelBuilder.Entity("Core.Domain.Entities.UserSetting", b =>
                 {
-                    b.HasOne("Core.Entities.User", "User")
+                    b.HasOne("Core.Domain.Entities.User", "User")
                         .WithOne("UserSetting")
-                        .HasForeignKey("Core.Entities.UserSetting", "UserId")
+                        .HasForeignKey("Core.Domain.Entities.UserSetting", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Entities.Platform", b =>
+            modelBuilder.Entity("Core.Domain.Entities.Platform", b =>
                 {
                     b.Navigation("PostPlatforms");
                 });
 
-            modelBuilder.Entity("Core.Entities.Post", b =>
+            modelBuilder.Entity("Core.Domain.Entities.Post", b =>
                 {
                     b.Navigation("PostPlatforms");
                 });
 
-            modelBuilder.Entity("Core.Entities.User", b =>
+            modelBuilder.Entity("Core.Domain.Entities.User", b =>
                 {
                     b.Navigation("Posts");
 

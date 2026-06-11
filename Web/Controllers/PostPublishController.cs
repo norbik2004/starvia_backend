@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Helpers;
-using Core.DTO.PostPublication.Request;
-using Core.Services;
+using Core.Application.DTO.PostPublication.Request;
+using Core.Application.Services;
 
 namespace Web.Controllers
 {

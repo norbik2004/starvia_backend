@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Core.Consts;
-using Core.DTO.User.Request;
-using Core.DTO.User.Response;
-using Core.DTO.UserPlatform.Response;
-using Core.Services;
+using Core.Domain.Consts;
+using Core.Application.DTO.User.Request;
+using Core.Application.DTO.User.Response;
+using Core.Application.DTO.UserPlatform.Response;
+using Core.Application.Services;
 using Service.Mapping;
 using Service.Services;
 

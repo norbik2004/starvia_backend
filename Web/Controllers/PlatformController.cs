@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Core.DTO.Platform.Response;
-using Core.DTO.Post.Response;
-using Core.Services;
+using Core.Application.DTO.Platform.Response;
+using Core.Application.DTO.Post.Response;
+using Core.Application.Services;
 
 namespace Web.Controllers
 {

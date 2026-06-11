@@ -7,10 +7,10 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Core.DTO.LinkedIn;
-using Core.DTO.LinkedIn.Request;
-using Core.DTO.LinkedIn.Response;
-using Core.Services;
+using Core.Application.DTO.LinkedIn;
+using Core.Application.DTO.LinkedIn.Request;
+using Core.Application.DTO.LinkedIn.Response;
+using Core.Application.Services;
 using Service.Exceptions;
 
 namespace Service.LinkedIn

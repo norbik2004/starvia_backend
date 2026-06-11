@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
-using Core.DTO.Platform.Response;
-using Core.DTO.Post.Request;
-using Core.DTO.Post.Response;
-using Core.DTO.PostPublication.Request;
-using Core.DTO.PostPublication.Response;
-using Core.DTO.User.Response;
-using Core.DTO.UserPlatform.Request;
-using Core.DTO.UserPlatform.Response;
-using Core.DTO.UserPrompt.Response;
-using Core.DTO.UserSetting.Request;
-using Core.DTO.UserSetting.Response;
-using Core.Entities;
+using Core.Application.DTO.Platform.Response;
+using Core.Application.DTO.Post.Request;
+using Core.Application.DTO.Post.Response;
+using Core.Application.DTO.PostPublication.Request;
+using Core.Application.DTO.PostPublication.Response;
+using Core.Application.DTO.User.Response;
+using Core.Application.DTO.UserPlatform.Request;
+using Core.Application.DTO.UserPlatform.Response;
+using Core.Application.DTO.UserPrompt.Response;
+using Core.Application.DTO.UserSetting.Request;
+using Core.Application.DTO.UserSetting.Response;
+using Core.Domain.Entities;
 
 namespace Service.Mapping
 {

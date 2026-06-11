@@ -9,10 +9,10 @@ using System.Threading.RateLimiting;
 using Web.Helpers;
 using Web.Middlewares;
 using Core;
-using Core.Entities;
-using Core.Repositories;
-using Core.Services;
-using Core.Services.Gemini;
+using Core.Domain.Entities;
+using Core.Infrastructure.Repositories;
+using Core.Application.Services;
+using Core.Application.Services.Gemini;
 using Repository;
 using Repository.Repositories;
 using Repository.Seeds;
@@ -23,6 +23,7 @@ using Service.LinkedIn;
 using Service.Mapping;
 using Service.Services;
 using Web.Helpers;
+using Core.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 

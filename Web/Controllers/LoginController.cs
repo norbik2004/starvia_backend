@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Core.DTO.Platform.Response;
-using Core.DTO.User.Request;
-using Core.Entities;
+using Core.Application.DTO.Platform.Response;
+using Core.Application.DTO.User.Request;
+using Core.Domain.Entities;
 using Service.Exceptions;
 
 namespace Web.Controllers

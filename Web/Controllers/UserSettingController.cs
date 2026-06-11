@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Core.DTO.UserSetting.Request;
-using Core.DTO.UserSetting.Response;
-using Core.Services;
+using Core.Application.DTO.UserSetting.Request;
+using Core.Application.DTO.UserSetting.Response;
+using Core.Application.Services;
 using Service.Services;
 
 namespace Web.Controllers

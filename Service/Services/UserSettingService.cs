@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using System.Threading.Tasks;
-using Core.DTO.UserSetting.Request;
-using Core.DTO.UserSetting.Response;
-using Core.Entities;
-using Core.Repositories;
-using Core.Services;
+using Core.Application.DTO.UserSetting.Request;
+using Core.Application.DTO.UserSetting.Response;
+using Core.Domain.Entities;
+using Core.Infrastructure.Repositories;
+using Core.Application.Services;
 using Service.Exceptions;
 
 namespace Service.Services

@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Core.Services;
+using Core.Application.Services;
 using Web.Helpers;
 using System.Threading.Tasks;
-using Core.DTO.UserPlatform.Request;
+using Core.Application.DTO.UserPlatform.Request;
 using Service.LinkedIn;
-using Core.DTO.LinkedIn;
-using Core.DTO.LinkedIn.Request;
-using Core.Enums;
+using Core.Application.DTO.LinkedIn;
+using Core.Application.DTO.LinkedIn.Request;
+using Core.Domain.Enums;
 
 namespace Web.Controllers
 {

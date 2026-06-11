@@ -5,10 +5,10 @@ using Stripe;
 using Stripe.Checkout;
 using System.IO;
 using Web.Helpers;
-using Core.DTO.Stripe;
-using Core.DTO.Stripe.Request;
-using Core.Entities;
-using Core.Services;
+using Core.Application.DTO.Stripe;
+using Core.Application.DTO.Stripe.Request;
+using Core.Domain.Entities;
+using Core.Application.Services;
 
 namespace Web.Controllers;
 

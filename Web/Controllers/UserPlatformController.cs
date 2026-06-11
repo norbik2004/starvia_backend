@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Web.Helpers;
-using Core.DTO.UserPlatform.Request;
-using Core.DTO.UserPlatform.Response;
-using Core.Services;
+using Core.Application.DTO.UserPlatform.Request;
+using Core.Application.DTO.UserPlatform.Response;
+using Core.Application.Services;
 using Service.Exceptions;
 
 namespace Web.Controllers

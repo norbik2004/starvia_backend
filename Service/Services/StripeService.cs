@@ -7,10 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Core.DTO.Stripe;
-using Core.DTO.Stripe.Request;
-using Core.DTO.Stripe.Response;
-using Core.Services;
+using Core.Application.DTO.Stripe;
+using Core.Application.DTO.Stripe.Request;
+using Core.Application.DTO.Stripe.Response;
+using Core.Application.Services;
 using Repository;
 using Service.Exceptions;
 

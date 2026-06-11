@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using Core.Entities;
-using Core.Repositories;
+using Core.Domain.Entities;
+using Core.Infrastructure.Repositories;
 
 namespace Repository.Repositories
 {

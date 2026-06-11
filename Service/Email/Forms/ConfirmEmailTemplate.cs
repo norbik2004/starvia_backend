@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Core.DTO.Email.Models;
+using Core.Application.DTO.Email.Models;
 
 namespace Service.Email.Forms
 {

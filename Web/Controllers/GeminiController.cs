@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Helpers;
-using Core.DTO.Gemini;
-using Core.DTO.Gemini.Request;
-using Core.Enums;
-using Core.Services.Gemini;
+using Core.Application.DTO.Gemini;
+using Core.Application.DTO.Gemini.Request;
+using Core.Domain.Enums;
+using Core.Application.Services.Gemini;
 
 namespace Web.Controllers
 {

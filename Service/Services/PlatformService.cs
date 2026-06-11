@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Core.DTO.Platform.Response;
-using Core.Enums;
-using Core.Repositories;
-using Core.Services;
+using Core.Application.DTO.Platform.Response;
+using Core.Domain.Enums;
+using Core.Infrastructure.Repositories;
+using Core.Application.Services;
 using Service.Exceptions;
 
 namespace Service.Services
