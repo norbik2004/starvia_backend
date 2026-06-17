@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ArchitectureTests.NamingConventions
+namespace Core.Domain
 {
-    internal class DtoNamingTests
+    public sealed class AssemblyReference
     {
     }
 }

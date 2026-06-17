@@ -1,4 +1,4 @@
-﻿namespace tr_api
+﻿namespace Web
 {
     public sealed class AssemblyReference
     {

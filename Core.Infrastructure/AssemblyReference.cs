@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ArchitectureTests.LayerRules
+namespace Core.Infrastructure
 {
-    internal class ApiRulesTests
+    public sealed class AssemblyReference
     {
     }
 }

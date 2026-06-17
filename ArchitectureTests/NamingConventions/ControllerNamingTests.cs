@@ -1,4 +1,7 @@
-﻿using System;
+﻿using ArchitectureTests.Shared;
+using FluentAssertions;
+using NetArchTest.Rules;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +9,104 @@ using System.Threading.Tasks;
 
 namespace ArchitectureTests.NamingConventions
 {
-    internal class ControllerNamingTests
+    public class ControllerNamingTests : ArchitectureTestsBase
     {
+        [Fact]
+        public void Controllers_Should_EndWith_Controller()
+        {
+            var result = Types
+                .InAssembly(Web)
+                .That()
+                .ResideInNamespace(WebNamespace + ".Controllers")
+                .Should()
+                .HaveNameEndingWith("Controller")
+                .GetResult();
+
+            result.IsSuccessful.Should().BeTrue();
+        }
+
+        [Fact]
+        public void Controllers_Should_Be_Public()
+        {
+            var result = Types
+                .InAssembly(Web)
+                .That()
+                .HaveNameEndingWith("Controller")
+                .Should()
+                .BePublic()
+                .GetResult();
+
+            result.IsSuccessful.Should().BeTrue();
+        }
+
+        [Fact]
+        public void Controllers_Should_Not_Be_Abstract()
+        {
+            var result = Types
+                .InAssembly(Web)
+                .That()
+                .HaveNameEndingWith("Controller")
+                .ShouldNot()
+                .BeAbstract()
+                .GetResult();
+
+            result.IsSuccessful.Should().BeTrue();
+        }
+
+        [Fact]
+        public void Controllers_Should_Not_Be_Static()
+        {
+            var result = Types
+                .InAssembly(Web)
+                .That()
+                .HaveNameEndingWith("Controller")
+                .ShouldNot()
+                .BeStatic()
+                .GetResult();
+
+            result.IsSuccessful.Should().BeTrue();
+        }
+
+        [Fact]
+        public void Controllers_Should_Not_Be_Named_Service()
+        {
+            var result = Types
+                .InAssembly(Web)
+                .That()
+                .HaveNameEndingWith("Controller")
+                .ShouldNot()
+                .HaveNameEndingWith("Service")
+                .GetResult();
+
+            result.IsSuccessful.Should().BeTrue();
+        }
+
+        [Fact]
+        public void Controllers_Should_Not_Be_Repositories()
+        {
+            var result = Types
+                .InAssembly(Web)
+                .That()
+                .HaveNameEndingWith("Controller")
+                .ShouldNot()
+                .HaveNameEndingWith("Repository")
+                .GetResult();
+
+            result.IsSuccessful.Should().BeTrue();
+        }
+
+        [Fact]
+        public void Controllers_Should_Reside_In_Web_Namespace()
+        {
+            var result = Types
+                .InAssembly(Web)
+                .That()
+                .HaveNameEndingWith("Controller")
+                .Should()
+                .ResideInNamespace(WebNamespace)
+                .GetResult();
+
+            result.IsSuccessful.Should().BeTrue();
+        }
     }
 }
