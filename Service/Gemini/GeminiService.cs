@@ -20,7 +20,7 @@ namespace Service.Gemini
     public class GeminiService(ILogger<IGeminiService> logger, IUserService userService, IPostRepository postRepository,
         IUserPromptRepository userPromptRepository, Client geminiClient, GeminiLlMConfig config) : IGeminiService
     {
-        public async Task<GeminiResponse> AskGemini(string userId, GeminiRequest request)
+        public async Task<string> AskGemini(string userId, GeminiRequest request)
         {
             _ = await UserAccesibilityValidation(userId, request);
 
@@ -28,6 +28,7 @@ namespace Service.Gemini
             {
                 logger.LogInformation("Sending request to Gemini");
 
+                //TODO: add last conversation context to the prompt
                 var response = await geminiClient.Models.GenerateContentAsync(
                     model: request.Model.ToModelString(),
                     contents: request.UserPrompt.Prompt,
@@ -58,10 +59,7 @@ namespace Service.Gemini
                 await userPromptRepository.AddAsync(userPrompt);
                 await userPromptRepository.SaveChangesAsync();
 
-                return new GeminiResponse
-                {
-                    Response = text
-                };
+                return text;
 
             }
             catch (Exception ex)
@@ -72,7 +70,7 @@ namespace Service.Gemini
             }
         }
 
-        public async Task GeneratePost(string userId, GeminiRequest request)
+        public async Task<string> GeneratePost(string userId, GeminiRequest request)
         {
             var post = await UserAccesibilityValidation(userId, request);
 
@@ -112,12 +110,7 @@ namespace Service.Gemini
                 await userPromptRepository.AddAsync(userPrompt);
                 await userPromptRepository.SaveChangesAsync();
 
-                post.Status = PostStatus.Generated;
-                post.PromptText = request.UserPrompt.Prompt;
-                post.Body += $"\n\n Wygenerowany tekst: \n\n{text}";
-
-                postRepository.Update(post);
-                await postRepository.SaveChangesAsync();
+                return text;
 
             }
             catch (Exception ex)

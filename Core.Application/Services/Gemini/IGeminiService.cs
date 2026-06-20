@@ -11,7 +11,7 @@ namespace Core.Application.Services.Gemini
 {
     public interface IGeminiService
     {
-        public Task GeneratePost(string userId, GeminiRequest request);
-        public Task<GeminiResponse> AskGemini(string userId, GeminiRequest request);
+        public Task<string> GeneratePost(string userId, GeminiRequest request);
+        public Task<string> AskGemini(string userId, GeminiRequest request);
     }
 }

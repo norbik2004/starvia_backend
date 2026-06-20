@@ -12,7 +12,7 @@ namespace Core.Application.DTO.Post.Request
     {
         [MaxLength(75)]
         public required string Title { get; set; }
-        [MaxLength(500)]
+        [MaxLength(1000)]
         public string? Body { get; set; }
     }
 }
