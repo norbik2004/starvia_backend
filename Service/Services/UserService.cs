@@ -77,11 +77,6 @@ namespace Service.Services
             var userToReturn = mapper.Map<UserResponse>(user);
             userToReturn.Roles = roles;
 
-            var userPostsCount = user.Posts.Select(c => c.PostPublications.Count(p => p.Status == PostPublicationStatus.Published)).Sum();
-
-            userToReturn.PostsPublished = userPostsCount;
-            userToReturn.PostsGenerated = user.Posts.Count(c => c.Status == PostStatus.Generated);
-
             return userToReturn;
         }
 

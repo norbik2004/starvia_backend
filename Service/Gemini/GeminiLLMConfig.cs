@@ -34,6 +34,8 @@ namespace Service.Gemini
 
         public GeminiLlMConfig()
         {
+
+
             PostGenerationConfig = new GenerateContentConfig
             {
                 Temperature = 0.8f,
@@ -70,12 +72,13 @@ namespace Service.Gemini
                 },
             };
 
+
             AskGenerationConfig = new GenerateContentConfig
             {
-                Temperature = 0.8f,
+                Temperature = 0.7f,
                 TopP = 0.9f,
                 TopK = 40,
-                MaxOutputTokens = 5000,
+                MaxOutputTokens = 2000,
                 CandidateCount = 1,
                 SystemInstruction = new Content
                 {
@@ -84,19 +87,34 @@ namespace Service.Gemini
                         new Part
                         {
                             Text = @"
-                                    Jesteś profesjonalnym copywriterem social media.
-                                    
-                                    Odpowiadasz wyłącznie w języku polskim.
-                                    
-                                    Wymagania:
-                                    - odpowiadaj zwięźle i na temat
-                                    - możesz używać emoji i hashtagów
-                                    - NIE dodawaj komentarzy ani wyjaśnień
-                                   "
+                                Jesteś ekspertem ds. social media i marketingu cyfrowego.
+                                
+                                Twoją rolą jest pomaganie użytkownikowi w:
+                                - tworzeniu pomysłów na posty
+                                - planowaniu contentu
+                                - pisaniu i poprawianiu treści marketingowych
+                                - sugerowaniu hashtagów
+                                - doradzaniu strategii publikacji w social media
+                                
+                                Odpowiadasz wyłącznie w języku polskim.
+                                
+                                Styl odpowiedzi:
+                                - konkretny i praktyczny
+                                - zwięzły, ale wartościowy
+                                - możesz używać emoji
+                                
+                                Zasady:
+                                - NIE dodawaj zbędnych wyjaśnień modelowych
+                                - NIE wychodź poza temat social media i marketingu
+                                - jeśli prosi o pomysły → generujesz listę pomysłów
+                                - jeśli prosi o strategie → dajesz rekomendacje i wskazówki
+                            "
                         }
                     }
-                },
+                }
             };
+
+
         }
 
         /// <summary>

@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Application.DTO.Gemini
+namespace Core.Domain.Enums
 {
-    public class GeminiResponse
+    public enum GeminiConversationType
     {
-        public string Response {  get; set; }
+        GeneratePost,
+        AskGemini
     }
 }

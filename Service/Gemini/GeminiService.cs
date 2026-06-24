@@ -1,141 +1,145 @@
-﻿using Google.GenAI;
+﻿using Core.Application.DTO.UserPrompt.Request;
+using Core.Application.Services;
+using Core.Application.Services.Gemini;
+using Core.Domain.Entities;
+using Core.Domain.Enums;
+using Core.Infrastructure.Repositories;
+using Google.GenAI;
 using Google.GenAI.Types;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Abstractions;
+using Service.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Core.Application.DTO.Gemini;
-using Core.Application.DTO.Gemini.Request;
-using Core.Domain.Entities;
-using Core.Domain.Enums;
-using Core.Infrastructure.Repositories;
-using Core.Application.Services;
-using Core.Application.Services.Gemini;
-using Service.Exceptions;
 
 namespace Service.Gemini
 {
     public class GeminiService(ILogger<IGeminiService> logger, IUserService userService, IPostRepository postRepository,
-        IUserPromptRepository userPromptRepository, Client geminiClient, GeminiLlMConfig config) : IGeminiService
+        IUserPromptRepository userPromptRepository, Client geminiClient, GeminiLlMConfig config,
+        IGeminiModelHealthService geminiModelHealthService) : IGeminiService
     {
-        public async Task<GeminiResponse> AskGemini(string userId, GeminiRequest request)
-        {
-            _ = await UserAccesibilityValidation(userId, request);
 
-            try
-            {
-                logger.LogInformation("Sending request to Gemini");
-
-                var response = await geminiClient.Models.GenerateContentAsync(
-                    model: request.Model.ToModelString(),
-                    contents: request.UserPrompt.Prompt,
-                    config: config.GetAskGenerationConfig()
-                );
-
-                var text = response?.Candidates?
-                    .FirstOrDefault()?
-                    .Content?
-                    .Parts?
-                    .FirstOrDefault()?
-                    .Text;
-
-                if (string.IsNullOrWhiteSpace(text))
-                {
-                    logger.LogWarning("Empty response from Gemini");
-                    throw new BadRequestException("Gemini returned null");
-                }
-
-                var userPrompt = new UserPrompt
-                {
-                    Prompt = request.UserPrompt.Prompt,
-                    Response = text,
-                    UserId = userId,
-                    PostId = request.UserPrompt.PostId
-                };
-
-                await userPromptRepository.AddAsync(userPrompt);
-                await userPromptRepository.SaveChangesAsync();
-
-                return new GeminiResponse
-                {
-                    Response = text
-                };
-
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error while calling Gemini");
-
-                throw new BadRequestException("Error while communicating with gemini", ex);
-            }
-        }
-
-        public async Task GeneratePost(string userId, GeminiRequest request)
+        public async Task<string> AskAiPostScope(
+            string userId,
+            UserPromptRequest request)
         {
             var post = await UserAccesibilityValidation(userId, request);
 
-            try
+            var models = await GetAvailableModelsAsync(
+                GeminiModelType.Gemini3FlashPreview);
+
+            if (models.Count == 0)
             {
-                logger.LogInformation("Sending request to Gemini");
+                throw new BadRequestException(
+                    "Our Ai models are currently unavalible, please try again in 5 minutes");
+            }
 
-                var response = await geminiClient.Models.GenerateContentAsync(
-                    model: request.Model.ToModelString(),
-                    contents: request.UserPrompt.Prompt,
-                    config: config.GetPostGenerationConfig()
-                );
+            GenerateContentConfig configuration = request.ConversationType switch
+            {
+                GeminiConversationType.GeneratePost => config.GetPostGenerationConfig(),
+                GeminiConversationType.AskGemini => config.GetAskGenerationConfig(),
+                _ => throw new BadRequestException("Invalid conversation type"),
+            };
 
-                var text = response?.Candidates?
-                    .FirstOrDefault()?
-                    .Content?
-                    .Parts?
-                    .FirstOrDefault()?
-                    .Text;
+            var content = new List<Content>();
 
-                if (string.IsNullOrWhiteSpace(text))
+            if (request.ConversationType == GeminiConversationType.AskGemini)
+            {
+                var previousPrompts = await userPromptRepository
+                    .GetAllPerPostIdAndUserIdConversationVise(request.PostId, userId);
+
+                content.AddRange(BuildContents(previousPrompts));
+            }
+
+            content.Add(new Content
+            {
+                Role = "user",
+                Parts =
+                [
+                    new Part { Text = request.Prompt }
+                ]
+            });
+
+            Exception? lastException = null;
+
+            foreach (var model in models)
+            {
+                try
                 {
-                    logger.LogWarning("Empty response from Gemini");
-                    throw new BadRequestException("Gemini returned null");
+                    logger.LogInformation(
+                        "Trying Gemini model {Model}",
+                        model);
+
+                    var response = await geminiClient.Models.GenerateContentAsync(
+                        model: model.ToModelString(),
+                        contents: content,
+                        config: configuration
+                    );
+
+                    var text = response?.Candidates?
+                        .FirstOrDefault()?
+                        .Content?
+                        .Parts?
+                        .FirstOrDefault()?
+                        .Text;
+
+                    if (string.IsNullOrWhiteSpace(text))
+                    {
+                        throw new BadRequestException(
+                            $"Empty response from Ai");
+                    }
+
+                    var userPrompt = new UserPrompt
+                    {
+                        Prompt = request.Prompt,
+                        Response = text,
+                        UserId = userId,
+                        PostId = post.Id,
+                        ConversationType = request.ConversationType
+                    };
+
+                    await userPromptRepository.AddAsync(userPrompt);
+                    await userPromptRepository.SaveChangesAsync();
+
+                    logger.LogInformation(
+                        "Model {Model} succeeded",
+                        model);
+
+                    return text;
                 }
-
-                logger.LogInformation("Response received from Gemini");
-
-                var userPrompt = new UserPrompt
+                catch (Exception ex)
                 {
-                    Prompt = request.UserPrompt.Prompt,
-                    Response = text,
-                    UserId = userId,
-                    PostId = post.Id
-                };
+                    lastException = ex;
 
-                await userPromptRepository.AddAsync(userPrompt);
-                await userPromptRepository.SaveChangesAsync();
+                    logger.LogWarning(
+                        ex,
+                        "Model {Model} failed. Marking as unhealthy.",
+                        model);
 
-                post.Status = PostStatus.Generated;
-                post.PromptText = request.UserPrompt.Prompt;
-                post.Body += $"\n\n Wygenerowany tekst: \n\n{text}";
+                    await geminiModelHealthService.MarkAsFailedAsync(model);
 
-                postRepository.Update(post);
-                await postRepository.SaveChangesAsync();
-
+                }
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error while calling Gemini");
 
-                throw new BadRequestException("Error while communicating with gemini", ex);
-            }
+            logger.LogError(
+                lastException,
+                "All Gemini models failed.");
+
+            throw new BadRequestException(
+                "Our Ai models are currently unavalible, please try again in 5 minutes");
         }
 
-        private async Task<Post> UserAccesibilityValidation(string userId, GeminiRequest request)
+        private async Task<Post> UserAccesibilityValidation(string userId, UserPromptRequest request)
         {
             bool canUserAccessAi = await userService.CanUserAccessAi(userId);
 
             if (!canUserAccessAi)
                 throw new BadRequestException("User has used hit limit, can't access Ai");
 
-            var post = await postRepository.GetByIdAsync(request.UserPrompt.PostId.ToString())
+            var post = await postRepository.GetByIdAsync(request.PostId.ToString())
                     ?? throw new NotFoundException("Post was not found");
 
             if (post.UserId != userId)
@@ -144,6 +148,54 @@ namespace Service.Gemini
             }
 
             return post;
+        }
+
+        private async Task<List<GeminiModelType>> GetAvailableModelsAsync(
+            GeminiModelType preferredModel)
+        {
+            var models = Enum.GetValues<GeminiModelType>()
+                .OrderBy(x => x == preferredModel ? 0 : 1);
+
+            var result = new List<GeminiModelType>();
+
+            foreach (var model in models)
+            {
+                if (await geminiModelHealthService.IsAvailableAsync(model))
+                {
+                    result.Add(model);
+                }
+            }
+
+            return result;
+        }
+
+
+        private static List<Content> BuildContents(
+            IEnumerable<UserPrompt> history)
+        {
+            return history
+                .OrderBy(x => x.CreatedAt)
+                .Take(10)
+                .SelectMany(x => new[]
+                {
+            new Content
+            {
+                Role = "user",
+                Parts =
+                [
+                    new Part { Text = x.Prompt }
+                ]
+            },
+            new Content
+            {
+                Role = "model",
+                Parts =
+                [
+                    new Part { Text = x.Response }
+                ]
+            }
+                })
+                .ToList();
         }
     }
 }

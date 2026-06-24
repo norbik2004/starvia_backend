@@ -24,6 +24,7 @@ using Service.Mapping;
 using Service.Services;
 using Web.Helpers;
 using Core.Application;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,16 @@ builder.Services.AddSwaggerGen();
 ProgramHelpers.AddSingletons(builder);
 
 builder.Services.AddHttpClient<ILinkedInService, LinkedInService>();
+
+var redisConnectionString = builder.Configuration.GetSection("Redis:ConnectionString").Value;
+
+if(redisConnectionString is null)
+{
+    throw new InvalidOperationException("Redis connection string is not configured.");
+}
+
+var multiplexer = await ConnectionMultiplexer.ConnectAsync(redisConnectionString);
+builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
 
 builder.Services.AddDbContext<TrDbContext>(options =>
     options.UseNpgsql(
@@ -179,6 +190,7 @@ builder.Services.AddScoped<IPostPublishService, PostPublicationService>();
 builder.Services.AddScoped<IGeminiService, GeminiService>();
 builder.Services.AddScoped<IUserPromptRepository, UserPromptRepository>();
 builder.Services.AddScoped<IUserPromptService, UserPromptService>();
+builder.Services.AddScoped<IGeminiModelHealthService, GeminiModelHealthService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

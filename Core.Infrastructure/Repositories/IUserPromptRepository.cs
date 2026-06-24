@@ -8,6 +8,7 @@ using Core.Domain.Entities;
 namespace Core.Infrastructure.Repositories
 {
     public interface IUserPromptRepository : IRepository<UserPrompt>
-    { 
+    {
+        public Task<List<UserPrompt>> GetAllPerPostIdAndUserIdConversationVise(int postId, string userId);
     }
 }

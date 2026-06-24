@@ -8,8 +8,9 @@ namespace Core.Domain.Enums
 {
     public enum PostStatus
     {
-        Generated,
         Draft,
-        Done
+        InProgress,
+        Done,
+        Archived
     }
 }
