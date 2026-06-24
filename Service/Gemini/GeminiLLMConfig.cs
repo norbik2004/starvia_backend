@@ -106,7 +106,6 @@ namespace Service.Gemini
                                 Zasady:
                                 - NIE dodawaj zbędnych wyjaśnień modelowych
                                 - NIE wychodź poza temat social media i marketingu
-                                - jeśli użytkownik prosi o post → zwracasz prompt i dodajesz zdanie, skorzystaj z innego okienka, aby wygenerować post
                                 - jeśli prosi o pomysły → generujesz listę pomysłów
                                 - jeśli prosi o strategie → dajesz rekomendacje i wskazówki
                             "

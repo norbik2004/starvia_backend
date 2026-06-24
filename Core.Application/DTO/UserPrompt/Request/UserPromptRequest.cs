@@ -10,7 +10,7 @@ namespace Core.Application.DTO.UserPrompt.Request
 {
     public class UserPromptRequest
     {
-        [MaxLength(150)]
+        [MaxLength(300)]
         public required string Prompt { get; set; }
         public required int PostId { get; set; }
         public required GeminiConversationType ConversationType { get; set; }
