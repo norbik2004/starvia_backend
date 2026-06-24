@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
 using Core.Infrastructure.Repositories;
+using Core.Domain.Enums;
 
 namespace Repository.Repositories
 {
@@ -30,6 +31,14 @@ namespace Repository.Repositories
         public Task<List<UserPrompt>> GetAllAsync()
         {
             return dbContext.UserPrompts.ToListAsync();
+        }
+
+        public async Task<List<UserPrompt>> GetAllPerPostIdAndUserIdConversationVise(int postId, string userId)
+        {
+            return await dbContext.UserPrompts.Where(up => 
+                (up.PostId == postId && up.UserId == userId)
+                && up.ConversationType == GeminiConversationType.AskGemini)
+                .ToListAsync();
         }
 
         public async Task<UserPrompt?> GetByIdAsync(string id)

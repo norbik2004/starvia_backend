@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -19,5 +20,6 @@ namespace Core.Domain.Entities
 
         [ForeignKey(nameof(Post))]
         public int? PostId { get; set; }
+        public required GeminiConversationType ConversationType { get; set; }
     }
 }

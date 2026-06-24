@@ -11,5 +11,6 @@ namespace Core.Application.Services
     public interface IUserPromptService
     {
         Task<List<UserPromptResponse>> GetAllPerUserWithParamsAsync(UserPromptQueryParams queryParams, string userId);
+        Task<List<UserPromptResponse>> GetAllPerPostIdAndUserIdAsyncConversation(int postId, string userId);
     }
 }

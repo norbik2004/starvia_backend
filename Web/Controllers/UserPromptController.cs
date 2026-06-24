@@ -26,5 +26,13 @@ namespace Web.Controllers
             return await PaginatedList<UserPromptResponse>.CreateAsync(prompts.AsQueryable(), mapper, queryParams.PageNumber, queryParams.PageSize);
         }
 
+        [HttpGet("conversation/{postId}")]
+        public async Task<List<UserPromptResponse>> GetUsersConversationPerPost(int postId)
+        {
+            var userId = UserHelpers.GetUserIdFromClaims(User);
+            var prompts = await userPromptService.GetAllPerPostIdAndUserIdAsyncConversation(postId, userId);
+            return prompts;
+        }
+
     }
 }

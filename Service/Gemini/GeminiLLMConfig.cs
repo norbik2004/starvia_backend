@@ -34,6 +34,8 @@ namespace Service.Gemini
 
         public GeminiLlMConfig()
         {
+
+
             PostGenerationConfig = new GenerateContentConfig
             {
                 Temperature = 0.8f,
@@ -70,12 +72,13 @@ namespace Service.Gemini
                 },
             };
 
+
             AskGenerationConfig = new GenerateContentConfig
             {
-                Temperature = 0.8f,
+                Temperature = 0.7f,
                 TopP = 0.9f,
                 TopK = 40,
-                MaxOutputTokens = 5000,
+                MaxOutputTokens = 2000,
                 CandidateCount = 1,
                 SystemInstruction = new Content
                 {
@@ -109,8 +112,10 @@ namespace Service.Gemini
                             "
                         }
                     }
-                },
+                }
             };
+
+
         }
 
         /// <summary>

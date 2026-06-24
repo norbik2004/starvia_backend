@@ -10,6 +10,13 @@ namespace Service.Services
 {
     public class UserPromptService(IUserPromptRepository userPromptRepository, IMapper mapper) : BaseHelpers, IUserPromptService
     {
+        public async Task<List<UserPromptResponse>> GetAllPerPostIdAndUserIdAsyncConversation(int postId, string userId)
+        {
+            var posts = await userPromptRepository.GetAllPerPostIdAndUserIdConversationVise(postId, userId);
+
+            return mapper.Map<List<UserPromptResponse>>(posts);
+        }
+
         public async Task<List<UserPromptResponse>> GetAllPerUserWithParamsAsync(UserPromptQueryParams queryParams, string userId)
         {
 
