@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Repository
 {
@@ -22,6 +23,8 @@ namespace Repository
         public DbSet<Platform> Platforms { get; set; }
         public DbSet<UserPlatform> UserPlatforms { get; set; }
         public DbSet<UserPrompt> UserPrompts { get; set; }
+        public DbSet<UserUploadedFile> UserUploadedFiles { get; set; }
+        public DbSet<PostAttachment> PostAttachments { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

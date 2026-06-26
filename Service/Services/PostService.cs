@@ -115,9 +115,6 @@ namespace Service.Services
             if (request.Status != null)
                 posts = posts.Where(p => p.Status == request.Status);
 
-            if (request.UserId != null)
-                posts = posts.Where(p => p.UserId == request.UserId);
-
             if (request.PublishedOn != null)
                 posts = posts.Where(p => p.PostPublications.Any(p => p.UserPlatform.Platform.Type == request.PublishedOn));
 
