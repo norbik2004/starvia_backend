@@ -11,6 +11,7 @@ namespace Core.Application.DTO.UserUploadedFile.Response
         public required Guid Id { get; set; }
         public required string FileName { get; set; }
         public required DateTime CreatedAt { get; set; }
+        public string? Description { get; set; }
         public required string PreviewUrl { get; set; }
     }
 }

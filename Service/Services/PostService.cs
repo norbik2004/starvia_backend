@@ -18,7 +18,7 @@ using Service.Exceptions;
 
 namespace Service.Services
 {
-    public class PostService(IPostRepository postRepository, IMapper mapper) : BaseHelpers, IPostService
+    public class PostService(IPostRepository postRepository, IUserPromptRepository userPromptRepository, IMapper mapper) : BaseHelpers, IPostService
     {
         public async Task<PostResponse> CreatePostAsync(PostRequest request, string userId)
         {
@@ -39,6 +39,12 @@ namespace Service.Services
 
             if(post.UserId != userId)
                 throw new UnauthorizedException("User is not the owner of the post");
+
+            foreach(var userPrompt in post.User.UserPrompts)
+            {
+                userPromptRepository.Remove(userPrompt);
+            }
+            await userPromptRepository.SaveChangesAsync();
 
             postRepository.Remove(post);
             await postRepository.SaveChangesAsync();

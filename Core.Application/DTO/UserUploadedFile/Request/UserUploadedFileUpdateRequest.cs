@@ -13,5 +13,8 @@ namespace Core.Application.DTO.UserUploadedFile.Request
 
         [MaxLength(50)]
         public required string FileName { get; set; }
+
+        [MaxLength(250)]
+        public string? Description { get; set; }
     }
 }

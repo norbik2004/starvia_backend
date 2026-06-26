@@ -138,6 +138,7 @@ namespace Service.Services
                 ?? throw new NotFoundException("File was not found");
 
             file.FileName = request.FileName;
+            file.Description = request.Description;
             var fileEntity = mapper.Map<UserUploadedFile>(file);
 
             userUploadedFileRepository.Update(fileEntity);
@@ -146,9 +147,15 @@ namespace Service.Services
             return mapper.Map<UserUploadedFileResponse>(file);
         }
 
-        public Task RemoveUploadedFile(Guid fileId, string userId)
+        public async Task RemoveUploadedFile(Guid fileId, string userId)
         {
-            throw new NotImplementedException();
+            var file = await userUploadedFileRepository.GetByIdAndUserIdAsync(fileId, userId)
+                ?? throw new NotFoundException("Can't delete this resource");
+
+            await minioService.DeleteFileAsync(UserFilesBucketName, file.FilePath);
+
+            userUploadedFileRepository.Remove(file);
+            await userUploadedFileRepository.SaveChangesAsync();
         }
     }
 }

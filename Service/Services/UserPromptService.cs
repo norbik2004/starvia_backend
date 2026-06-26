@@ -6,15 +6,22 @@ using Core.Infrastructure.Repositories;
 using Core.Application.Services;
 using System.Linq.Dynamic.Core;
 using Core.Application.Helpers;
+using Service.Exceptions;
 namespace Service.Services
 {
-    public class UserPromptService(IUserPromptRepository userPromptRepository, IMapper mapper) : BaseHelpers, IUserPromptService
+    public class UserPromptService(IUserPromptRepository userPromptRepository, IPostRepository postRepository, IMapper mapper) : BaseHelpers, IUserPromptService
     {
         public async Task<List<UserPromptResponse>> GetAllPerPostIdAndUserIdAsyncConversation(int postId, string userId)
         {
-            var posts = await userPromptRepository.GetAllPerPostIdAndUserIdConversationVise(postId, userId);
+            var post = await postRepository.GetByIdAsync(postId.ToString())
+                ?? throw new NotFoundException("Post was not found");
 
-            return mapper.Map<List<UserPromptResponse>>(posts);
+            if (post.UserId != userId)
+                throw new BadRequestException("User cannot see this post");
+
+            var userPrompts = await userPromptRepository.GetAllPerPostIdAndUserIdConversationVise(postId, userId);
+
+            return mapper.Map<List<UserPromptResponse>>(userPrompts);
         }
 
         public async Task<List<UserPromptResponse>> GetAllPerUserWithParamsAsync(UserPromptQueryParams queryParams, string userId)
