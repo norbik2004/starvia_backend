@@ -10,6 +10,8 @@ using Core.Application.DTO.UserPlatform.Response;
 using Core.Application.DTO.UserPrompt.Response;
 using Core.Application.DTO.UserSetting.Request;
 using Core.Application.DTO.UserSetting.Response;
+using Core.Application.DTO.UserUploadedFile.Request;
+using Core.Application.DTO.UserUploadedFile.Response;
 using Core.Domain.Entities;
 
 namespace Service.Mapping
@@ -36,6 +38,12 @@ namespace Service.Mapping
 
             CreateMap<PostPublication, PostPublicationResponse>();
             CreateMap<PublishPostRequest, PostPublication>();
+
+            CreateMap<UserUploadedFile, UserUploadedFileResponse>()
+                .ForMember(dest => dest.PreviewUrl,
+                    opt => opt.MapFrom<UserUploadedFilePreviewUrlResolver>());
+
+            CreateMap<UserUploadedFileRequest, UserUploadedFile>();
         }
     }
 }

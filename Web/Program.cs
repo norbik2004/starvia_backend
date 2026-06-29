@@ -34,6 +34,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpContextAccessor();
+
 ProgramHelpers.AddSingletons(builder);
 
 builder.Services.AddHttpClient<ILinkedInService, LinkedInService>();
@@ -191,6 +193,9 @@ builder.Services.AddScoped<IGeminiService, GeminiService>();
 builder.Services.AddScoped<IUserPromptRepository, UserPromptRepository>();
 builder.Services.AddScoped<IUserPromptService, UserPromptService>();
 builder.Services.AddScoped<IGeminiModelHealthService, GeminiModelHealthService>();
+builder.Services.AddScoped<IUserUploadedFileRepository, UserUploadedFileRepository>();
+builder.Services.AddScoped<IUserUploadedFileService, UserUploadedFileService>();
+builder.Services.AddScoped<UserUploadedFilePreviewUrlResolver>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

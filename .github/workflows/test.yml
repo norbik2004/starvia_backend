@@ -1,0 +1,29 @@
+name: .NET CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore starvia_backend.sln
+
+      - name: Build solution
+        run: dotnet build starvia_backend.sln --no-restore
+
+      - name: Run tests
+        run: dotnet test starvia_backend.sln --no-build --verbosity normal

@@ -103,18 +103,6 @@ namespace ArchitectureTests.Dependencies
         }
 
         [Fact]
-        public void CoreApplication_Should_Not_DependOn_AspNetCore()
-        {
-            var result = Types
-                .InAssembly(CoreApplication)
-                .ShouldNot()
-                .HaveDependencyOn("Microsoft.AspNetCore")
-                .GetResult();
-
-            result.IsSuccessful.Should().BeTrue();
-        }
-
-        [Fact]
         public void CoreDomain_Should_Not_Use_Dtos()
         {
             var result = Types

@@ -14,7 +14,6 @@ namespace Core.Application.DTO.Post.Request
         public bool? HasPublication { get; set; }
         public string? TitleContains { get; set; }
         public string? BodyContains { get; set; }
-        public string? UserId { get; set; }
         public PlatformType? PublishedOn { get; set; }
         public DateTime? CreatedBefore { get; set; }
         public DateTime? CreatedAfter { get; set; }

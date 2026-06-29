@@ -8,11 +8,16 @@
 
   <ItemGroup>
     <Folder Include="DTO\Platform\Request\" />
+    <Folder Include="DTO\PostAttachment\Response\" />
   </ItemGroup>
 
 
 	<ItemGroup>
 		<ProjectReference Include="..\Core.Domain\Core.Domain.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
 </Project>

@@ -1,12 +1,15 @@
-﻿using dotenv.net;
-using Google.GenAI;
-using Stripe;
-using Core.Application.DTO.Stripe;
+﻿using Core.Application.DTO.Stripe;
+using Core.Application.Services;
 using Core.Application.Services.Email;
+using dotenv.net;
+using Google.GenAI;
+using Minio;
 using Service.Email;
 using Service.Exceptions;
 using Service.Gemini;
 using Service.LinkedIn;
+using Service.Services;
+using Stripe;
 
 namespace Web.Helpers
 {
@@ -82,6 +85,21 @@ namespace Web.Helpers
                     options.CallbackPath = new PathString("/signin-linkedin-mw-callback");
                 });
 
+            builder.Services.AddSingleton<IMinioClient>(_ =>
+            {
+                var config = _.GetRequiredService<IConfiguration>();
+                var minioSettings = config.GetSection("Minio");
+
+                bool.TryParse(minioSettings["UseSSL"], out var useSSL);
+
+                return new MinioClient()
+                    .WithEndpoint($"{minioSettings["Host"]}:{minioSettings["Port"]}")
+                    .WithCredentials(minioSettings["Login"], minioSettings["Password"])
+                    .WithSSL(useSSL)
+                    .Build();
+            });
+
+            builder.Services.AddSingleton<IMinioService, MinioService>();
             builder.Services.AddSingleton(linkedInConfig);
             builder.Services.AddSingleton(stripeConfig);
             builder.Services.AddSingleton<GeminiLlMConfig>();

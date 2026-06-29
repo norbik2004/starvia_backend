@@ -35,7 +35,10 @@ namespace Repository.Repositories
         {
             int identifier = Int32.Parse(id);
 
-            var post = await dbContext.Posts.FirstOrDefaultAsync(p => p.Id == identifier);
+            var post = await dbContext.Posts
+                .Include(up => up.User)
+                .ThenInclude(up => up.UserPrompts)
+                .FirstOrDefaultAsync(p => p.Id == identifier);
 
             return post;
         }
