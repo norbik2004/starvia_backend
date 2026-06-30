@@ -1,17 +1,19 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.Options;
-using System.Security.Claims;
-using Web.Helpers;
-using Core;
-using Core.Domain.Consts;
+﻿using Core;
+using Core.Application;
+using Core.Application.DTO.API;
 using Core.Application.DTO.User.Request;
 using Core.Application.DTO.User.Response;
 using Core.Application.Services;
+using Core.Domain.Consts;
+using Core.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Options;
 using Service.Exceptions;
 using Service.Mapping;
-using Core.Application;
+using System.Security.Claims;
+using Web.Helpers;
 
 namespace Web.Controllers
 {
@@ -42,8 +44,14 @@ namespace Web.Controllers
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
         {
-            await userService.ConfirmEmailAsync(userId, token);
-            return Redirect($"{appSettings.Value.FrontendURL}/email-confirmed");
+            var result = await userService.ConfirmEmailAsync(userId, token);
+
+            if (!result.Success)
+            {
+                return Redirect($"{appSettings.Value.FrontendURL}/email-confirmed?status=error&message={Uri.EscapeDataString(result.Message)}");
+            }
+
+            return Redirect($"{appSettings.Value.FrontendURL}/email-confirmed?status=success");
         }
 
         [EnableRateLimiting("email-confirm")]
@@ -53,5 +61,36 @@ namespace Web.Controllers
             await userService.ResendConfirmationEmailAsync(email);
             return Ok();
         }
+
+        [EnableRateLimiting("email-confirm")]
+        [HttpGet("reset-password")]
+        public async Task<IActionResult> SendResetPasswordEmail([FromQuery] string email)
+        {
+            await userService.SendPasswordResetEmailAsync(email);
+            return Ok();
+        }
+
+        [HttpPost("confirm-reset-password")]
+        public async Task<IActionResult> ValidateResetPasswordRequest([FromQuery] string token, [FromQuery] string userId, [FromBody] string password)
+        {
+            var result = await userService.ResetPassword(userId, token, password);
+
+            if (!result.Success)
+            {
+                throw new BadRequestException("Error while resetting password, contact support");
+            }
+
+            return Ok("Password has been changed succesfully");
+        }
+
+        [HttpPut]
+        [Authorize]
+        public async Task<UserResponse> ChangeUsername([FromBody] string username)
+        {
+            var userId = UserHelpers.GetUserIdFromClaims(User);
+
+            return await userService.UpdateUsername(userId, username);
+        }
+    
     }
 }

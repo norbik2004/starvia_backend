@@ -9,6 +9,7 @@ namespace Core.Domain.Enums
     public enum EmailForm
     {
         WelcomeEmail,
-        EmailConfirmation
+        EmailConfirmation,
+        PasswordReset,
     }
 }

@@ -54,12 +54,19 @@ namespace Service.Gemini
                 content.AddRange(BuildContents(previousPrompts));
             }
 
+            var prompt = request.Prompt;
+
+            if(request.IncludePostText == true)
+            {
+                prompt += "\n\n Użytkownik dodatkowo aktualną załączył treść posta: \n" + post.Body;
+            }
+
             content.Add(new Content
             {
                 Role = "user",
                 Parts =
                 [
-                    new Part { Text = request.Prompt }
+                    new Part { Text = prompt }
                 ]
             });
 

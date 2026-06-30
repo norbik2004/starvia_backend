@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Core.Application.DTO.Email.Models
 {
-    public class ConfirmEmailRequest : BaseEmailRequest
+    public class PasswordResetEmailRequest : BaseEmailRequest
     {
         public required string Token { get; set; }
 
-        public override string Subject => "Confirm your email - Starvia Team";
+        public override string Subject => "Reset your password - Starvia Team";
         public required string UserId { get; set; }
     }
 }

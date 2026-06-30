@@ -84,6 +84,34 @@ namespace Service.LinkedIn
             }
         }
 
+        public async Task<List<LinkedInOrganizationsResponse>> GetUserCompanies(string accessToken)
+        {
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", accessToken);
+
+            client.DefaultRequestHeaders.Add("LinkedIn-Version", "202405");
+            client.DefaultRequestHeaders.Add("X-Restli-Protocol-Version", "2.0.0");
+
+            var response = await client.GetAsync(
+                "https://api.linkedin.com/rest/organizations?q=roleAssignee");
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            var result = JsonSerializer.Deserialize<LinkedInOrganizationsResponse>(
+                json,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            return result?.Elements ?? new();
+        }
+
         public async Task<string> PostTextAsync(LinkedInPostRequest request)
         {
             var accessToken = request.AccessToken;

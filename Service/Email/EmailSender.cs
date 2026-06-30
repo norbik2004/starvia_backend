@@ -27,6 +27,22 @@ namespace Service.Email
             }
         }
 
+        public async Task<bool> SendPasswordResetEmail(PasswordResetEmailRequest request)
+        {
+            try
+            {
+                var htmlBody = ResetPasswordTemplate.GenerateUserMessageTemplate(request, appSettings.Value.FrontendURL);
+
+                await SendEmailAsync(request.To, request.Subject, htmlBody);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error while sending confirmation email");
+                return false;
+            }
+        }
+
         private async Task SendEmailAsync(string to, string subject, string htmlBody)
         {
             try

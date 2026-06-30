@@ -14,6 +14,6 @@ namespace Core.Application.Services
         Task<List<UserPlatformResponse>> GetUserPlatformsAsync(string userId);
         Task<UserPlatformResponseLong> GetUserPlatformByIdAsync(int userPlatformId, string userId);
         Task RemoveUserPlatform(int userPlatformId, string userId);
-        Task<UserPlatformResponseLong> UpdateUserPlatformAsync(int userPlatformId, UserPlatformUpdateRequest request, string userId);
+        Task<UserPlatformResponse> UpdateUserPlatformAsync(int userPlatformId, UserPlatformUpdateRequest request, string userId);
     }
 }

@@ -58,7 +58,7 @@ namespace Repository.Repositories
 
         public void Update(User entity)
         {
-            throw new NotImplementedException();
+            dbContext.Update(entity);
         }
     }
 }
