@@ -5,5 +5,6 @@ namespace Core.Application.Services.Email
     public interface IEmailSender
     {
         public Task<bool> SendConfirmationEmail(ConfirmEmailRequest request);
+        public Task<bool> SendPasswordResetEmail(PasswordResetEmailRequest request);
     }
 }

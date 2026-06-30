@@ -65,7 +65,7 @@ namespace Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<UserPlatformResponseLong> UpdateUserPlatform(int userPlatformId, [FromBody] UserPlatformUpdateRequest request)
+        public async Task<UserPlatformResponse> UpdateUserPlatform(int userPlatformId, [FromBody] UserPlatformUpdateRequest request)
         {
             var userId = UserHelpers.GetUserIdFromClaims(User);
 

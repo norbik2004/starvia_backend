@@ -1,19 +1,21 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Stripe;
-using Core.Domain.Consts;
+using Core.Application.DTO.API;
 using Core.Application.DTO.Email.Models;
 using Core.Application.DTO.User.Request;
 using Core.Application.DTO.User.Response;
+using Core.Application.Services;
+using Core.Application.Services.Email;
+using Core.Domain.Consts;
 using Core.Domain.Entities;
 using Core.Domain.Enums;
 using Core.Infrastructure.Repositories;
-using Core.Application.Services;
-using Core.Application.Services.Email;
+using Google.GenAI;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Repository.Migrations;
 using Service.Exceptions;
+using Stripe;
 
 namespace Service.Services
 {
@@ -39,17 +41,45 @@ namespace Service.Services
             return true;
         }
 
-        public async Task ConfirmEmailAsync(string userId, string token)
+        public async Task<ApiEmailResponse> ConfirmEmailAsync(string userId, string token)
         {
-            var user = await userRepository.GetByIdAsync(userId)
-                ?? throw new NotFoundException("Bad request");
+            var user = await userRepository.GetByIdAsync(userId);
+
+            if (user == null)
+            {
+                return new ApiEmailResponse
+                {
+                    Success = false,
+                    Message = "Error while confirming email, contact support"
+                };
+            }
+
+            if (user.EmailConfirmed)
+            {
+                return new ApiEmailResponse
+                {
+                    Success = false,
+                    Message = "You have arleady confirmed your email"
+                };
+            }
 
             var result = await userManager.ConfirmEmailAsync(user, token);
 
             if (!result.Succeeded)
             {
-                throw new BadRequestException("Error, contact support");
+                return new ApiEmailResponse
+                {
+                    Success = false,
+                    Message = "Error while confirming email, contact support",
+                    Email = user.Email!,
+                };
             }
+
+            return new ApiEmailResponse
+            {
+                Success = true,
+                Message = "Email confirmed successfully"
+            };
         }
 
         public async Task<List<UserResponse>> GetAllUsers(UserPaginatedParamsRequest request)
@@ -123,12 +153,65 @@ namespace Service.Services
         public async Task ResendConfirmationEmailAsync(string email)
         {
             var user = await userManager.FindByEmailAsync(email)
-                ?? throw new NotFoundException("User not found");
+                ?? throw new NotFoundException("Error while resending confirmation email, contact support");
 
             if (user.EmailConfirmed)
-                throw new BadRequestException("Email is already confirmed");
+                throw new BadRequestException("Error while resending confirmation email, contact support");
 
             await SendConfirmationEmailAsync(user);
+        }
+
+        public async Task<ApiEmailResponse> ResetPassword(string userId, string token, string password)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return new ApiEmailResponse
+                {
+                    Success = false,
+                    Message = "Error while resetting password, contact support"
+                };
+            }
+
+            var result = await userManager.ResetPasswordAsync(user, token, password);
+
+            if (!result.Succeeded)
+            {
+                return new ApiEmailResponse
+                {
+                    Success = false,
+                    Message = "Error while resetting password, contact support",
+                    Email = user.Email!,
+                };
+            }
+
+            return new ApiEmailResponse
+            {
+                Success = true,
+                Message = "Password has been reset successfully"
+            };
+        }
+
+        public async Task SendPasswordResetEmailAsync(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email)
+                 ?? throw new NotFoundException("Error while sending password reset email, contact support");
+
+            if(!user.EmailConfirmed)
+                throw new BadRequestException("You need to confirm your email first");
+
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+            PasswordResetEmailRequest emailRequest = new()
+            {
+                To = user.Email!,
+                Token = token,
+                UserId = user.Id,
+                EmailType = EmailForm.PasswordReset
+            };
+
+            await emailSender.SendPasswordResetEmail(emailRequest);
         }
 
         public async Task SetStripeCustomerId(string userId, string customerId)
@@ -149,6 +232,25 @@ namespace Service.Services
             user.IsSubscribed = status;
 
             await userRepository.SaveChangesAsync();
+        }
+
+        public async Task<UserResponse> UpdateUsername(string userId, string username)
+        {
+            var user = await userRepository.GetByIdAsync(userId)
+                ?? throw new NotFoundException("User was not found");
+
+            user.UserName = username;
+            var userEntity = mapper.Map<User>(user);
+
+            userRepository.Update(userEntity);
+            await userRepository.SaveChangesAsync();
+
+            List<string> roles = [.. await userManager.GetRolesAsync(user)];
+
+            var userToReturn = mapper.Map<UserResponse>(user);
+            userToReturn.Roles = roles;
+
+            return userToReturn;
         }
 
         private async Task SendConfirmationEmailAsync(User user)

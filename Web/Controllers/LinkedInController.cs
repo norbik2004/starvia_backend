@@ -66,5 +66,22 @@ namespace Web.Controllers
             return Redirect(appsettingsConfig["LinkedIn:SuccessRedirectUrl"]!);
         }
 
+        [HttpGet("companies")]
+        public async Task<IActionResult> GetCompanies()
+        {
+            var userId = UserHelpers.GetUserIdFromClaims(User);
+
+            var linkedInPlatform = await platformService.GetByPlatformTypeAsync(PlatformType.LinkedIn);
+
+            var userPlatform = await userPlatformService.GetUserPlatformByIdAsync(linkedInPlatform.Id, userId);
+
+            if (userPlatform == null)
+                return BadRequest("LinkedIn account not connected.");
+
+            var companies = await linkedInService.GetUserCompanies(userPlatform.AccessToken);
+
+            return Ok(companies);
+        }
+
     }
 }

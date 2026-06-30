@@ -61,18 +61,17 @@ namespace Service.Services
             await userPlatformRepository.SaveChangesAsync();
         }
 
-        public async Task<UserPlatformResponseLong> UpdateUserPlatformAsync(int userPlatformId, UserPlatformUpdateRequest request, string userId)
+        public async Task<UserPlatformResponse> UpdateUserPlatformAsync(int userPlatformId, UserPlatformUpdateRequest request, string userId)
         {
             var platform = await userPlatformRepository.GetUserPlatformPerUserByIdAsync(userPlatformId, userId)
                 ?? throw new NotFoundException("User platform not found");
 
             var platformEntity = mapper.Map(request, platform);
-            platformEntity.Id = userPlatformId;
 
             userPlatformRepository.Update(platformEntity);
             await userPlatformRepository.SaveChangesAsync();
 
-            return mapper.Map<UserPlatformResponseLong>(platform);
+            return mapper.Map<UserPlatformResponse>(platform);
         }
     }
 }

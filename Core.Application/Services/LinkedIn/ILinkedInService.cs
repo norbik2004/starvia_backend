@@ -10,5 +10,6 @@ namespace Core.Application.Services
         Task<string> ExchangeCodeForAccessToken(string code, string redirectUri);
         Task<LinkedInAccountInfoResponse> GetAccountInfo(string accessToken);
         Task<string> PostTextAsync(LinkedInPostRequest request);
+        Task<List<LinkedInOrganizationsResponse>> GetUserCompanies(string accessToken);
     }
 }

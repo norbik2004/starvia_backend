@@ -168,7 +168,6 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
 {
     options.TokenLifespan = TimeSpan.FromDays(3);
-    options.Name = "ContentForgeTokenProvider";
 });
 
 builder.Services.Configure<SecurityStampValidatorOptions>(options =>
