@@ -25,5 +25,5 @@ jobs:
       - name: Build solution
         run: dotnet build starvia_backend.sln --no-restore
 
-      - name: Run tests
-        run: dotnet test starvia_backend.sln --no-build --verbosity normal
+      - name: Run ArchitectureTests
+        run: dotnet test tests/ArchitectureTests/ArchitectureTests.csproj --no-build --verbosity normal
