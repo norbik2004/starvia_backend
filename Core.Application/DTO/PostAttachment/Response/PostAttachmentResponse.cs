@@ -8,6 +8,7 @@ namespace Core.Application.DTO.PostAttachment.Response
 {
     public class PostAttachmentResponse
     {
+        public required int Id { get; set; }
         public required int PostId { get; set; }
         public required Guid UserUploadedFileId { get; set; }
         public required int Order { get; set; }

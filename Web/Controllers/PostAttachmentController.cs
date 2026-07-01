@@ -19,5 +19,23 @@ namespace Web.Controllers
 
             return await postAttachmentService.AddPostAttachmentAsync(request, userId);
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> RemovePostAttachmentAsync(int postAttachmentId)
+        {
+            var userId = UserHelpers.GetUserIdFromClaims(User);
+
+            await postAttachmentService.RemovePostAttachment(postAttachmentId, userId);
+
+            return Ok();
+        }
+
+        [HttpPut]
+        public async Task<List<PostAttachmentResponse>> UpdatePostAttachmentsOrder(UpdatePostAttachmentOrdersRequest request)
+        {
+            var userId = UserHelpers.GetUserIdFromClaims(User);
+
+            return await postAttachmentService.UpdatePostAttachmentOrdersAsync(request, userId);
+        }
     }
 }

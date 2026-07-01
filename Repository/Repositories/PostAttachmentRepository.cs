@@ -43,7 +43,9 @@ namespace Repository.Repositories
 
         public async Task<PostAttachment?> GetByIdAsync(string id)
         {
-            return await dbContext.PostAttachments.FirstOrDefaultAsync(pa => pa.Id.ToString() == id);
+            return await dbContext.PostAttachments
+                .Include(c => c.Post)
+                .FirstOrDefaultAsync(pa => pa.Id.ToString() == id);
         }
 
         public void Remove(PostAttachment entity)

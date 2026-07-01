@@ -1,4 +1,5 @@
-﻿using Core.Application.DTO.PostAttachment.Request;
+﻿using AutoMapper;
+using Core.Application.DTO.PostAttachment.Request;
 using Core.Application.DTO.PostAttachment.Response;
 using Core.Application.Services;
 using Core.Domain.Entities;
@@ -6,42 +7,31 @@ using Core.Infrastructure.Repositories;
 using Service.Exceptions;
 namespace Service.Services
 {
-    public class PostAttachmentService(IPostAttachmentRepository postAttachmentRepository, IPostRepository postRepository) : IPostAttachmentService
+    public class PostAttachmentService(IPostAttachmentRepository postAttachmentRepository, IPostRepository postRepository,
+        IMapper mapper) : IPostAttachmentService
     {
         public async Task<List<PostAttachmentResponse>> AddPostAttachmentAsync(PostAttachmentRequest request, string userId)
         {
             var post = await postRepository.GetByIdAsync(request.PostId.ToString())
                 ?? throw new NotFoundException("Post was not found");
 
-            if(post.UserId != userId)
+            if (post.UserId != userId)
             {
                 throw new UnauthorizedException("You are not authorized to add attachment to this post");
             }
 
-            List<PostAttachmentResponse> result = [];
+            var attachments = mapper.Map<List<PostAttachment>>(request.Attachments);
 
-            foreach(var postFile in request.Attachemnts)
+            attachments.ForEach(x => x.PostId = request.PostId);
+
+            foreach (var attachment in attachments)
             {
-                PostAttachment postAttachment = new()
-                {
-                    PostId = request.PostId,
-                    UserUploadedFileId = postFile.UploadedFileId,
-                    Order = postFile.Order,
-                };
-
-                await postAttachmentRepository.AddAsync(postAttachment);
-
-                result.Add(new PostAttachmentResponse
-                {
-                    PostId = postAttachment.PostId,
-                    UserUploadedFileId = postAttachment.UserUploadedFileId,
-                    Order = postAttachment.Order,
-                });
+                await postAttachmentRepository.AddAsync(attachment);
             }
 
             await postAttachmentRepository.SaveChangesAsync();
 
-            return result;
+            return mapper.Map<List<PostAttachmentResponse>>(attachments);
         }
 
         public Task<List<PostAttachmentResponse>> GetPostAttachemntsPerUserAndPost(int postId, string userId)
@@ -54,14 +44,48 @@ namespace Service.Services
             throw new NotImplementedException();
         }
 
-        public Task RemovePostAttachment(int postAttachmentId, string userId)
+        public async Task RemovePostAttachment(int postAttachmentId, string userId)
         {
-            throw new NotImplementedException();
+            var postAttachment = await postAttachmentRepository.GetByIdAsync(postAttachmentId.ToString())
+                ?? throw new NotFoundException("Post attachment was not found");
+
+            if (postAttachment.Post.UserId != userId)
+            {
+                throw new UnauthorizedException("You are not authorized to remove this attachment");
+            }
+
+            postAttachmentRepository.Remove(postAttachment);
+            await postAttachmentRepository.SaveChangesAsync();
         }
 
-        public Task<PostAttachmentResponse> UpdatePostAttachmentAsync(PostAttachmentRequest request, string userId)
+        public async Task<List<PostAttachmentResponse>> UpdatePostAttachmentOrdersAsync(
+            UpdatePostAttachmentOrdersRequest request,
+            string userId)
         {
-            throw new NotImplementedException();
+            var post = await postRepository.GetByIdAsync(request.PostId.ToString())
+                ?? throw new NotFoundException("Post was not found");
+
+            if (post.UserId != userId)
+            {
+                throw new UnauthorizedException("You are not authorized to modify this post");
+            }
+
+            var attachments = await postAttachmentRepository.GetAllPerPostAndUserId(request.PostId, userId);
+
+            foreach (var attachment in attachments)
+            {
+                var updated = request.Attachments.FirstOrDefault(x =>
+                    x.UserUploadedFileId == attachment.UserUploadedFileId);
+
+                if (updated != null)
+                {
+                    attachment.Order = updated.Order;
+                }
+            }
+
+            await postAttachmentRepository.SaveChangesAsync();
+
+            return mapper.Map<List<PostAttachmentResponse>>(attachments);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Core.Application.Services
     public interface IPostAttachmentService
     {
         public Task<List<PostAttachmentResponse>> AddPostAttachmentAsync(PostAttachmentRequest request, string userId);
-        public Task<PostAttachmentResponse> UpdatePostAttachmentAsync(PostAttachmentRequest request, string userId);
+        public Task<List<PostAttachmentResponse>> UpdatePostAttachmentOrdersAsync(UpdatePostAttachmentOrdersRequest request, string userId);
         public Task RemovePostAttachment(int postAttachmentId, string userId);
         public Task<PostAttachmentResponse> GetPostAttachmentById(int postAttachmentId, string userId);
         public Task<List<PostAttachmentResponse>> GetPostAttachemntsPerUserAndPost(int postId, string userId);
