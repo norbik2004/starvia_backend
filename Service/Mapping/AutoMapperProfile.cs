@@ -2,6 +2,7 @@
 using Core.Application.DTO.Platform.Response;
 using Core.Application.DTO.Post.Request;
 using Core.Application.DTO.Post.Response;
+using Core.Application.DTO.PostAttachment.Response;
 using Core.Application.DTO.PostPublication.Request;
 using Core.Application.DTO.PostPublication.Response;
 using Core.Application.DTO.User.Response;
@@ -21,8 +22,13 @@ namespace Service.Mapping
         public AutoMapperProfile()
         {
             CreateMap<User, UserResponse>();
+
             CreateMap<Post, PostResponse>();
+            CreateMap<Post, PostResponseLong>()
+                .ForMember(dest => dest.Attachments, opt => opt.MapFrom(src => src.Attachments));
+
             CreateMap<PostRequest, Post>();
+            CreateMap<PostAttachment, PostAttachmentResponse>();
 
             CreateMap<Platform, PlatformResponse>();
 

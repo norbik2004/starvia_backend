@@ -36,6 +36,7 @@ namespace Repository.Repositories
             int identifier = Int32.Parse(id);
 
             var post = await dbContext.Posts
+                .Include(p => p.Attachments)
                 .Include(up => up.User)
                 .ThenInclude(up => up.UserPrompts)
                 .FirstOrDefaultAsync(p => p.Id == identifier);

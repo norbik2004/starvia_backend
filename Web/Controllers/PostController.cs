@@ -47,10 +47,10 @@ namespace Web.Controllers
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<PostResponse> GetPostById(int id)
+        public async Task<PostResponseLong> GetPostById(int id)
         {
             string userId = UserHelpers.GetUserIdFromClaims(User);
-            var post = await postService.GetUserPostById(id, userId);
+            var post = await postService.GetPostByIdLong(id, userId);
             return post;
         }
 

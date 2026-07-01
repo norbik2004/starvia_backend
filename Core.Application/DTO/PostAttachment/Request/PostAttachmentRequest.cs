@@ -9,7 +9,15 @@ namespace Core.Application.DTO.PostAttachment.Request
 {
     public class PostAttachmentRequest
     {
-        public required List<IFormFile> Files { get; set; }
         public required int PostId { get; set; }
+        public required List<FileAttachmentRequest> Attachemnts { get; set; }
+        
     }
+
+    public class FileAttachmentRequest
+    {
+        public required Guid UploadedFileId { get; set; }
+        public required int Order { get; set; }
+    }
+
 }

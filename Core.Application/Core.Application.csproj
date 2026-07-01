@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="DTO\Platform\Request\" />
-    <Folder Include="DTO\PostAttachment\Response\" />
   </ItemGroup>
 
 

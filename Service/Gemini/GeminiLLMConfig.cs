@@ -56,7 +56,7 @@ namespace Service.Gemini
                                     Tworzysz wyłącznie gotowe posty w języku polskim.
                                     
                                     Wymagania:
-                                    - post musi mieć 3–6 zdań lub kilka krótkich akapitów
+                                    - post musi mieć maksymalnie 2000 znaków, w zależności od potrzeb może być krótszy lub dłuższy, ale nie przekraczać limitu
                                     - pierwszy akapit = hook (przyciągający uwagę)
                                     - środek = rozwinięcie
                                     - końcówka = podsumowanie lub CTA

@@ -194,6 +194,8 @@ builder.Services.AddScoped<IUserPromptService, UserPromptService>();
 builder.Services.AddScoped<IGeminiModelHealthService, GeminiModelHealthService>();
 builder.Services.AddScoped<IUserUploadedFileRepository, UserUploadedFileRepository>();
 builder.Services.AddScoped<IUserUploadedFileService, UserUploadedFileService>();
+builder.Services.AddScoped<IPostAttachmentRepository, PostAttachmentRepository>();
+builder.Services.AddScoped<IPostAttachmentService, PostAttachmentService>();
 builder.Services.AddScoped<UserUploadedFilePreviewUrlResolver>();
 
 builder.Services.AddControllers()
