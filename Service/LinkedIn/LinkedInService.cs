@@ -1,4 +1,12 @@
+using Core.Application.DTO.LinkedIn;
+using Core.Application.DTO.LinkedIn.Request;
+using Core.Application.DTO.LinkedIn.Response;
+using Core.Application.DTO.PostAttachment.Response;
+using Core.Application.Services;
+using Core.Domain.Entities;
 using Microsoft.Extensions.Configuration;
+using Service.Exceptions;
+using Service.Services;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -7,15 +15,12 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Core.Application.DTO.LinkedIn;
-using Core.Application.DTO.LinkedIn.Request;
-using Core.Application.DTO.LinkedIn.Response;
-using Core.Application.Services;
-using Service.Exceptions;
 
 namespace Service.LinkedIn
 {
-    public class LinkedInService(HttpClient client, LinkedInConfig enviromentalConfig, IConfiguration appsettingsConfig) : ILinkedInService
+    public class LinkedInService(HttpClient client, LinkedInConfig enviromentalConfig,
+        IUserUploadedFileService userUploadedFileService,
+        IConfiguration appsettingsConfig) : ILinkedInService
     {
 
         public async Task<string> ExchangeCodeForAccessToken(string code, string redirectUri)
@@ -153,14 +158,187 @@ namespace Service.LinkedIn
                 throw new BadRequestException($"LinkedIn post failed: {resp.StatusCode} - {json}");
             }
 
-            var response = JsonSerializer.Deserialize<LinkedInPostResponse>(json);
-
-            if(response == null)
+            if (json.StartsWith("\""))
             {
-                throw new BadRequestException("Failed to parse LinkedIn post response.");
+                json = JsonSerializer.Deserialize<string>(json);
             }
 
-            return response.Id;
+            using var doc = JsonDocument.Parse(json);
+
+            var id = doc.RootElement.GetProperty("id").GetString();
+
+            return id;
         }
+
+        public async Task<string> PostTextWithMediaAsync(LinkedInPostWithMediaRequest request, string userId)
+        {
+            var accessToken = request.AccessToken;
+            var authorUrn = $"urn:li:person:{request.ExternalAccountId}";
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", accessToken);
+
+            client.DefaultRequestHeaders.Remove("X-Restli-Protocol-Version");
+            client.DefaultRequestHeaders.Add("X-Restli-Protocol-Version", "2.0.0");
+
+            var media = await CreateMediaAsync(
+                request.Attachments,
+                authorUrn,
+                accessToken,
+                userId);
+
+            var body = new
+            {
+                author = authorUrn,
+                lifecycleState = "PUBLISHED",
+                specificContent = new
+                {
+                    com_linkedin_ugc_ShareContent = new
+                    {
+                        shareCommentary = new
+                        {
+                            text = request.Content
+                        },
+                        shareMediaCategory = "IMAGE",
+                        media
+                    }
+                },
+                visibility = new
+                {
+                    com_linkedin_ugc_MemberNetworkVisibility = "PUBLIC"
+                }
+            };
+
+            var raw = JsonSerializer.Serialize(body)
+                .Replace("com_linkedin_ugc_ShareContent", "com.linkedin.ugc.ShareContent")
+                .Replace("com_linkedin_ugc_MemberNetworkVisibility", "com.linkedin.ugc.MemberNetworkVisibility");
+
+            var resp = await client.PostAsync(
+                $"{appsettingsConfig["LinkedIn:ApiUrl"]}ugcPosts",
+                new StringContent(raw, Encoding.UTF8, "application/json"));
+
+            var json = await resp.Content.ReadAsStringAsync();
+
+            if (!resp.IsSuccessStatusCode)
+            {
+                throw new BadRequestException($"LinkedIn post failed: {resp.StatusCode} - {json}");
+            }
+
+            if (json.StartsWith("\""))
+            {
+                json = JsonSerializer.Deserialize<string>(json);
+            }
+
+            using var doc = JsonDocument.Parse(json);
+
+            var id = doc.RootElement.GetProperty("id").GetString();
+
+            return id;
+        }
+
+
+        private async Task<List<object>> CreateMediaAsync(
+        IEnumerable<PostAttachmentResponse> attachments,
+        string ownerUrn,
+        string accessToken,
+        string userId)
+        {
+            var media = new List<object>();
+
+            foreach (var attachment in attachments)
+            {
+                var (asset, uploadUrl) = await RegisterUploadAsync(ownerUrn);
+
+                await UploadMediaAsync(uploadUrl, accessToken, attachment, userId);
+
+                media.Add(new
+                {
+                    status = "READY",
+                    media = asset
+                });
+            }
+
+            return media;
+        }
+
+
+        private async Task<(string Asset, string UploadUrl)> RegisterUploadAsync(string ownerUrn)
+        {
+            var body = new
+            {
+                registerUploadRequest = new
+                {
+                    recipes = new[]
+                    {
+                "urn:li:digitalmediaRecipe:feedshare-image"
+            },
+                    owner = ownerUrn,
+                    serviceRelationships = new[]
+                    {
+                new
+                {
+                    relationshipType = "OWNER",
+                    identifier = "urn:li:userGeneratedContent"
+                }
+            }
+                }
+            };
+
+            var response = await client.PostAsync(
+                $"{appsettingsConfig["LinkedIn:ApiUrl"]}assets?action=registerUpload",
+                new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json"));
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new BadRequestException($"LinkedIn register upload failed: {json}");
+
+            using var document = JsonDocument.Parse(json);
+
+            var value = document.RootElement.GetProperty("value");
+
+            var asset = value.GetProperty("asset").GetString()!;
+
+            var uploadUrl = value
+                .GetProperty("uploadMechanism")
+                .GetProperty("com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest")
+                .GetProperty("uploadUrl")
+                .GetString()!;
+
+            return (asset, uploadUrl);
+        }
+
+
+        private async Task UploadMediaAsync(
+            string uploadUrl,
+            string accessToken,
+            PostAttachmentResponse attachment,
+            string userId)
+        {
+            var fileResult = await userUploadedFileService.DownloadFileById(attachment.UserUploadedFileId, userId);
+
+            fileResult.FileStream.Position = 0;
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, uploadUrl);
+
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue("Bearer", accessToken);
+
+            request.Content = new StreamContent(fileResult.FileStream);
+
+            request.Content.Headers.ContentType =
+                new MediaTypeHeaderValue(fileResult.ContentType);
+
+            var response = await client.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new BadRequestException($"LinkedIn upload failed: {error}");
+            }
+        }
+
     }
+
+
 }

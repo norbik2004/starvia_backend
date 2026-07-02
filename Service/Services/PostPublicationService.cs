@@ -16,18 +16,10 @@ namespace Service.Services
     {
         public async Task<PostPublicationResponse> PublishPostToLinkedInAsync(PublishPostRequest request, string userId)
         {
-            var post = await postService.GetUserPostById(request.PostId, userId);
-
-            if(post == null)
-                throw new NotFoundException("Post not found");
+            var post = await postService.GetPostByIdLong(request.PostId, userId);
 
             if(post.Body == null)
                 throw new BadRequestException("Post body cannot be null");
-
-            if (post.UserId != userId)
-            {
-                throw new UnauthorizedException("User is not the owner of the post");
-            }
 
             // to verify if the user has the platform linked before trying to publish and is the owner of the platform
             var userPlatform = await userPlatformService.GetUserPlatformByIdAsync(request.UserPlatformId, userId);
@@ -37,15 +29,31 @@ namespace Service.Services
 
             //publication logic
 
-            LinkedInPostRequest linkedInPostRequest = new LinkedInPostRequest
-            {
-                AccessToken = userPlatform.AccessToken,
-                Content = post.Body,
-                ExternalAccountId = userPlatform.ExternalAccountId
-            };
-            
+            string? code;
 
-            var code = await linkedInService.PostTextAsync(linkedInPostRequest);
+            if (post.Attachments != null && post.Attachments.Count > 0)
+            {
+                LinkedInPostWithMediaRequest linkedInPostWithMediaRequest = new()
+                {
+                    AccessToken = userPlatform.AccessToken,
+                    Content = post.Body,
+                    ExternalAccountId = userPlatform.ExternalAccountId,
+                    Attachments = post.Attachments
+                };
+
+                code = await linkedInService.PostTextWithMediaAsync(linkedInPostWithMediaRequest, userId);
+            }
+            else
+            {
+                LinkedInPostRequest linkedInPostRequest = new()
+                {
+                    AccessToken = userPlatform.AccessToken,
+                    Content = post.Body,
+                    ExternalAccountId = userPlatform.ExternalAccountId
+                };
+
+                code = await linkedInService.PostTextAsync(linkedInPostRequest);
+            }
 
             var postPublicationEntity = mapper.Map<PostPublication>(request);
 
