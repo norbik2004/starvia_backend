@@ -2,6 +2,8 @@
 using Core.Application.DTO.Platform.Response;
 using Core.Application.DTO.Post.Request;
 using Core.Application.DTO.Post.Response;
+using Core.Application.DTO.PostAttachment.Request;
+using Core.Application.DTO.PostAttachment.Response;
 using Core.Application.DTO.PostPublication.Request;
 using Core.Application.DTO.PostPublication.Response;
 using Core.Application.DTO.User.Response;
@@ -21,10 +23,20 @@ namespace Service.Mapping
         public AutoMapperProfile()
         {
             CreateMap<User, UserResponse>();
+
             CreateMap<Post, PostResponse>();
+            CreateMap<Post, PostResponseLong>()
+                .ForMember(dest => dest.Attachments, opt => opt.MapFrom(src => src.Attachments));
+
+            CreateMap<FileAttachmentRequest, PostAttachment>()
+                .ForMember(d => d.UserUploadedFileId, o => o.MapFrom(s => s.UserUploadedFileId))
+                .ForMember(d => d.Order, o => o.MapFrom(s => s.Order))
+                .ForMember(d => d.PostId, o => o.Ignore());
+
             CreateMap<PostRequest, Post>();
 
             CreateMap<Platform, PlatformResponse>();
+            CreateMap<PostAttachment, PostAttachmentResponse>();
 
             CreateMap<UserPlatform, UserPlatformResponse>();
             CreateMap<UserPlatform, UserPlatformResponseLong>();

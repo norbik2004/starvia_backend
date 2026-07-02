@@ -18,7 +18,9 @@ using Service.Exceptions;
 
 namespace Service.Services
 {
-    public class PostService(IPostRepository postRepository, IUserPromptRepository userPromptRepository, IMapper mapper) : BaseHelpers, IPostService
+    public class PostService(IPostRepository postRepository, IUserPromptRepository userPromptRepository,
+        IPostAttachmentRepository postAttachmentRepository,
+        IMapper mapper) : BaseHelpers, IPostService
     {
         public async Task<PostResponse> CreatePostAsync(PostRequest request, string userId)
         {
@@ -44,7 +46,15 @@ namespace Service.Services
             {
                 userPromptRepository.Remove(userPrompt);
             }
+
             await userPromptRepository.SaveChangesAsync();
+
+            foreach (var postAttachment in post.Attachments)
+            {
+                postAttachmentRepository.Remove(postAttachment);
+            }
+
+            await postAttachmentRepository.SaveChangesAsync();
 
             postRepository.Remove(post);
             await postRepository.SaveChangesAsync();
@@ -140,6 +150,19 @@ namespace Service.Services
                 posts = posts.Where(p => p.Body != null && p.Body.Contains(request.BodyContains, StringComparison.CurrentCultureIgnoreCase));
 
             return posts;
+        }
+
+        public async Task<PostResponseLong> GetPostByIdLong(int postId, string userId)
+        {
+            var post = await postRepository.GetByIdAsync(postId.ToString());
+
+            if (post == null)
+                throw new BadRequestException("Post was not found");
+
+            if (post.UserId != userId)
+                throw new UnauthorizedException("User is not the owner of the post");
+
+            return mapper.Map<PostResponseLong>(post);
         }
     }
 }
