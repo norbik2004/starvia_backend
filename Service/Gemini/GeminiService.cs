@@ -1,4 +1,5 @@
-﻿using Core.Application.DTO.UserPrompt.Request;
+﻿using Core.Application.DTO.ImageGeneration.Prompt;
+using Core.Application.DTO.UserPrompt.Request;
 using Core.Application.Services;
 using Core.Application.Services.Gemini;
 using Core.Domain.Entities;
@@ -22,9 +23,7 @@ namespace Service.Gemini
         IGeminiModelHealthService geminiModelHealthService) : IGeminiService
     {
 
-        public async Task<string> AskAiPostScope(
-            string userId,
-            UserPromptRequest request)
+        public async Task<string> AskAiPostScope(string userId, UserPromptRequest request)
         {
             var post = await UserAccesibilityValidation(userId, request);
 
@@ -139,6 +138,11 @@ namespace Service.Gemini
                 "Our Ai models are currently unavalible, please try again in 5 minutes");
         }
 
+        public Task<ImagePromptResponse> GenerateImage(string userId, ImagePromptRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
         private async Task<Post> UserAccesibilityValidation(string userId, UserPromptRequest request)
         {
             bool canUserAccessAi = await userService.CanUserAccessAi(userId);
@@ -204,5 +208,6 @@ namespace Service.Gemini
                 })
                 .ToList();
         }
+
     }
 }

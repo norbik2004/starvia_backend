@@ -14,5 +14,6 @@ namespace Core.Domain.Entities
         public ICollection<UserPlatform> UserPlatforms { get; set; } = [];
         public UserSetting? UserSettings { get; set; }
         public ICollection<UserPrompt> UserPrompts { get; set; } = [];
+        public ICollection<ImageConversation> ImageConversations { get; set; } = [];
     }
 }

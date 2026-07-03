@@ -25,6 +25,9 @@ namespace Repository
         public DbSet<UserPrompt> UserPrompts { get; set; }
         public DbSet<UserUploadedFile> UserUploadedFiles { get; set; }
         public DbSet<PostAttachment> PostAttachments { get; set; }
+        public DbSet<ImageConversation> ImageConversations { get; set; }
+        public DbSet<ImagePrompt> ImagePrompts { get; set; }
+        public DbSet<ImagePromptFile> ImagePromptFiles { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

@@ -1,4 +1,7 @@
 ﻿using AutoMapper;
+using Core.Application.DTO.ImageGeneration.Conversation;
+using Core.Application.DTO.ImageGeneration.File;
+using Core.Application.DTO.ImageGeneration.Prompt;
 using Core.Application.DTO.Platform.Response;
 using Core.Application.DTO.Post.Request;
 using Core.Application.DTO.Post.Response;
@@ -59,6 +62,21 @@ namespace Service.Mapping
                     opt => opt.MapFrom<UserUploadedFilePreviewUrlResolver>());
 
             CreateMap<UserUploadedFileRequest, UserUploadedFile>();
+
+
+            /* image generation */
+            CreateMap<ImageConversation, ImageConversationResponse>();
+
+            CreateMap<ImageConversation, ImageConversationLongResponse>()
+                .ForMember(dest => dest.ImagePromptResponses, opt => opt.MapFrom(src => src.ImagePrompts));
+
+            CreateMap<ImagePrompt, ImagePromptResponse>()
+                .ForMember(dest => dest.ImagePromptFile, opt => opt.MapFrom(src => src.ImagePromptFile));
+
+            CreateMap<ImagePromptFile, ImagePromptFileResponse>()
+                .ForMember(dest => dest.PreviewUrl,
+                    opt => opt.MapFrom<ConversationImageFilePReviewUrlResolver>());
+            /* image generation */
         }
     }
 }
