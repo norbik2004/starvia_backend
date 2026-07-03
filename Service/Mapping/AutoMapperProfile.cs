@@ -48,7 +48,10 @@ namespace Service.Mapping
 
             CreateMap<UserPrompt, UserPromptResponse>();
 
-            CreateMap<PostPublication, PostPublicationResponse>();
+            CreateMap<PostPublication, PostPublicationResponse>()
+                .ForMember(d => d.AccountUsername, o => o.MapFrom(s => s.UserPlatform.AccountUsername))
+                .ForMember(d => d.PostBody, o => o.MapFrom(s => s.Post.Body));
+
             CreateMap<PublishPostRequest, PostPublication>();
 
             CreateMap<UserUploadedFile, UserUploadedFileResponse>()

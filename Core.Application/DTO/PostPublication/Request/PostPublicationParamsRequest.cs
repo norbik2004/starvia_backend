@@ -15,8 +15,13 @@ namespace Core.Application.DTO.PostPublication.Request
         public PostPublicationStatus? Status { get; set; }
         public DateTime? PublishedBefore { get; set; }
         public DateTime? PublishedAfter { get; set; }
-        public DateTime? CreatedBefore { get; set; }
-        public DateTime? CreatedAfter { get; set; }
         public PlatformType? PublishedOn { get; set; }
+        public PostPublishSortBy? SortBy { get; set; }
+    }
+
+    public enum PostPublishSortBy
+    {
+        CreatedAt,
+        Platform,
     }
 }

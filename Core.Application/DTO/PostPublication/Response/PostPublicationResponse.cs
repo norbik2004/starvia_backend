@@ -9,8 +9,9 @@ namespace Core.Application.DTO.PostPublication.Response
 {
     public class PostPublicationResponse
     {
-        public int PostId { get; set; }
-        public int UserPlatformId { get; set; }
+        public string PostBody { get; set; }
+        public PlatformType PlatformType { get; set; }
+        public string AccountUsername { get; set; }
         public PostPublicationStatus Status {  get; set; }
         public DateTime? PublishedAt { get; set; }
         public string? ExternalPostId { get; set; }

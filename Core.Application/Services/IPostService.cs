@@ -11,7 +11,7 @@ namespace Core.Application.Services
     public interface IPostService
     {
         public Task<List<PostResponse>> GetAllPostsAsync(PostPaginatedParamsRequest request);
-        public Task<List<PostResponse>> GetAllPostsPerUserAsync(PostPaginatedParamsRequest request, string userId);
+        public Task<List<PostResponseLong>> GetAllPostsPerUserAsync(PostPaginatedParamsRequest request, string userId);
         public Task<PostResponse> GetUserPostById(int postId, string userId);
         public Task<PostResponseLong> GetPostByIdLong(int postId, string userId);
         public Task<PostResponse> CreatePostAsync(PostRequest request, string userId);

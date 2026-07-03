@@ -73,7 +73,7 @@ namespace Service.Services
                 .ToListAsync();
         }
 
-        public async Task<List<PostResponse>> GetAllPostsPerUserAsync(PostPaginatedParamsRequest request, string userId)
+        public async Task<List<PostResponseLong>> GetAllPostsPerUserAsync(PostPaginatedParamsRequest request, string userId)
         {
             var posts = postRepository.GetAllAsQueryPerUserIdAsync(userId);
 
@@ -87,7 +87,7 @@ namespace Service.Services
             posts = posts.OrderBy($"{sortColumn} {direction}");
 
             return await posts
-                .ProjectTo<PostResponse>(mapper.ConfigurationProvider)
+                .ProjectTo<PostResponseLong>(mapper.ConfigurationProvider)
                 .ToListAsync();
         }
 
