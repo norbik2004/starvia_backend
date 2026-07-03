@@ -11,5 +11,6 @@ namespace Core.Application.Services
     public interface IPostPublishService
     {
         public Task<PostPublicationResponse> PublishPostToLinkedInAsync(PublishPostRequest request, string userId);
+        public Task<List<PostPublicationResponse>> GetUserPostPublicationsAsync(PostPublicationParamsRequest request, string userId);
     }
 }

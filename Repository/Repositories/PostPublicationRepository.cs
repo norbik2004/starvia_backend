@@ -25,6 +25,8 @@ namespace Repository.Repositories
         {
             return dbContext.PostPublications
                 .Include(pp => pp.UserPlatform)
+                .ThenInclude(platform => platform.Platform)
+                .Include(pp => pp.Post)
                 .Where(pb => pb.UserPlatform.UserId == userId).AsNoTracking();
         }
 

@@ -34,14 +34,14 @@ namespace Web.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(PaginatedList<PostResponse>), StatusCodes.Status200OK)]
-        public async Task<PaginatedList<PostResponse>> GetAllUserPosts([FromQuery] PostPaginatedParamsRequest request)
+        [ProducesResponseType(typeof(PaginatedList<PostResponseLong>), StatusCodes.Status200OK)]
+        public async Task<PaginatedList<PostResponseLong>> GetAllUserPosts([FromQuery] PostPaginatedParamsRequest request)
         {
             var userId = UserHelpers.GetUserIdFromClaims(User);
 
             var posts = await postService.GetAllPostsPerUserAsync(request, userId);
 
-            return await PaginatedList<PostResponse>.CreateAsync(posts.AsQueryable(), mapper, request.PageNumber, request.PageSize);
+            return await PaginatedList<PostResponseLong>.CreateAsync(posts.AsQueryable(), mapper, request.PageNumber, request.PageSize);
         }
 
         [HttpGet("{id:int}")]

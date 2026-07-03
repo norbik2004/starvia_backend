@@ -23,7 +23,9 @@ namespace Repository.Repositories
 
         public IQueryable<Post> GetAllAsQueryPerUserIdAsync(string userId)
         {
-            return dbContext.Posts.Where(p => p.UserId == userId).AsNoTracking();
+            return dbContext.Posts.
+                Include(p => p.Attachments)
+                .Where(p => p.UserId == userId).AsNoTracking();
         }
 
         public async Task<List<Post>> GetAllAsync()
