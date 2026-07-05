@@ -23,7 +23,7 @@ namespace Service.Mapping
         {
             var request = httpContextAccessor.HttpContext!.Request;
 
-            return $"{request.Scheme}://{request.Host}/api/ImageConver/download/{source.Id}";
+            return $"{request.Scheme}://{request.Host}/api/ImageConver/download/{source.Id}";  
         }
     }
 }

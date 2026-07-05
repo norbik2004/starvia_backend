@@ -199,6 +199,7 @@ builder.Services.AddScoped<IPostAttachmentService, PostAttachmentService>();
 builder.Services.AddScoped<UserUploadedFilePreviewUrlResolver>();
 builder.Services.AddScoped<IImageConversationRepository, ImageConversationRepository>();
 builder.Services.AddScoped<IImageConversationService, ImageConversationService>();
+builder.Services.AddScoped<IImagePromptRepository, ImagePromptRepository>();
 builder.Services.AddScoped<ConversationImageFilePReviewUrlResolver>();
 
 builder.Services.AddControllers()

@@ -31,11 +31,10 @@ namespace Service.Gemini
     {
         private GenerateContentConfig PostGenerationConfig { get; set; }
         private GenerateContentConfig AskGenerationConfig { get; set; }
+        private GenerateImagesConfig ImageGenerationConfig { get; set; }
 
         public GeminiLlMConfig()
         {
-
-
             PostGenerationConfig = new GenerateContentConfig
             {
                 Temperature = 0.8f,
@@ -115,6 +114,28 @@ namespace Service.Gemini
             };
 
 
+            ImageGenerationConfig = new GenerateImagesConfig
+            {
+                NumberOfImages = 1,
+
+                AspectRatio = "1:1",
+                ImageSize = "2K",
+
+                EnhancePrompt = true,
+
+                GuidanceScale = 7.5,
+                SafetyFilterLevel = SafetyFilterLevel.BlockNone,
+
+                PersonGeneration = PersonGeneration.AllowAll,
+
+                OutputMimeType = "image/png",
+
+                AddWatermark = false,
+
+                Seed = null
+            };
+
+
         }
 
         /// <summary>
@@ -135,6 +156,11 @@ namespace Service.Gemini
         {
             return AskGenerationConfig;
 
+        }
+
+        public GenerateImagesConfig GetGenerateContentConfig()
+        {
+            return ImageGenerationConfig;
         }
     }
 }

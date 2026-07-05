@@ -9,7 +9,10 @@ namespace Core.Application.Services.Gemini
 {
     public interface IGeminiModelHealthService
     {
-        Task<bool> IsAvailableAsync(GeminiModelType model);
-        Task MarkAsFailedAsync(GeminiModelType model);
+        Task<bool> IsAvailableAsync<TModel>(TModel model)
+            where TModel : Enum;
+
+        Task MarkAsFailedAsync<TModel>(TModel model)
+            where TModel : Enum;
     }
 }

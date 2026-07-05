@@ -7,6 +7,7 @@ using Core.Domain.Enums;
 using Core.Infrastructure.Repositories;
 using Google.GenAI;
 using Google.GenAI.Types;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Abstractions;
 using Service.Exceptions;
@@ -25,10 +26,18 @@ namespace Service.Gemini
 
         public async Task<string> AskAiPostScope(string userId, UserPromptRequest request)
         {
-            var post = await UserAccesibilityValidation(userId, request);
+            await UserAccesibilityValidation(userId);
 
-            var models = await GetAvailableModelsAsync(
-                GeminiModelType.Gemini3FlashPreview);
+            var post = await postRepository.GetByIdAsync(request.PostId.ToString())
+                    ?? throw new NotFoundException("Post was not found");
+
+            if (post.UserId != userId)
+            {
+                throw new UnauthorizedException("User cant access this post");
+            }
+
+            var models = await GetAvailableModelsAsync<LlmGeminiModelType>(
+                LlmGeminiModelType.Gemini3FlashPreview);
 
             if (models.Count == 0)
             {
@@ -138,36 +147,83 @@ namespace Service.Gemini
                 "Our Ai models are currently unavalible, please try again in 5 minutes");
         }
 
-        public Task<ImagePromptResponse> GenerateImage(string userId, ImagePromptRequest request)
+        public async Task<ImagePromptResponse> GenerateImage(string userId, ImagePromptRequest request)
         {
-            throw new NotImplementedException();
+            await UserAccesibilityValidation(userId);
+
+            var models = await GetAvailableModelsAsync<ImageGeminiModelType>(
+                 ImageGeminiModelType.Imagen4UltraGenerate);
+
+            if (models.Count == 0)
+            {
+                throw new BadRequestException(
+                    "Our Ai models are currently unavalible, please try again in 5 minutes");
+            }
+
+            foreach (var model in models)
+            {
+                try
+                {
+                    logger.LogInformation(
+                        "Trying Gemini model {Model}",
+                        model);
+
+                    var response = await geminiClient.Models.GenerateContentAsync(
+                        model: model.ToModelString(),
+                        contents: content,
+                        config: config.
+                    );
+
+                    var text = response?.Candidates?
+                        .FirstOrDefault()?
+                        .Content?
+                        .Parts?
+                        .FirstOrDefault()?
+                        .Text;
+
+                    if (string.IsNullOrWhiteSpace(text))
+                    {
+                        throw new BadRequestException(
+                            $"Empty response from Ai");
+                    }
+
+                    logger.LogInformation(
+                        "Model {Model} succeeded",
+                        model);
+
+                    return text;
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+
+                    logger.LogWarning(
+                        ex,
+                        "Model {Model} failed. Marking as unhealthy.",
+                        model);
+
+                    await geminiModelHealthService.MarkAsFailedAsync(model);
+
+                }
+            }
         }
 
-        private async Task<Post> UserAccesibilityValidation(string userId, UserPromptRequest request)
+        private async Task UserAccesibilityValidation(string userId)
         {
             bool canUserAccessAi = await userService.CanUserAccessAi(userId);
 
             if (!canUserAccessAi)
                 throw new BadRequestException("User has used hit limit, can't access Ai");
-
-            var post = await postRepository.GetByIdAsync(request.PostId.ToString())
-                    ?? throw new NotFoundException("Post was not found");
-
-            if (post.UserId != userId)
-            {
-                throw new UnauthorizedException("User cant access this post");
-            }
-
-            return post;
         }
 
-        private async Task<List<GeminiModelType>> GetAvailableModelsAsync(
-            GeminiModelType preferredModel)
+        private async Task<List<TModel>> GetAvailableModelsAsync<TModel>(TModel preferredModel)
+            where TModel : Enum
         {
-            var models = Enum.GetValues<GeminiModelType>()
-                .OrderBy(x => x == preferredModel ? 0 : 1);
+            var models = Enum.GetValues(typeof(TModel))
+                .Cast<TModel>()
+                .OrderBy(x => EqualityComparer<TModel>.Default.Equals(x, preferredModel) ? 0 : 1);
 
-            var result = new List<GeminiModelType>();
+            var result = new List<TModel>();
 
             foreach (var model in models)
             {
@@ -179,7 +235,6 @@ namespace Service.Gemini
 
             return result;
         }
-
 
         private static List<Content> BuildContents(
             IEnumerable<UserPrompt> history)
