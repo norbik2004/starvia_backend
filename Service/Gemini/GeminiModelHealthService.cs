@@ -25,7 +25,7 @@ namespace Service.Gemini
             await database.StringSetAsync(
                 GetKey(model.ToModelString()),
                 "failed",
-                TimeSpan.FromMinutes(5));
+                TimeSpan.FromMinutes(1));
         }
 
         private static string GetKey(string model)
