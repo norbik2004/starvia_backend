@@ -6,6 +6,7 @@ namespace Core.Domain.Entities
     {
         public bool IsSubscribed { get; set; }
         public string? StripeCustomerId { get; set; }
+        public string? UserLlmInstuctions { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         //POSTY USERA
@@ -14,5 +15,6 @@ namespace Core.Domain.Entities
         public ICollection<UserPlatform> UserPlatforms { get; set; } = [];
         public UserSetting? UserSettings { get; set; }
         public ICollection<UserPrompt> UserPrompts { get; set; } = [];
+        public ICollection<ImageConversation> ImageConversations { get; set; } = [];
     }
 }

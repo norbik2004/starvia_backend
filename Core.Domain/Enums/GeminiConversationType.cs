@@ -9,6 +9,7 @@ namespace Core.Domain.Enums
     public enum GeminiConversationType
     {
         GeneratePost,
-        AskGemini
+        AskGemini,
+        MimicUser
     }
 }

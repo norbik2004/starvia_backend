@@ -4,6 +4,8 @@ using Web.Helpers;
 using Core.Domain.Enums;
 using Core.Application.Services.Gemini;
 using Core.Application.DTO.UserPrompt.Request;
+using Repository.Repositories;
+using Core.Application.DTO.ImageGeneration.Prompt;
 
 namespace Web.Controllers
 {
@@ -17,6 +19,14 @@ namespace Web.Controllers
         {
             var userId = UserHelpers.GetUserIdFromClaims(User);
             return await geminiService.AskAiPostScope(userId, request);
+        }
+
+        [HttpPost("image")]
+        public async Task<ImagePromptResponse> GenerateImage([FromForm] ImagePromptRequest request)
+        {
+            var userId = UserHelpers.GetUserIdFromClaims(User);
+
+            return await geminiService.GenerateImage(userId, request);
         }
     }
 }

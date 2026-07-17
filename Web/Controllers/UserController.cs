@@ -8,6 +8,7 @@ using Core.Application.DTO.UserPlatform.Response;
 using Core.Application.Services;
 using Service.Mapping;
 using Service.Services;
+using Web.Helpers;
 
 namespace Web.Controllers
 {
@@ -27,5 +28,13 @@ namespace Web.Controllers
             return await PaginatedList<UserResponse>.CreateAsync(users.AsQueryable(), mapper, request.PageIndex, request.PageSize);
         }
 
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> GenerateMimicInstructionsForUser([FromBody] string userTexts)
+        {
+            var userId = UserHelpers.GetUserIdFromClaims(User);
+            await userService.GenerateLlmMimicInstructions(userId, userTexts);
+            return Ok();
+        }
     }
 }

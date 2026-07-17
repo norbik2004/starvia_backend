@@ -5,6 +5,7 @@ using Core.Application.DTO.User.Request;
 using Core.Application.DTO.User.Response;
 using Core.Application.Services;
 using Core.Application.Services.Email;
+using Core.Application.Services.Gemini;
 using Core.Domain.Consts;
 using Core.Domain.Entities;
 using Core.Domain.Enums;
@@ -19,7 +20,7 @@ using Stripe;
 
 namespace Service.Services
 {
-    public class UserService(UserManager<User> userManager, IUserRepository userRepository,
+    public class UserService(UserManager<User> userManager, IUserRepository userRepository, IGeminiService geminiService,
         IMapper mapper, IEmailSender emailSender) : IUserService
     {
 
@@ -82,6 +83,19 @@ namespace Service.Services
             };
         }
 
+        public async Task GenerateLlmMimicInstructions(string userId, string userTexts)
+        {
+            var user = await userRepository.GetByIdAsync(userId)
+                ?? throw new NotFoundException("User was not found");
+
+            var instructions = await geminiService.GenerateUserMimicConfig(userId, userTexts);
+
+            user.UserLlmInstuctions = instructions;
+
+            userRepository.Update(user);
+            await userRepository.SaveChangesAsync();
+        }
+
         public async Task<List<UserResponse>> GetAllUsers(UserPaginatedParamsRequest request)
         {
             var users = await userRepository.GetAllAsync();
@@ -106,6 +120,7 @@ namespace Service.Services
 
             var userToReturn = mapper.Map<UserResponse>(user);
             userToReturn.Roles = roles;
+            userToReturn.HasLlmInstructions = user.UserLlmInstuctions != null;
 
             return userToReturn;
         }

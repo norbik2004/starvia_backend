@@ -197,6 +197,10 @@ builder.Services.AddScoped<IUserUploadedFileService, UserUploadedFileService>();
 builder.Services.AddScoped<IPostAttachmentRepository, PostAttachmentRepository>();
 builder.Services.AddScoped<IPostAttachmentService, PostAttachmentService>();
 builder.Services.AddScoped<UserUploadedFilePreviewUrlResolver>();
+builder.Services.AddScoped<IImageConversationRepository, ImageConversationRepository>();
+builder.Services.AddScoped<IImageConversationService, ImageConversationService>();
+builder.Services.AddScoped<IImagePromptRepository, ImagePromptRepository>();
+builder.Services.AddScoped<ConversationImageFilePReviewUrlResolver>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -214,23 +218,22 @@ var app = builder.Build();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
-/*
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-*/
-
-app.UseSwagger();
-app.UseSwaggerUI();
 
 await DbMigrate.MigrateDatabase(app);
+
 using (var scope = app.Services.CreateScope())
 {
-    await RoleSeed.Seed(scope.ServiceProvider);
-    await SeedUsers.Seed(scope.ServiceProvider);
     await SeedPlatforms.Seed(scope.ServiceProvider);
+    await RoleSeed.Seed(scope.ServiceProvider);
+}
+
+if (app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+        await SeedUsers.Seed(scope.ServiceProvider);
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseRouting();

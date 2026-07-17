@@ -13,20 +13,22 @@ namespace Service.Gemini
     {
         private readonly IDatabase database = multiplexer.GetDatabase();
 
-        public async Task<bool> IsAvailableAsync(GeminiModelType model)
+        public async Task<bool> IsAvailableAsync<TModel>(TModel model)
+            where TModel : Enum
         {
             return !await database.KeyExistsAsync(GetKey(model.ToModelString()));
         }
 
-        public async Task MarkAsFailedAsync(GeminiModelType model)
+        public async Task MarkAsFailedAsync<TModel>(TModel model)
+            where TModel : Enum
         {
             await database.StringSetAsync(
                 GetKey(model.ToModelString()),
                 "failed",
-                TimeSpan.FromMinutes(5));
+                TimeSpan.FromMinutes(1));
         }
 
         private static string GetKey(string model)
-             => $"gemini:model:{model}:failed";
+            => $"gemini:model:{model}:failed";
     }
 }

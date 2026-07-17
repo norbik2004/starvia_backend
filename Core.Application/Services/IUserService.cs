@@ -23,5 +23,6 @@ namespace Core.Application.Services
         public Task SendPasswordResetEmailAsync(string email);
         public Task<ApiEmailResponse> ResetPassword(string userId, string token, string password);
         public Task<UserResponse> UpdateUsername(string userId, string username);
+        public Task GenerateLlmMimicInstructions(string userId, string userTexts);
     }
 }
