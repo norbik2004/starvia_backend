@@ -6,6 +6,7 @@ namespace Core.Domain.Entities
     {
         public bool IsSubscribed { get; set; }
         public string? StripeCustomerId { get; set; }
+        public string? UserLlmInstuctions { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         //POSTY USERA

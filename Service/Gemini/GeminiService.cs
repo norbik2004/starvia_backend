@@ -280,6 +280,89 @@ namespace Service.Gemini
                 "Our Ai models are currently unavalible, please try again in 5 minutes");
         }
 
+
+        public async Task<string> GenerateUserMimicConfig(string userId, string userTexts)
+        {
+            await UserAccesibilityValidation(userId);
+
+            var models = await GetAvailableModelsAsync<LlmGeminiModelType>(
+                LlmGeminiModelType.Gemini3FlashPreview);
+
+            if (models.Count == 0)
+            {
+                throw new BadRequestException(
+                    "Our Ai models are currently unavalible, please try again in 5 minutes");
+            }
+
+            var configuration = config.GetUserMimicGenerationConfig();
+            Exception? lastException = null;
+
+            var content = new List<Content>
+            {
+                new() {
+                    Role = "user",
+                    Parts =
+                    [
+                        new Part { Text = userTexts }
+                    ]
+                }
+            };
+
+            foreach (var model in models)
+            {
+                try
+                {
+                    logger.LogInformation(
+                        "Trying Gemini model {Model}",
+                        model);
+
+                    var response = await geminiClient.Models.GenerateContentAsync(
+                        model: model.ToModelString(),
+                        contents: content,
+                        config: configuration
+                    );
+
+                    var text = response?.Candidates?
+                        .FirstOrDefault()?
+                        .Content?
+                        .Parts?
+                        .FirstOrDefault()?
+                        .Text;
+
+                    if (string.IsNullOrWhiteSpace(text))
+                    {
+                        throw new BadRequestException(
+                            $"Empty response from Ai");
+                    }
+
+                    logger.LogInformation(
+                        "Model {Model} succeeded",
+                        model);
+
+                    return text;
+
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+
+                    logger.LogWarning(
+                        ex,
+                        "Model {Model} failed. Marking as unhealthy.",
+                        model);
+
+                    await geminiModelHealthService.MarkAsFailedAsync(model);
+                }
+            }
+
+            logger.LogError(
+                lastException,
+                "All Gemini models failed.");
+
+            throw new BadRequestException(
+                "Our Ai models are currently unavalible, please try again in 5 minutes");
+        }
+
         private async Task UserAccesibilityValidation(string userId)
         {
             bool canUserAccessAi = await userService.CanUserAccessAi(userId);

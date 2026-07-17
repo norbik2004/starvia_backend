@@ -13,5 +13,6 @@ namespace Core.Application.DTO.User.Response
         public List<string> Roles { get; set; } = [];
         public bool IsSubscribed { get; set; }
         public string? StripeCustomerId { get; set; } 
+        public bool HasLlmInstructions { get; set; }
     }
 }

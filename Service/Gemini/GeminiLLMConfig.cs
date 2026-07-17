@@ -32,6 +32,7 @@ namespace Service.Gemini
         private GenerateContentConfig PostGenerationConfig { get; set; }
         private GenerateContentConfig AskGenerationConfig { get; set; }
         private GenerateImagesConfig ImageGenerationConfig { get; set; }
+        private GenerateContentConfig UserMimicGenerationConfig { get; set; }
 
         public GeminiLlMConfig()
         {
@@ -121,23 +122,79 @@ namespace Service.Gemini
                 OutputMimeType = "image/png",
             };
 
+            UserMimicGenerationConfig = new GenerateContentConfig
+            {
+                Temperature = 0.3f,
+                TopP = 0.9f,
+                TopK = 40,
+                MaxOutputTokens = 2500,
+                CandidateCount = 1,
+                SystemInstruction = new Content
+                {
+                    Parts = new List<Part>
+                {
+                new Part
+                {
+                    Text = @"
+                        Jesteś ekspertem od analizy stylu pisania.
+                        
+                        Otrzymasz jedną lub więcej próbek tekstu użytkownika.
+                        
+                        Twoim jedynym zadaniem jest wygenerowanie instrukcji SYSTEMOWEJ dla innego modelu językowego.
+                        
+                        Instrukcja ma opisywać WYŁĄCZNIE sposób pisania autora, a nie treść jego wypowiedzi.
+                        
+                        Zwróć uwagę między innymi na:
+                        - ton wypowiedzi,
+                        - poziom formalności,
+                        - długość i budowę zdań,
+                        - rytm tekstu,
+                        - dobór słownictwa,
+                        - charakterystyczne zwroty,
+                        - sposób argumentacji,
+                        - sposób rozpoczynania i kończenia tekstów,
+                        - interpunkcję,
+                        - używanie emoji,
+                        - używanie pytań retorycznych,
+                        - stosowanie CTA,
+                        - sposób prowadzenia narracji,
+                        - poziom energii wypowiedzi,
+                        - elementy, których należy unikać.
+                        
+                        Wygenerowana instrukcja ma być napisana bezpośrednio do modelu językowego.
+                        
+                        Nie opisuj autora.
+                        Nie oceniaj jakości tekstu.
+                        Nie twórz podsumowania.
+                        Nie zwracaj JSON.
+                        Nie zwracaj Markdown.
+                        Nie używaj nagłówków.
+                        
+                        Wynik ma być gotowym promptem systemowym, który można wkleić jako SystemInstruction do kolejnego modelu.
+                        
+                        Instrukcja powinna zawierać wyłącznie polecenia typu:
+                        - Pisz...
+                        - Zachowuj...
+                        - Unikaj...
+                        - Stosuj...
+                        - Nie używaj...
+                        - Naśladuj...
+                        
+                        Jeżeli próbka jest niewystarczająca do określenia jakiejś cechy, pomiń ją zamiast zgadywać.
+                        
+                        Nie wspominaj o analizie ani o użytkowniku. Zwróć wyłącznie gotową instrukcję."
+                        }
+                    }
+                }
+            };
 
         }
 
-        /// <summary>
-        /// Zwraca skonfigurowany obiekt GenerateContentConfig.
-        /// </summary>
         public GenerateContentConfig GetPostGenerationConfig()
         {
             return PostGenerationConfig;
         }
 
-        /// <summary>
-        /// Zwraca skonfigurowany obiekt GenerateContentConfig dla funkcji AskGemini,
-        /// który jest bardziej zwięzły i dostosowany do odpowiadania na pytania,
-        /// a nie generowania pełnych postów.
-        /// </summary>
-        /// <returns></returns>
         public GenerateContentConfig GetAskGenerationConfig()
         {
             return AskGenerationConfig;
@@ -148,5 +205,11 @@ namespace Service.Gemini
         {
             return ImageGenerationConfig;
         }
+
+        public GenerateContentConfig GetUserMimicGenerationConfig()
+        {
+            return UserMimicGenerationConfig;
+        }
+
     }
 }

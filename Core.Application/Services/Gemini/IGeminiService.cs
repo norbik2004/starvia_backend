@@ -13,5 +13,6 @@ namespace Core.Application.Services.Gemini
     {
         public Task<string> AskAiPostScope(string userId, UserPromptRequest request);
         public Task<ImagePromptResponse> GenerateImage(string userId, ImagePromptRequest request);
+        public Task<string> GenerateUserMimicConfig(string userId, string userTexts);
     }
 }
