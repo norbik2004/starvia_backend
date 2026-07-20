@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace Service.Gemini
 {
-    public class GeminiService(ILogger<IGeminiService> logger, IUserService userService, IPostRepository postRepository,
+    public class GeminiService(ILogger<IGeminiService> logger, IPostRepository postRepository,
         IUserPromptRepository userPromptRepository, Client geminiClient, GeminiLlMConfig config,
         IGeminiModelHealthService geminiModelHealthService, IImagePromptRepository imagePromptRepository,
         IMinioService minioService, IMapper mapper) : IGeminiService
@@ -365,7 +365,7 @@ namespace Service.Gemini
 
         private async Task UserAccesibilityValidation(string userId)
         {
-            bool canUserAccessAi = await userService.CanUserAccessAi(userId);
+            bool canUserAccessAi = true; //await userService.CanUserAccessAi(userId);
 
             if (!canUserAccessAi)
                 throw new BadRequestException("User has used hit limit, can't access Ai");
