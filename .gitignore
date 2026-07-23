@@ -23,3 +23,5 @@ artifacts/
 coverage*.json
 coverage*.xml
 *.coverage
+
+.env
