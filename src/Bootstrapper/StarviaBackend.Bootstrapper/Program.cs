@@ -1,7 +1,6 @@
+using ModularMonolith.Bootstrapper.Bootstrap;
 using Serilog;
-using StarviaBackend.Bootstrapper.Bootstrap;
 using StarviaBackend.Shared.Infrastructure;
-using StarviaBackend.Bootstrapper.Bootstrap;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +20,10 @@ app.UseInfrastructure();
 app.MapAppEndpoints();
 app.MapControllers();
 
-app.UseHttpsRedirection();
-
 app.Run();
+
+// Exposed so WebApplicationFactory<Program> can boot the host in integration tests.
+namespace ModularMonolith.Bootstrapper
+{
+    public partial class Program;
+}

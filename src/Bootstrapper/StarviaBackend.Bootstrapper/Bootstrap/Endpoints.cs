@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace StarviaBackend.Bootstrapper.Bootstrap;
+namespace ModularMonolith.Bootstrapper.Bootstrap;
 
 internal static class Endpoints
 {

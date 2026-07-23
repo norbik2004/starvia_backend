@@ -1,23 +1,27 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <IsPackable>false</IsPackable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <PackageId>StarviaBackend.Modules.Accounts.Tests.Integration</PackageId>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="coverlet.collector" Version="6.0.4"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0"/>
-        <PackageReference Include="NUnit" Version="4.3.2"/>
-        <PackageReference Include="NUnit.Analyzers" Version="4.7.0"/>
-        <PackageReference Include="NUnit3TestAdapter" Version="5.0.0"/>
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="MassTransit" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Using Include="NUnit.Framework"/>
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Shared\StarviaBackend.Shared.Tests.Integration\StarviaBackend.Shared.Tests.Integration.csproj" />
+    <ProjectReference Include="..\..\StarviaBackend.Modules.Accounts.Infrastructure\StarviaBackend.Modules.Accounts.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\StarviaBackend.Modules.Accounts.Application\StarviaBackend.Modules.Accounts.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
 
 </Project>

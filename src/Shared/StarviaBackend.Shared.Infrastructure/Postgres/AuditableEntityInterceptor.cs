@@ -46,11 +46,6 @@ public sealed class AuditableEntityInterceptor(IClock clock, IContext context) :
                     entry.Entity.LastModifiedAt = now;
                     entry.Entity.LastModifiedBy = user;
                     break;
-                case EntityState.Deleted:
-                case EntityState.Unchanged:
-                case EntityState.Detached:
-                default:
-                    break;
             }
         }
     }

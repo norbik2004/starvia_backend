@@ -1,0 +1,27 @@
+using StarviaBackend.Shared.Abstractions.Exceptions;
+
+namespace StarviaBackend.Modules.Accounts.Core.Users.Exceptions;
+
+internal sealed class EmailAlreadyInUseException(string email)
+    : BusinessException($"Email '{email}' is already in use.")
+{
+    public override string Code => "email_already_in_use";
+}
+
+internal sealed class UserNotFoundException(Guid userId)
+    : BusinessException($"User '{userId}' was not found.")
+{
+    public override string Code => "user_not_found";
+}
+
+internal sealed class InvalidCredentialsException()
+    : BusinessException("Invalid email or password.")
+{
+    public override string Code => "invalid_credentials";
+}
+
+internal sealed class UserCreationFailedException(string reason)
+    : BusinessException($"Could not create the account: {reason}")
+{
+    public override string Code => "user_creation_failed";
+}

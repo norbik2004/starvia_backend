@@ -1,9 +1,25 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>StarviaBackend.Modules.Accounts.Application</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="MassTransit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StarviaBackend.Modules.Accounts.Core\StarviaBackend.Modules.Accounts.Core.csproj" />
+    <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Infrastructure\StarviaBackend.Shared.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ModularMonolith.Modules.Accounts.Infrastructure" />
+    <InternalsVisibleTo Include="ModularMonolith.Modules.Accounts.Api" />
+    <InternalsVisibleTo Include="ModularMonolith.Modules.Accounts.Tests.Integration" />
+  </ItemGroup>
 
 </Project>

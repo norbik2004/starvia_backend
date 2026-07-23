@@ -1,6 +1,9 @@
-﻿using StarviaBackend.Shared.Infrastructure.Messaging;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using StarviaBackend.Modules.Accounts.Api;
+using StarviaBackend.Shared.Infrastructure.Messaging;
 
-namespace StarviaBackend.Bootstrapper.Bootstrap;
+namespace ModularMonolith.Bootstrapper.Bootstrap;
 
 internal static class Messaging
 {
@@ -8,7 +11,7 @@ internal static class Messaging
     {
         return services.AddMessaging(configuration, configurator =>
         {
-            //configurator.RegisterAccountsConsumers();
+            configurator.RegisterAccountsConsumers();
         });
     }
 }

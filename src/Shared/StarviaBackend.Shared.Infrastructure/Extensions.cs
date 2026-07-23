@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 using StarviaBackend.Shared.Abstractions.Time;
-using StarviaBackend.Shared.Infrastructure.Api;
 using StarviaBackend.Shared.Infrastructure.Auth;
 using StarviaBackend.Shared.Infrastructure.Contexts;
 using StarviaBackend.Shared.Infrastructure.Cqrs;
 using StarviaBackend.Shared.Infrastructure.Exceptions;
 using StarviaBackend.Shared.Infrastructure.Postgres;
+using StarviaBackend.Shared.Infrastructure.Api;
 using StarviaBackend.Shared.Infrastructure.Time;
 
 namespace StarviaBackend.Shared.Infrastructure;
@@ -53,9 +53,19 @@ public static class Extensions
                 In = ParameterLocation.Header,
                 Description = "Paste the JWT access token (without the 'Bearer ' prefix).",
             });
-            options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
-                [new OpenApiSecuritySchemeReference("Bearer")] = []
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer",
+                        },
+                    },
+                    []
+                },
             });
         });
 

@@ -1,9 +1,28 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>StarviaBackend.Modules.Accounts.Api</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ardalis.ApiEndpoints" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
+    <PackageReference Include="MassTransit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StarviaBackend.Modules.Accounts.Application\StarviaBackend.Modules.Accounts.Application.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Accounts.Core\StarviaBackend.Modules.Accounts.Core.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Accounts.Infrastructure\StarviaBackend.Modules.Accounts.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ModularMonolith.Modules.Accounts.Tests.Integration" />
+  </ItemGroup>
 
 </Project>

@@ -1,11 +1,11 @@
-﻿# Default ignored files
+# Default ignored files
 /shelf/
 /workspace.xml
 # Rider ignored files
+/projectSettingsUpdater.xml
 /contentModel.xml
 /modules.xml
-/projectSettingsUpdater.xml
-/.idea.starvia_backend.iml
+/.idea.ModularMonolithBoilerplate.iml
 # Editor-based HTTP Client requests
 /httpRequests/
 # Ignored default folder with query files
