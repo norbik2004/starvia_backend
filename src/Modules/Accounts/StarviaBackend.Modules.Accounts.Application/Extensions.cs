@@ -1,7 +1,11 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Shared.Infrastructure.Cqrs;
 
+[assembly:InternalsVisibleTo("StarviaBackend.Modules.Accounts.Infrastructure")]
+[assembly:InternalsVisibleTo("StarviaBackend.Modules.Accounts.Api")]
+[assembly:InternalsVisibleTo("StarviaBackend.Modules.Accounts.Tests.Integration")]
 namespace StarviaBackend.Modules.Accounts.Application;
 
 internal static class Extensions

@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using StarviaBackend.Modules.Accounts.Infrastructure.EF.Contexts;
-using ModularMonolith.Shared.Abstractions.Exceptions;
+using StarviaBackend.Shared.Abstractions.Exceptions;
 
 namespace StarviaBackend.Modules.Accounts.Tests.Integration.Users;
 

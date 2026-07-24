@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using StarviaBackend.Shared.Tests.Integration;
 
 namespace StarviaBackend.Modules.Accounts.Tests.Integration;

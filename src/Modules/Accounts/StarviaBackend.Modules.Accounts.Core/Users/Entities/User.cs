@@ -25,13 +25,13 @@ internal sealed class User : IdentityUser<Guid>
     {
     }
 
-    public static User Create(string email, string userName, DateTime createdAt)
+    public static User Create(string email, DateTime createdAt)
     {
         return new User
         {
             Id = Guid.NewGuid(),
             Email = email,
-            UserName = userName,
+            UserName = email.Split("@").First(),
             CreatedAt = createdAt,
         };
     }

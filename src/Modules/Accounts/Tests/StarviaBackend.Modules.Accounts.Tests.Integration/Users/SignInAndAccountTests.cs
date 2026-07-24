@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
-using ModularMonolith.Shared.Abstractions.Auth;
+using StarviaBackend.Shared.Abstractions.Auth;
 
 namespace StarviaBackend.Modules.Accounts.Tests.Integration.Users;
 

@@ -1,8 +1,9 @@
+using System.Runtime.CompilerServices;
 using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using ModularMonolith.Modules.Accounts.Core.Users.Entities;
+using StarviaBackend.Modules.Accounts.Core.Users.Entities;
 using StarviaBackend.Modules.Accounts.Infrastructure.EF.Contexts;
 using StarviaBackend.Modules.Accounts.Infrastructure.EF.Initializers;
 using StarviaBackend.Shared.Tests.Integration;

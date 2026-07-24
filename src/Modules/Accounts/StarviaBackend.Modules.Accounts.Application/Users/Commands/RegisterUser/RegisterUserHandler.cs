@@ -26,7 +26,7 @@ internal sealed class RegisterUserHandler(
             throw new EmailAlreadyInUseException(command.Email);
         }
 
-        var user = User.Create(command.Email, command.UserName, clock.UtcNow);
+        var user = User.Create(command.Email, clock.UtcNow);
 
         var result = await userManager.CreateAsync(user, command.Password);
         if (!result.Succeeded)

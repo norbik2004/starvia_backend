@@ -23,4 +23,10 @@ internal sealed class UsersRepository(AccountsWriteDbContext dbContext) : IUsers
         var normalized = email.ToUpperInvariant();
         return _users.AnyAsync(u => u.NormalizedEmail == normalized, cancellationToken);
     }
+
+    public async Task UpdateAsync(User user, CancellationToken cancellationToken = default)
+    {
+        dbContext.Users.Update(user);
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
 }

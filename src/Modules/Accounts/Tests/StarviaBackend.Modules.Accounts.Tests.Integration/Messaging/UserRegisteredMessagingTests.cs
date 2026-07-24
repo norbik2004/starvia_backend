@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using FluentAssertions;
 using MassTransit;
 using MassTransit.Testing;

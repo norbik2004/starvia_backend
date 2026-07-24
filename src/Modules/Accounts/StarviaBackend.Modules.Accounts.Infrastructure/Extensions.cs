@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Modules.Accounts.Core.Users.Entities;
@@ -9,6 +10,8 @@ using StarviaBackend.Modules.Accounts.Infrastructure.EF.Contexts;
 using StarviaBackend.Modules.Accounts.Infrastructure.EF.Initializers;
 using StarviaBackend.Modules.Accounts.Infrastructure.EF.Users.Repositories;
 
+[assembly:InternalsVisibleTo("StarviaBackend.Modules.Accounts.Api")]
+[assembly:InternalsVisibleTo("StarviaBackend.Modules.Accounts.Tests.Integration")]
 namespace StarviaBackend.Modules.Accounts.Infrastructure;
 
 internal static class Extensions
