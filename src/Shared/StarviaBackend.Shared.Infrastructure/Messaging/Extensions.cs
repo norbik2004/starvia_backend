@@ -20,8 +20,9 @@ public static class Extensions
         {
             registerConsumers(x);
 
-            x.UsingInMemory((context, cfg) =>
+            x.UsingRabbitMq((context, cfg) =>
             {
+                cfg.Host(configuration.GetConnectionString("RabbitMq"));
                 cfg.ConfigureEndpoints(context);
             });
         });

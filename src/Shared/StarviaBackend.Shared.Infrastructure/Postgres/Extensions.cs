@@ -12,8 +12,14 @@ public static class Extensions
     public static IServiceCollection AddPostgres(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptions<PostgresOptions>()
-            .Bind(configuration.GetSection(PostgresOptions.SectionName));
+            .Configure(options =>
+            {
+                options.ConnectionString =
+                    configuration.GetConnectionString(PostgresOptions.SectionName)!;
+            });
+
         services.TryAddScoped<AuditableEntityInterceptor>();
+
         return services;
     }
 

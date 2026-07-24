@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <RootNamespace>ModularMonolith.Tests.Architecture</RootNamespace>
-    <AssemblyName>ModularMonolith.Tests.Architecture</AssemblyName>
     <IsPackable>false</IsPackable>
+    <PackageId>StarviaBackend.Tests.Architecture</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

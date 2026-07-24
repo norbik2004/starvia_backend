@@ -2,7 +2,7 @@
 services:
   database:
     image: postgres:17.6
-    container_name: tr_database
+    container_name: PostgresDatabase
     ports:
       - "5435:5432"
     environment:
@@ -14,7 +14,7 @@ services:
 
   minio:
     image: minio/minio:latest
-    container_name: tr_minio
+    container_name: MiniO
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -25,9 +25,20 @@ services:
       - ./minio-data:/data
     command: server /data --console-address ":9001"
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: RabbitMQ
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbituser
+      RABBITMQ_DEFAULT_PASS: password
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
   redis:
     image: redis:latest
-    container_name: tr_redis
+    container_name: Redis
     ports:
       - "6379:6379"
     volumes:
@@ -37,3 +48,4 @@ volumes:
   database_pgdata: { }
   redisdata: { }
   miniodata: { }
+  rabbitmqdata: { }

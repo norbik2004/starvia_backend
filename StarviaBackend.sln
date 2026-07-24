@@ -36,7 +36,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarviaBackend.Modules.Acco
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularMonolith.Tests.Architecture", "tests\ModularMonolith.Tests.Architecture\ModularMonolith.Tests.Architecture.csproj", "{7C7E4929-CDE8-4058-910F-C34BF36B7C44}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarviaBackend.Tests.Architecture", "tests\StarviaBackend.Tests.Architecture\StarviaBackend.Tests.Architecture.csproj", "{7C7E4929-CDE8-4058-910F-C34BF36B7C44}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
