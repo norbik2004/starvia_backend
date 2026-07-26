@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.8.11904.113 insiders
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{C8E42992-5E42-0C2B-DBFE-AA848D06431C}"
@@ -37,6 +40,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarviaBackend.Tests.Architecture", "tests\StarviaBackend.Tests.Architecture\StarviaBackend.Tests.Architecture.csproj", "{7C7E4929-CDE8-4058-910F-C34BF36B7C44}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Posts", "Posts", "{BFE72221-F863-47CA-8551-F147CB9F92B5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{3256A4F4-B681-4562-AA3D-6DC824C7E0F4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5102D6DE-1E89-415F-9A49-64DF3EFC515A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarviaBackend.Modules.Posts.Core", "src\Modules\Posts\StarviaBackend.Modules.Posts.Core\StarviaBackend.Modules.Posts.Core.csproj", "{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -180,6 +191,18 @@ Global
 		{7C7E4929-CDE8-4058-910F-C34BF36B7C44}.Release|x64.Build.0 = Release|Any CPU
 		{7C7E4929-CDE8-4058-910F-C34BF36B7C44}.Release|x86.ActiveCfg = Release|Any CPU
 		{7C7E4929-CDE8-4058-910F-C34BF36B7C44}.Release|x86.Build.0 = Release|Any CPU
+		{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF}.Debug|x64.Build.0 = Debug|Any CPU
+		{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF}.Debug|x86.Build.0 = Debug|Any CPU
+		{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF}.Release|x64.ActiveCfg = Release|Any CPU
+		{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF}.Release|x64.Build.0 = Release|Any CPU
+		{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF}.Release|x86.ActiveCfg = Release|Any CPU
+		{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -202,5 +225,12 @@ Global
 		{B90DC9F6-9E95-EE4C-9492-A799A4945C80} = {AB43F588-E49B-60AD-8B9A-B0B6B2EE6BE9}
 		{D807F4F7-9301-4B3E-8EE3-65E25DCA2639} = {B90DC9F6-9E95-EE4C-9492-A799A4945C80}
 		{7C7E4929-CDE8-4058-910F-C34BF36B7C44} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{BFE72221-F863-47CA-8551-F147CB9F92B5} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
+		{3256A4F4-B681-4562-AA3D-6DC824C7E0F4} = {BFE72221-F863-47CA-8551-F147CB9F92B5}
+		{5102D6DE-1E89-415F-9A49-64DF3EFC515A} = {BFE72221-F863-47CA-8551-F147CB9F92B5}
+		{F1A812E4-4CE4-4440-A4D3-7231DB49F5AF} = {BFE72221-F863-47CA-8551-F147CB9F92B5}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {06F57D9F-0013-49B6-A091-060DF8AFE057}
 	EndGlobalSection
 EndGlobal
