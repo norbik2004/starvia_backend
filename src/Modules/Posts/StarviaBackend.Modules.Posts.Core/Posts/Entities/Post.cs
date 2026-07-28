@@ -2,19 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using StarviaBackend.Modules.Posts.Core.Posts.Enums;
+using StarviaBackend.Shared.Abstractions.Auth;
 using StarviaBackend.Shared.Abstractions.Domain;
 
 namespace StarviaBackend.Modules.Posts.Core.Posts.Entities;
 
 internal sealed class Post : BaseEntity, IAuditable
 {
-    public string Title { get; private set; }
+    private readonly List<PostPublication> _postPublications = [];
+
+    public required string Title { get; set; }
     public string? Body { get; set; }
     public PostStatus Status { get; private set; }
+
     public DateTime CreatedAt { get; set; }
     public string? CreatedBy { get; set; }
     public DateTime? LastModifiedAt { get; set; }
     public string? LastModifiedBy { get; set; }
+
+    public IReadOnlyCollection<PostPublication> Roles => _postPublications.AsReadOnly();
 
     private Post()
     {

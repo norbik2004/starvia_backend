@@ -31,7 +31,7 @@ internal sealed class User : IdentityUser<Guid>
         {
             Id = Guid.NewGuid(),
             Email = email,
-            UserName = email.Split("@").First(),
+            UserName = email.Split("@")[0] ?? "New User",
             CreatedAt = createdAt,
         };
     }
