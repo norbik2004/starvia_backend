@@ -8,7 +8,8 @@ using StarviaBackend.Shared.Infrastructure.Cqrs;
 using StarviaBackend.Shared.Infrastructure.Postgres;
 using StarviaBackend.Modules.Platforms.Infrastructure.EF.Contexts;
 using StarviaBackend.Modules.Platforms.Infrastructure.EF.Initializers;
-using StarviaBackend.Modules.Platforms.Infrastructure.EF.Users.Repositories;
+using StarviaBackend.Modules.Platforms.Infrastructure.EF.Platforms.Repositories;
+using StarviaBackend.Modules.Platforms.Infrastructure.EF.UserPlatforms.Repositories;
 
 [assembly:InternalsVisibleTo("StarviaBackend.Modules.Platforms.Api")]
 [assembly:InternalsVisibleTo("StarviaBackend.Modules.Platforms.Tests.Integration")]
@@ -22,6 +23,7 @@ internal static class Extensions
         services.AddPostgres<PlatformsReadDbContext>();
 
         services.AddScoped<IPlatformRepository, PlatformRepository>();
+        services.AddScoped<IUserPlatformRepository, UserPlatformRepository>();
         services.AddHostedService<PlatformsDataInitializer>();
 
         services.RegisterHandlers(Assembly.GetExecutingAssembly());

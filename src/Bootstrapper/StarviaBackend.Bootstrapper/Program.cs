@@ -20,7 +20,7 @@ app.UseInfrastructure();
 app.MapAppEndpoints();
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
 
 // Exposed so WebApplicationFactory<Program> can boot the host in integration tests.
 namespace ModularMonolith.Bootstrapper

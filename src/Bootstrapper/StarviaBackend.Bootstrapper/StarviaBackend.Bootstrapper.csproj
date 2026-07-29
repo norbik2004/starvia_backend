@@ -14,6 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Modules\Platforms\StarviaBackend.Modules.Platforms.Api\StarviaBackend.Modules.Platforms.Api.csproj" />
+    <ProjectReference Include="..\..\Modules\Platforms\StarviaBackend.Modules.Platforms.Infrastructure\StarviaBackend.Modules.Platforms.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Shared\StarviaBackend.Shared.Infrastructure\StarviaBackend.Shared.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Accounts\StarviaBackend.Modules.Accounts.Api\StarviaBackend.Modules.Accounts.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Accounts\StarviaBackend.Modules.Accounts.Infrastructure\StarviaBackend.Modules.Accounts.Infrastructure.csproj" />

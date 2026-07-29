@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using StarviaBackend.Modules.Platforms.Infrastructure.EF.Platforms.Configurations.Read;
 using StarviaBackend.Modules.Platforms.Infrastructure.EF.Platforms.Configurations.Read.Models;
+using StarviaBackend.Modules.Platforms.Infrastructure.EF.UserPlatforms.Configurations.Read;
+using StarviaBackend.Modules.Platforms.Infrastructure.EF.UserPlatforms.Configurations.Read.Models;
 
 namespace StarviaBackend.Modules.Platforms.Infrastructure.EF.Contexts;
 
@@ -10,12 +13,14 @@ namespace StarviaBackend.Modules.Platforms.Infrastructure.EF.Contexts;
 /// </summary>
 internal sealed class PlatformsReadDbContext(DbContextOptions<PlatformsReadDbContext> options) : DbContext(options)
 {
-    public DbSet<UserReadModel> Users => Set<UserReadModel>();
+    public DbSet<PlatformReadModel> Platforms => Set<PlatformReadModel>();
+    public DbSet<UserPlatformReadModel> UserPlatforms => Set<UserPlatformReadModel>();
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        builder.HasDefaultSchema(PlatformsWriteDbContext.Schema);
-        builder.ApplyConfiguration(new UserReadConfiguration());
+        modelBuilder.HasDefaultSchema(PlatformsWriteDbContext.Schema);
+        modelBuilder.ApplyConfiguration(new PlatformReadConfiguration());
+        modelBuilder.ApplyConfiguration(new UserPlatformReadConfiguration());
     }
 
     public override int SaveChanges() => throw new InvalidOperationException("Read context is read-only.");

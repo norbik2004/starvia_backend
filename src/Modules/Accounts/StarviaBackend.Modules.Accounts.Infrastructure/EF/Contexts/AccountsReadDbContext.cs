@@ -12,10 +12,10 @@ internal sealed class AccountsReadDbContext(DbContextOptions<AccountsReadDbConte
 {
     public DbSet<UserReadModel> Users => Set<UserReadModel>();
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        builder.HasDefaultSchema(AccountsWriteDbContext.Schema);
-        builder.ApplyConfiguration(new UserReadConfiguration());
+        modelBuilder.HasDefaultSchema(AccountsWriteDbContext.Schema);
+        modelBuilder.ApplyConfiguration(new UserReadConfiguration());
     }
 
     public override int SaveChanges() => throw new InvalidOperationException("Read context is read-only.");

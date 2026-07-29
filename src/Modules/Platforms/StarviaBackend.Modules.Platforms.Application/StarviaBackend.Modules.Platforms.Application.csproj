@@ -7,16 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="MassTransit" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Infrastructure\StarviaBackend.Shared.Infrastructure.csproj" />
-    <ProjectReference Include="..\StarviaBackend.Modules.Platforms.Application\StarviaBackend.Modules.Platforms.Application.csproj" />
     <ProjectReference Include="..\StaviaBackend.Modules.Platforms.Core\StarviaBackend.Modules.Platforms.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="UserPlatforms\Commands\" />
+    <Folder Include="UserPlatforms\Events\" />
+    <Folder Include="Platforms\Commands\" />
+    <Folder Include="Platforms\Events\" />
+    <Folder Include="UserPlatforms\Queries\GetUserPlatforms\" />
   </ItemGroup>
 
 </Project>

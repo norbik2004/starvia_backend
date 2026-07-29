@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using StarviaBackend.Modules.Platforms.Core.Users.Entities;
-using StarviaBackend.Modules.Platforms.Infrastructure.EF.Users.Configurations.Write;
+using StarviaBackend.Modules.Platforms.Core.Platforms.Entities;
+using StarviaBackend.Modules.Platforms.Infrastructure.EF.Platforms.Configurations.Write;
+using StarviaBackend.Modules.Platforms.Infrastructure.EF.UserPlatforms.Configurations.Write;
 
 namespace StarviaBackend.Modules.Platforms.Infrastructure.EF.Contexts;
 
@@ -10,19 +11,18 @@ namespace StarviaBackend.Modules.Platforms.Infrastructure.EF.Contexts;
 /// </summary>
 internal sealed class PlatformsWriteDbContext(DbContextOptions<PlatformsWriteDbContext> options) : DbContext(options)
 {
-    public const string Schema = "posts";
+    public const string Schema = "platforms";
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    public DbSet<Platform> Platforms => Set<Platform>();
+
+    public DbSet<UserPlatform> UserPlatforms => Set<UserPlatform>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(builder);
-        builder.HasDefaultSchema(Schema);
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.HasDefaultSchema(Schema);
 
-        builder.ApplyConfiguration(new UserConfiguration());
-        builder.ApplyConfiguration(new RoleConfiguration());
-        builder.ApplyConfiguration(new UserRoleConfiguration());
-        builder.ApplyConfiguration(new UserClaimConfiguration());
-        builder.ApplyConfiguration(new RoleClaimConfiguration());
-        builder.ApplyConfiguration(new UserLoginConfiguration());
-        builder.ApplyConfiguration(new UserTokenConfiguration());
+        modelBuilder.ApplyConfiguration(new PlatformConfiguration());
+        modelBuilder.ApplyConfiguration(new UserPlatformConfiguration());
     }
 }

@@ -15,7 +15,7 @@ internal sealed class Platform : BaseEntity
     public PlatformType PlatformType { get; private set; }
     public bool IsOnline { get; private set; }
 
-    public IReadOnlyCollection<UserPlatform> Roles => _userPlatforms.AsReadOnly();
+    public IReadOnlyCollection<UserPlatform> UserPlatforms => _userPlatforms.AsReadOnly();
 
     private Platform()
     {

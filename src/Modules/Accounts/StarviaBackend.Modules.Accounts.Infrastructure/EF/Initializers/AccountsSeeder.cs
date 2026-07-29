@@ -23,7 +23,9 @@ internal static class AccountsSeeder
     public static async Task SeedAdminAsync(UserManager<User> userManager, IClock clock)
     {
         var adminEmail = "admin@admin.com";
+#pragma warning disable S2068
         var adminPassword = "Admin123!";
+#pragma warning restore S2068
 
         var existingAdmin = await userManager.FindByEmailAsync(adminEmail);
 

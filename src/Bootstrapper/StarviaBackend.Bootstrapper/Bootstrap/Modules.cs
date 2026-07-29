@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Modules.Accounts.Api;
+using StarviaBackend.Modules.Platforms.Api;
 
 namespace ModularMonolith.Bootstrapper.Bootstrap;
 
@@ -13,6 +14,7 @@ internal static class Modules
     public static IServiceCollection AddModules(this IServiceCollection services, IConfiguration configuration)
     {
         services.RegisterAccountsModule();
+        services.RegisterPlatformsModule();
         return services;
     }
 }
