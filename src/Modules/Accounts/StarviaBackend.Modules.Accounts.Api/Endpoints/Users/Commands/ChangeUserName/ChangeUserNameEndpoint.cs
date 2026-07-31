@@ -11,7 +11,6 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace StarviaBackend.Modules.Accounts.Api.Endpoints.Users.Commands.ChangeUserName;
 
-[AllowAnonymous]
 internal sealed class ChangeUserNameEndpoint(IDispatcher dispatcher, IContext context)
     : EndpointBaseAsync.WithRequest<ChangeUserNameRequest>.WithActionResult<ChangeUserNameResult>
 {

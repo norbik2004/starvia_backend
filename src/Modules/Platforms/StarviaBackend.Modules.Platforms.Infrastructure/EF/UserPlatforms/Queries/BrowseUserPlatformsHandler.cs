@@ -12,7 +12,7 @@ internal sealed class BrowseUserPlatfromsHandler(PlatformsReadDbContext dbContex
         BrowseUserPlatformsQuery query,
         CancellationToken cancellationToken = default)
     {
-        var total = await dbContext.Platforms.LongCountAsync(cancellationToken);
+        var total = await dbContext.UserPlatforms.LongCountAsync(cancellationToken);
         if (total == 0)
         {
             return PagedResult<UserPlatformDto>.Empty(query.Page, query.PageSize);

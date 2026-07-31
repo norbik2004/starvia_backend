@@ -9,4 +9,6 @@ internal interface IUserPlatformRepository
 {
     Task<UserPlatform?> GetByIdAndUserIdAsync(Guid userPlatformId,
         Guid UserId, CancellationToken cancellationToken = default);
+
+    Task AddAsync(UserPlatform userPlatform);
 }

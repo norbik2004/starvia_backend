@@ -11,6 +11,13 @@ namespace StarviaBackend.Modules.Platforms.Infrastructure.EF.UserPlatforms.Repos
 internal class UserPlatformRepository(PlatformsWriteDbContext dbContext) : IUserPlatformRepository
 {
     private readonly DbSet<UserPlatform> _userPlatforms = dbContext.UserPlatforms;
+
+    public async Task AddAsync(UserPlatform userPlatform)
+    {
+        await _userPlatforms.AddAsync(userPlatform);
+        await dbContext.SaveChangesAsync();
+    }
+
     public async Task<UserPlatform?> GetByIdAndUserIdAsync(Guid userPlatformId, Guid UserId, CancellationToken cancellationToken = default)
     {
         return await _userPlatforms.Include(c => c.Platform).FirstOrDefaultAsync(u => userPlatformId == u.Id &&

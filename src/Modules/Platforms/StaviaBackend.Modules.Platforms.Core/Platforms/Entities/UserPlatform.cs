@@ -42,5 +42,17 @@ internal sealed class UserPlatform : BaseEntity, IAuditable
         };
     }
 
+    public static UserPlatform Create(Guid userId, Guid platformId, string accountUsername, string? accountComment)
+    {
+        return new UserPlatform
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            PlatformId = platformId,
+            AccountUsername = accountUsername,
+            AccountComment = accountComment,
+        };
+    }
+
     public void UpdateToken(string accessToken) => AccessToken = accessToken;
 }

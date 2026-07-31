@@ -10,7 +10,7 @@ using StarviaBackend.Shared.Abstractions.Dispatchers;
 using StarviaBackend.Shared.Abstractions.Queries;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace StarviaBackend.Modules.Platforms.Api.Endpoints.UserPlatforms.Queries;
+namespace StarviaBackend.Modules.Platforms.Api.Endpoints.UserPlatforms.Queries.BrowseUserPlatforms;
 
 [Authorize(Roles = UserPlatformsEndpoint.AdminRole)]
 internal sealed class BrowseUserPlatformsEndpoint(IDispatcher dispatcher)
