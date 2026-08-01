@@ -1,6 +1,6 @@
 using StarviaBackend.Shared.Abstractions.Auth;
 
-namespace StarviaBackend.Modules.Accounts.Api.Endpoints.Users;
+namespace StarviaBackend.Modules.Platforms.Api.Endpoints.UserPlatforms;
 
 /// <summary>Centralized route/tag/role constants for the User platforms feature endpoints.</summary>
 internal static class UserPlatformsEndpoint

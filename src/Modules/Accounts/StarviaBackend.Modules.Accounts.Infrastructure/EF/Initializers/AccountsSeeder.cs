@@ -32,6 +32,7 @@ internal static class AccountsSeeder
         if (existingAdmin == null)
         {
             var adminUser = User.Create(adminEmail, clock.UtcNow);
+            adminUser.EmailConfirmed = true;
 
             var result = await userManager.CreateAsync(adminUser, adminPassword);
 

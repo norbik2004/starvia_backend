@@ -25,3 +25,9 @@ internal sealed class UserCreationFailedException(string reason)
 {
     public override string Code => "user_creation_failed";
 }
+
+internal sealed class EmailNotConfirmedException()
+    : BusinessException("The email address has not been confirmed.")
+{
+    public override string Code => "email_not_confirmed";
+}

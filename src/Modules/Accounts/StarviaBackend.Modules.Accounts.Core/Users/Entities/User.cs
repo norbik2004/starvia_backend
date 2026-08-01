@@ -33,10 +33,13 @@ internal sealed class User : IdentityUser<Guid>
             Email = email,
             UserName = email.Split("@")[0] ?? "New User",
             CreatedAt = createdAt,
+            EmailConfirmed = false
         };
     }
 
     public void ChangeUserName(string userName) => UserName = userName;
 
     public void RecordLogin(DateTime at) => LastLoginAt = at;
+
+    public void ConfirmEmail() => EmailConfirmed = true;
 }

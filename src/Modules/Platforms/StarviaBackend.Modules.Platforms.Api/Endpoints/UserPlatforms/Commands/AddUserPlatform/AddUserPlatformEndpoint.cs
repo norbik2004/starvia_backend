@@ -4,7 +4,6 @@ using System.Text;
 using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using StarviaBackend.Modules.Accounts.Api.Endpoints.Users;
 using StarviaBackend.Modules.Platforms.Application.UserPlatforms.Commands.AddUserPlatform;
 using StarviaBackend.Modules.Platforms.Application.UserPlatforms.Queries.BrowseUserPlatforms;
 using StarviaBackend.Shared.Abstractions.Contexts;
