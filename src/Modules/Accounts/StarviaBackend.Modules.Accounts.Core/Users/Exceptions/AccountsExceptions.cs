@@ -31,3 +31,9 @@ internal sealed class EmailNotConfirmedException()
 {
     public override string Code => "email_not_confirmed";
 }
+
+internal sealed class EmailArleadyConfirmedException(string email)
+    : BusinessException($"Email {email} is arleady confirmed")
+{
+    public override string Code => "email_arleady_confirmed";
+}
