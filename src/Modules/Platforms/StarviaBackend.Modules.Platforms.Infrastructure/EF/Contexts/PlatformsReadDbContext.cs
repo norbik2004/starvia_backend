@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using StarviaBackend.Modules.Platforms.Infrastructure.EF.Platforms.Configurations.Read;
 using StarviaBackend.Modules.Platforms.Infrastructure.EF.Platforms.Configurations.Read.Models;
 using StarviaBackend.Modules.Platforms.Infrastructure.EF.UserPlatforms.Configurations.Read;
