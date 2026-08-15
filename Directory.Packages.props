@@ -36,6 +36,10 @@
     <PackageVersion Include="MassTransit.RabbitMQ" Version="8.5.10" />
   </ItemGroup>
 
+  <ItemGroup Label="Email">
+    <PackageVersion Include="MailKit" Version="4.17.0" />
+  </ItemGroup>
+
   <ItemGroup Label="Logging">
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
   </ItemGroup>

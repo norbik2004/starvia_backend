@@ -8,6 +8,7 @@ using StarviaBackend.Shared.Abstractions.Time;
 using StarviaBackend.Shared.Infrastructure.Auth;
 using StarviaBackend.Shared.Infrastructure.Contexts;
 using StarviaBackend.Shared.Infrastructure.Cqrs;
+using StarviaBackend.Shared.Infrastructure.Email;
 using StarviaBackend.Shared.Infrastructure.Exceptions;
 using StarviaBackend.Shared.Infrastructure.Postgres;
 using StarviaBackend.Shared.Infrastructure.Api;
@@ -31,6 +32,7 @@ public static class Extensions
         services.AddDispatchers();
         services.AddPostgres(configuration);
         services.AddAuth(configuration);
+        services.AddEmail(configuration);
 
         services.AddCors(options => options.AddPolicy(CorsPolicy, policy =>
             policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));

@@ -2,18 +2,21 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using StarviaBackend.Modules.Accounts.Application.Users.Commands.GenerateEmailConfirmationToken;
 using StarviaBackend.Shared.Abstractions.Dispatchers;
+using StarviaBackend.Shared.Abstractions.Email;
 
 namespace StarviaBackend.Modules.Accounts.Application.Users.Events.UserRegistered;
 
 /// <summary>
-/// Example consumer showing the publish/consume pattern end to end. Here it just logs;
-/// in a real module this is where you would send a welcome email, seed defaults, etc.
+/// After registration: generate a confirmation token and queue a confirm-account email via MassTransit.
 /// </summary>
 internal sealed class UserRegisteredConsumer(
     ILogger<UserRegisteredConsumer> logger,
-    IDispatcher dispatcher)
+    IDispatcher dispatcher,
+    IPublishEndpoint publishEndpoint)
     : IConsumer<UserRegisteredEvent>
 {
+    private const string ConfirmAccountEmailType = "ConfirmAccountEmail";
+
     public async Task Consume(ConsumeContext<UserRegisteredEvent> context)
     {
         logger.LogInformation(
@@ -22,9 +25,16 @@ internal sealed class UserRegisteredConsumer(
             context.Message.Email,
             context.Message.RegisteredAt);
 
-        var code = await dispatcher.SendAsync<GenerateEmailConfirmationTokenCommand, GenerateEmailConfirmationTokenResult>
-            (new GenerateEmailConfirmationTokenCommand(context.Message.UserId));
+        var code = await dispatcher.SendAsync<GenerateEmailConfirmationTokenCommand, GenerateEmailConfirmationTokenResult>(
+            new GenerateEmailConfirmationTokenCommand(context.Message.UserId),
+            context.CancellationToken);
 
-        // TODO: sending email with Code
+        await publishEndpoint.Publish(
+            new SendEmailRequestedEvent(
+                context.Message.UserId,
+                context.Message.Email,
+                ConfirmAccountEmailType,
+                code.Token),
+            context.CancellationToken);
     }
 }

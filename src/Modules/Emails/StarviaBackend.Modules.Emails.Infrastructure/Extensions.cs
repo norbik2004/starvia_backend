@@ -1,13 +1,14 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using StarviaBackend.Modules.Emails.Core.Emails.Entities;
+using StarviaBackend.Modules.Emails.Application.Emails.Templates;
 using StarviaBackend.Modules.Emails.Core.Emails.Repositories;
-using StarviaBackend.Shared.Infrastructure.Cqrs;
-using StarviaBackend.Shared.Infrastructure.Postgres;
 using StarviaBackend.Modules.Emails.Infrastructure.EF.Contexts;
 using StarviaBackend.Modules.Emails.Infrastructure.EF.Emails.Repositories;
+using StarviaBackend.Modules.Emails.Infrastructure.EF.Initializers;
+using StarviaBackend.Modules.Emails.Infrastructure.Mailing.Templates;
+using StarviaBackend.Shared.Infrastructure.Cqrs;
+using StarviaBackend.Shared.Infrastructure.Postgres;
 
 [assembly:InternalsVisibleTo("StarviaBackend.Modules.Emails.Api")]
 [assembly:InternalsVisibleTo("StarviaBackend.Modules.Emails.Tests.Integration")]
@@ -21,6 +22,8 @@ internal static class Extensions
         services.AddPostgres<EmailsReadDbContex>();
 
         services.AddScoped<IEmailRepository, EmailRepository>();
+        services.AddSingleton<IEmailTemplateRenderer, SimpleEmailTemplateRenderer>();
+        services.AddHostedService<EmailsDataInitializer>();
 
         services.RegisterHandlers(Assembly.GetExecutingAssembly());
         return services;

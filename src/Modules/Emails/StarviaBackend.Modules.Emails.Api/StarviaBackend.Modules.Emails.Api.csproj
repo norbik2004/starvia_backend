@@ -7,16 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Ardalis.ApiEndpoints" />
     <PackageReference Include="MassTransit" />
-    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
-    <ProjectReference Include="..\..\Platforms\StarviaBackend.Modules.Platforms.Application\StarviaBackend.Modules.Platforms.Application.csproj" />
-    <ProjectReference Include="..\..\Platforms\StarviaBackend.Modules.Platforms.Infrastructure\StarviaBackend.Modules.Platforms.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Platforms\StaviaBackend.Modules.Platforms.Core\StarviaBackend.Modules.Platforms.Core.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Emails.Application\StarviaBackend.Modules.Emails.Application.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Emails.Infrastructure\StarviaBackend.Modules.Emails.Infrastructure.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Emails.Core\StarviaBackend.Modules.Emails.Core.csproj" />
   </ItemGroup>
 
 </Project>

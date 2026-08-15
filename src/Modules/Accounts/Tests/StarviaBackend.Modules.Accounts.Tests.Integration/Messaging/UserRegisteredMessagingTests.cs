@@ -1,9 +1,13 @@
-using System.Runtime.CompilerServices;
 using FluentAssertions;
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using StarviaBackend.Modules.Accounts.Application.Users.Commands.GenerateEmailConfirmationToken;
 using StarviaBackend.Modules.Accounts.Application.Users.Events.UserRegistered;
+using StarviaBackend.Shared.Abstractions.Commands;
+using StarviaBackend.Shared.Abstractions.Dispatchers;
+using StarviaBackend.Shared.Abstractions.Email;
+using StarviaBackend.Shared.Abstractions.Queries;
 
 namespace StarviaBackend.Modules.Accounts.Tests.Integration.Messaging;
 
@@ -14,10 +18,11 @@ namespace StarviaBackend.Modules.Accounts.Tests.Integration.Messaging;
 public sealed class UserRegisteredMessagingTests
 {
     [Fact]
-    public async Task Publishing_UserRegisteredEvent_is_delivered_to_the_consumer()
+    public async Task Publishing_UserRegisteredEvent_queues_confirm_account_email()
     {
         await using var provider = new ServiceCollection()
             .AddLogging()
+            .AddSingleton<IDispatcher, StubDispatcher>()
             .AddMassTransitTestHarness(x => x.AddConsumer<UserRegisteredConsumer>())
             .BuildServiceProvider(true);
 
@@ -29,8 +34,31 @@ public sealed class UserRegisteredMessagingTests
 
         (await harness.Published.Any<UserRegisteredEvent>()).Should().BeTrue();
         (await harness.Consumed.Any<UserRegisteredEvent>()).Should().BeTrue();
+        (await harness.Published.Any<SendEmailRequestedEvent>()).Should().BeTrue();
 
         var consumerHarness = harness.GetConsumerHarness<UserRegisteredConsumer>();
         (await consumerHarness.Consumed.Any<UserRegisteredEvent>()).Should().BeTrue();
+    }
+
+    private sealed class StubDispatcher : IDispatcher
+    {
+        public Task SendAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default)
+            where TCommand : class, ICommand
+            => Task.CompletedTask;
+
+        public Task<TResult> SendAsync<TCommand, TResult>(TCommand command, CancellationToken cancellationToken = default)
+            where TCommand : class, ICommand<TResult>
+        {
+            if (typeof(TResult) == typeof(GenerateEmailConfirmationTokenResult))
+            {
+                object result = new GenerateEmailConfirmationTokenResult("test-token");
+                return Task.FromResult((TResult)result);
+            }
+
+            throw new NotSupportedException($"Unexpected command result type {typeof(TResult).Name}");
+        }
+
+        public Task<TResult> QueryAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
+            => throw new NotSupportedException();
     }
 }

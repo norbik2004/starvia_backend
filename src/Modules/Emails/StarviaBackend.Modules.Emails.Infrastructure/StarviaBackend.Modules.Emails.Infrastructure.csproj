@@ -19,8 +19,4 @@
     <ProjectReference Include="..\StarviaBackend.Modules.Emails.Core\StarviaBackend.Modules.Emails.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="EF\Initializers\" />
-  </ItemGroup>
-
 </Project>
