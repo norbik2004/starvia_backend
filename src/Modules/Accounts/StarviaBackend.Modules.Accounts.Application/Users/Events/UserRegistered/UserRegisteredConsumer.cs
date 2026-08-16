@@ -1,6 +1,8 @@
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using StarviaBackend.Modules.Accounts.Application.Users.Commands.ConfirmEmail;
 using StarviaBackend.Modules.Accounts.Application.Users.Commands.GenerateEmailConfirmationToken;
+using StarviaBackend.Shared.Abstractions.App;
 using StarviaBackend.Shared.Abstractions.Dispatchers;
 using StarviaBackend.Shared.Abstractions.Email;
 
@@ -12,7 +14,8 @@ namespace StarviaBackend.Modules.Accounts.Application.Users.Events.UserRegistere
 internal sealed class UserRegisteredConsumer(
     ILogger<UserRegisteredConsumer> logger,
     IDispatcher dispatcher,
-    IPublishEndpoint publishEndpoint)
+    IPublishEndpoint publishEndpoint,
+    IAppUrls appUrls)
     : IConsumer<UserRegisteredEvent>
 {
     private const string ConfirmAccountEmailType = "ConfirmAccountEmail";
@@ -29,12 +32,18 @@ internal sealed class UserRegisteredConsumer(
             new GenerateEmailConfirmationTokenCommand(context.Message.UserId),
             context.CancellationToken);
 
+        var confirmationLink = EmailConfirmationLink.Build(
+            appUrls.ApiBaseUrl,
+            context.Message.UserId,
+            code.Token);
+
         await publishEndpoint.Publish(
             new SendEmailRequestedEvent(
                 context.Message.UserId,
                 context.Message.Email,
                 ConfirmAccountEmailType,
-                code.Token),
+                Code: code.Token,
+                Link: confirmationLink),
             context.CancellationToken);
     }
 }

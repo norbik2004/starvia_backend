@@ -9,4 +9,8 @@ internal interface IEmailTemplateRenderer
 
 internal sealed record EmailTemplate(string Subject, string HtmlBody);
 
-internal sealed record EmailTemplateModel(string Email, string? Code = null, string? UserName = null);
+internal sealed record EmailTemplateModel(
+    string Email,
+    string? Code = null,
+    string? UserName = null,
+    string? Link = null);

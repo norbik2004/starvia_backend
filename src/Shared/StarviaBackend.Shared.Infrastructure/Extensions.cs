@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using StarviaBackend.Shared.Abstractions.Time;
+using StarviaBackend.Shared.Infrastructure.App;
 using StarviaBackend.Shared.Infrastructure.Auth;
 using StarviaBackend.Shared.Infrastructure.Contexts;
 using StarviaBackend.Shared.Infrastructure.Cqrs;
@@ -33,6 +34,7 @@ public static class Extensions
         services.AddPostgres(configuration);
         services.AddAuth(configuration);
         services.AddEmail(configuration);
+        services.AddAppUrls(configuration);
 
         services.AddCors(options => options.AddPolicy(CorsPolicy, policy =>
             policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));

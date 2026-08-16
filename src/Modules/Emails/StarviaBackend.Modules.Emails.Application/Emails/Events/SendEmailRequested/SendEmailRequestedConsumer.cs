@@ -32,7 +32,7 @@ internal sealed class SendEmailRequestedConsumer(
 
         await dispatcher.SendAsync<SendEmailCommand, SendEmailResult>(
             new SendEmailCommand(
-                new SendEmailRequest(message.Email, emailType, message.Code, message.UserName),
+                new SendEmailRequest(message.Email, emailType, message.Code, message.UserName, message.Link),
                 message.UserId),
             context.CancellationToken);
     }

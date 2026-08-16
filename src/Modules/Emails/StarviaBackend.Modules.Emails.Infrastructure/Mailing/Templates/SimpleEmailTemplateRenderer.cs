@@ -15,7 +15,7 @@ internal sealed class SimpleEmailTemplateRenderer : IEmailTemplateRenderer
         return emailType switch
         {
             EmailType.WelcomingEmail => RenderWelcome(displayName),
-            EmailType.ConfirmAccountEmail => RenderConfirmAccount(displayName, model.Code),
+            EmailType.ConfirmAccountEmail => RenderConfirmAccount(displayName, model.Link),
             EmailType.ResetPasswordEmail => RenderResetPassword(displayName, model.Code),
             _ => throw new ArgumentOutOfRangeException(nameof(emailType), emailType, "Unsupported email type."),
         };
@@ -35,16 +35,23 @@ internal sealed class SimpleEmailTemplateRenderer : IEmailTemplateRenderer
         return new EmailTemplate(subject, body);
     }
 
-    private static EmailTemplate RenderConfirmAccount(string displayName, string? code)
+    private static EmailTemplate RenderConfirmAccount(string displayName, string? link)
     {
         var subject = "Confirm your Starvia account";
-        var confirmationCode = string.IsNullOrWhiteSpace(code) ? "—" : code;
+        var confirmationLink = string.IsNullOrWhiteSpace(link) ? "#" : link;
         var body = Wrap(
             subject,
             $"""
             <p>Hi {Encode(displayName)},</p>
-            <p>Please confirm your email address using the code below:</p>
-            <p style="font-size:24px;font-weight:700;letter-spacing:2px;">{Encode(confirmationCode)}</p>
+            <p>Please confirm your email address by clicking the button below:</p>
+            <p style="margin:28px 0;">
+              <a href="{Encode(confirmationLink)}"
+                 style="display:inline-block;background:#1a1a1a;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:600;">
+                Confirm email
+              </a>
+            </p>
+            <p>If the button does not work, copy and paste this link into your browser:</p>
+            <p style="word-break:break-all;font-size:12px;color:#555;">{Encode(confirmationLink)}</p>
             <p>If you did not create an account, you can ignore this message.</p>
             """);
 

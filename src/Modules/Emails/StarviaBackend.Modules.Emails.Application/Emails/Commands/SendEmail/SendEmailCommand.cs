@@ -10,6 +10,7 @@ public sealed record SendEmailRequest(
     string Email,
     EmailType EmailType,
     string? Code = null,
-    string? UserName = null);
+    string? UserName = null,
+    string? Link = null);
 
 public sealed record SendEmailResult(Guid EmailId);

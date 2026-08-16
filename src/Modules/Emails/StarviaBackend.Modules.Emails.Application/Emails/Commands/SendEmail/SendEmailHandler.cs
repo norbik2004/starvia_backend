@@ -22,7 +22,7 @@ internal sealed class SendEmailHandler(
         var request = command.request;
         var template = templateRenderer.Render(
             request.EmailType,
-            new EmailTemplateModel(request.Email, request.Code, request.UserName));
+            new EmailTemplateModel(request.Email, request.Code, request.UserName, request.Link));
 
         try
         {

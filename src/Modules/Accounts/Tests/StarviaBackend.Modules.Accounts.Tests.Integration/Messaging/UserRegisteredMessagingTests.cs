@@ -4,6 +4,7 @@ using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Modules.Accounts.Application.Users.Commands.GenerateEmailConfirmationToken;
 using StarviaBackend.Modules.Accounts.Application.Users.Events.UserRegistered;
+using StarviaBackend.Shared.Abstractions.App;
 using StarviaBackend.Shared.Abstractions.Commands;
 using StarviaBackend.Shared.Abstractions.Dispatchers;
 using StarviaBackend.Shared.Abstractions.Email;
@@ -23,6 +24,7 @@ public sealed class UserRegisteredMessagingTests
         await using var provider = new ServiceCollection()
             .AddLogging()
             .AddSingleton<IDispatcher, StubDispatcher>()
+            .AddSingleton<IAppUrls, StubAppUrls>()
             .AddMassTransitTestHarness(x => x.AddConsumer<UserRegisteredConsumer>())
             .BuildServiceProvider(true);
 
@@ -38,6 +40,17 @@ public sealed class UserRegisteredMessagingTests
 
         var consumerHarness = harness.GetConsumerHarness<UserRegisteredConsumer>();
         (await consumerHarness.Consumed.Any<UserRegisteredEvent>()).Should().BeTrue();
+
+        var publishedEmail = harness.Published.Select<SendEmailRequestedEvent>().First();
+        publishedEmail.Context.Message.EmailType.Should().Be("ConfirmAccountEmail");
+        publishedEmail.Context.Message.Link.Should().Contain("/v1/accounts/confirm-email");
+        publishedEmail.Context.Message.Link.Should().Contain($"userId={@event.UserId}");
+    }
+
+    private sealed class StubAppUrls : IAppUrls
+    {
+        public string ApiBaseUrl => "http://api.test";
+        public string FrontendBaseUrl => "http://front.test";
     }
 
     private sealed class StubDispatcher : IDispatcher

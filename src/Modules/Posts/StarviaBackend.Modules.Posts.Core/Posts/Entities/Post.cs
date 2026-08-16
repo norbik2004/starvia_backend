@@ -26,7 +26,7 @@ internal sealed class Post : BaseEntity, IAuditable
     {
     }
 
-    public static Post Create(string title, DateTime createdAt, Guid createdBy, string? body)
+    public static Post Create(string title, DateTime createdAt, Guid createdBy)
     {
         return new Post
         {
@@ -34,7 +34,7 @@ internal sealed class Post : BaseEntity, IAuditable
             Title = title,
             CreatedAt = createdAt,
             CreatedBy = createdBy.ToString(),
-            Body = body
+            Status = PostStatus.Draft
         };
     }
 

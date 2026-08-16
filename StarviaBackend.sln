@@ -75,6 +75,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarviaBackend.Modules.Emai
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarviaBackend.Modules.Emails.Api", "src\Modules\Emails\StarviaBackend.Modules.Emails.Api\StarviaBackend.Modules.Emails.Api.csproj", "{FEBE5DC1-7176-4DC1-85B6-CE716EBBE9FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarviaBackend.Modules.Posts.Application", "src\Modules\Posts\StarviaBackend.Modules.Posts.Application\StarviaBackend.Modules.Posts.Application.csproj", "{B5B3F753-84A4-436C-85A3-BE859395C10E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -337,6 +339,18 @@ Global
 		{FEBE5DC1-7176-4DC1-85B6-CE716EBBE9FE}.Release|x64.Build.0 = Release|Any CPU
 		{FEBE5DC1-7176-4DC1-85B6-CE716EBBE9FE}.Release|x86.ActiveCfg = Release|Any CPU
 		{FEBE5DC1-7176-4DC1-85B6-CE716EBBE9FE}.Release|x86.Build.0 = Release|Any CPU
+		{B5B3F753-84A4-436C-85A3-BE859395C10E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5B3F753-84A4-436C-85A3-BE859395C10E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5B3F753-84A4-436C-85A3-BE859395C10E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B5B3F753-84A4-436C-85A3-BE859395C10E}.Debug|x64.Build.0 = Debug|Any CPU
+		{B5B3F753-84A4-436C-85A3-BE859395C10E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B5B3F753-84A4-436C-85A3-BE859395C10E}.Debug|x86.Build.0 = Debug|Any CPU
+		{B5B3F753-84A4-436C-85A3-BE859395C10E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5B3F753-84A4-436C-85A3-BE859395C10E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5B3F753-84A4-436C-85A3-BE859395C10E}.Release|x64.ActiveCfg = Release|Any CPU
+		{B5B3F753-84A4-436C-85A3-BE859395C10E}.Release|x64.Build.0 = Release|Any CPU
+		{B5B3F753-84A4-436C-85A3-BE859395C10E}.Release|x86.ActiveCfg = Release|Any CPU
+		{B5B3F753-84A4-436C-85A3-BE859395C10E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -376,6 +390,7 @@ Global
 		{109638D0-533F-4B89-92BE-7A7C5F791F34} = {36D1B960-DFC4-434B-87C7-D0CFFBD126DE}
 		{F6658418-4AF1-45C9-8DEB-6F262A9914E3} = {36D1B960-DFC4-434B-87C7-D0CFFBD126DE}
 		{FEBE5DC1-7176-4DC1-85B6-CE716EBBE9FE} = {36D1B960-DFC4-434B-87C7-D0CFFBD126DE}
+		{B5B3F753-84A4-436C-85A3-BE859395C10E} = {BFE72221-F863-47CA-8551-F147CB9F92B5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {06F57D9F-0013-49B6-A091-060DF8AFE057}

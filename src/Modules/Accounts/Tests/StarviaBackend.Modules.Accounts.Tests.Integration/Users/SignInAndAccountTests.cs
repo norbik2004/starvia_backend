@@ -1,7 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using StarviaBackend.Modules.Accounts.Core.Users.Entities;
 using StarviaBackend.Shared.Abstractions.Auth;
+using StarviaBackend.Shared.Abstractions.Exceptions;
 
 namespace StarviaBackend.Modules.Accounts.Tests.Integration.Users;
 
@@ -11,7 +15,7 @@ public sealed class SignInAndAccountTests(AccountsApp app) : AccountsIntegration
     public async Task SignIn_with_valid_credentials_returns_a_token()
     {
         var email = UniqueEmail();
-        await Register(email);
+        await RegisterAndConfirm(email);
 
         var response = await Client.PostAsJsonAsync(
             "/v1/accounts/sign-in",
@@ -25,10 +29,25 @@ public sealed class SignInAndAccountTests(AccountsApp app) : AccountsIntegration
     }
 
     [Fact]
-    public async Task SignIn_with_wrong_password_returns_bad_request()
+    public async Task SignIn_with_unconfirmed_email_returns_bad_request()
     {
         var email = UniqueEmail();
         await Register(email);
+
+        var response = await Client.PostAsJsonAsync(
+            "/v1/accounts/sign-in",
+            new { email, password = "Passw0rd!" });
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+        error!.Errors.Should().Contain(e => e.Code == "email_not_confirmed");
+    }
+
+    [Fact]
+    public async Task SignIn_with_wrong_password_returns_bad_request()
+    {
+        var email = UniqueEmail();
+        await RegisterAndConfirm(email);
 
         var response = await Client.PostAsJsonAsync(
             "/v1/accounts/sign-in",
@@ -70,6 +89,18 @@ public sealed class SignInAndAccountTests(AccountsApp app) : AccountsIntegration
         response.EnsureSuccessStatusCode();
         var body = await response.Content.ReadFromJsonAsync<RegisterUserResponse>();
         return body!.UserId;
+    }
+
+    private async Task RegisterAndConfirm(string email)
+    {
+        var userId = await Register(email);
+        await UsingServicesAsync(async sp =>
+        {
+            var userManager = sp.GetRequiredService<UserManager<User>>();
+            var user = await userManager.FindByIdAsync(userId.ToString());
+            var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
+            (await userManager.ConfirmEmailAsync(user!, token)).Succeeded.Should().BeTrue();
+        });
     }
 
     private static string UniqueEmail() => $"user-{Guid.NewGuid():N}@example.com";

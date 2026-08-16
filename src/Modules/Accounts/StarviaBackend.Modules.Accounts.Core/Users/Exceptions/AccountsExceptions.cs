@@ -37,3 +37,9 @@ internal sealed class EmailArleadyConfirmedException(string email)
 {
     public override string Code => "email_arleady_confirmed";
 }
+
+internal sealed class InvalidEmailConfirmationCodeException()
+    : BusinessException("The email confirmation code is invalid or has expired.")
+{
+    public override string Code => "invalid_email_confirmation_code";
+}

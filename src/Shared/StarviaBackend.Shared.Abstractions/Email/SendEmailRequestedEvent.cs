@@ -10,4 +10,5 @@ public sealed record SendEmailRequestedEvent(
     string Email,
     string EmailType,
     string? Code = null,
-    string? UserName = null) : IIntegrationEvent;
+    string? UserName = null,
+    string? Link = null) : IIntegrationEvent;

@@ -34,6 +34,7 @@ internal sealed class AccountsDataInitializer(IServiceProvider serviceProvider, 
             logger.LogInformation("Seeding admin user for development environment.");
 
             await AccountsSeeder.SeedAdminAsync(userManager, clock);
+            await AccountsSeeder.SeedUserAsync(userManager, clock);
         }
     }
     
