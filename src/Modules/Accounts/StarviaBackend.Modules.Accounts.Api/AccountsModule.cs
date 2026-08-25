@@ -24,6 +24,9 @@ public static class AccountsModule
 
     public static void RegisterAccountsConsumers(this IBusRegistrationConfigurator configurator)
     {
-        configurator.AddConsumer<UserRegisteredConsumer>();
+        configurator.AddConsumer<UserRegisteredConsumer>((context, cfg) =>
+        {
+            cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(60)));
+        });
     }
 }

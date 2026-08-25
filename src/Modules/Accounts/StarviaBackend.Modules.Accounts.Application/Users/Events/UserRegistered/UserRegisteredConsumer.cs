@@ -33,7 +33,7 @@ internal sealed class UserRegisteredConsumer(
             context.CancellationToken);
 
         var confirmationLink = EmailConfirmationLink.Build(
-            appUrls.ApiBaseUrl,
+            appUrls.FrontendBaseUrl,
             context.Message.UserId,
             code.Token);
 

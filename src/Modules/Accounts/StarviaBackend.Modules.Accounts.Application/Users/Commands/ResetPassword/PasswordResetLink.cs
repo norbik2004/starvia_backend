@@ -1,8 +1,8 @@
-namespace StarviaBackend.Modules.Accounts.Application.Users.Commands.ConfirmEmail;
+namespace StarviaBackend.Modules.Accounts.Application.Users.Commands.ResetPassword;
 
-internal static class EmailConfirmationLink
+internal static class PasswordResetLink
 {
-    public const string FrontendRelativePath = "email-confirmed";
+    public const string FrontendRelativePath = "reset-password";
 
     public static string Build(string frontendBaseUrl, Guid userId, string token)
     {
@@ -11,6 +11,4 @@ internal static class EmailConfirmationLink
     }
 
     public static string EncodeToken(string token) => IdentityTokenEncoder.Encode(token);
-
-    public static string DecodeToken(string code) => IdentityTokenEncoder.Decode(code);
 }

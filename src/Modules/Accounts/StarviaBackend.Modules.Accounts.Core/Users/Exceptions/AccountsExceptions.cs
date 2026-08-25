@@ -43,3 +43,15 @@ internal sealed class InvalidEmailConfirmationCodeException()
 {
     public override string Code => "invalid_email_confirmation_code";
 }
+
+internal sealed class InvalidPasswordResetCodeException()
+    : BusinessException("The password reset code is invalid or has expired.")
+{
+    public override string Code => "invalid_password_reset_code";
+}
+
+internal sealed class PasswordResetFailedException(string reason)
+    : BusinessException($"Could not reset the password: {reason}")
+{
+    public override string Code => "password_reset_failed";
+}

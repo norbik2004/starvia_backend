@@ -22,6 +22,7 @@ internal sealed class ConfirmEmailHandler(
         }
 
         string token;
+
         try
         {
             token = EmailConfirmationLink.DecodeToken(command.Code);

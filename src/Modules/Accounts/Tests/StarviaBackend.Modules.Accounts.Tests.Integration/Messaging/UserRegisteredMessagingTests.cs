@@ -43,8 +43,9 @@ public sealed class UserRegisteredMessagingTests
 
         var publishedEmail = harness.Published.Select<SendEmailRequestedEvent>().First();
         publishedEmail.Context.Message.EmailType.Should().Be("ConfirmAccountEmail");
-        publishedEmail.Context.Message.Link.Should().Contain("/v1/accounts/confirm-email");
+        publishedEmail.Context.Message.Link.Should().Contain("/email-confirmed");
         publishedEmail.Context.Message.Link.Should().Contain($"userId={@event.UserId}");
+        publishedEmail.Context.Message.Link.Should().StartWith("http://front.test/");
     }
 
     private sealed class StubAppUrls : IAppUrls

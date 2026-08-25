@@ -2,30 +2,29 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Modules.Accounts.Application.Users.Commands.ConfirmEmail;
 using StarviaBackend.Modules.Accounts.Core.Users.Entities;
 using StarviaBackend.Modules.Accounts.Infrastructure.EF.Contexts;
-using StarviaBackend.Shared.Abstractions.App;
+using StarviaBackend.Shared.Abstractions.Exceptions;
 
 namespace StarviaBackend.Modules.Accounts.Tests.Integration.Users;
 
 public sealed class ConfirmEmailTests(AccountsApp app) : AccountsIntegrationTest(app)
 {
     [Fact]
-    public async Task Confirm_email_with_valid_code_sets_confirmed_and_redirects_to_frontend()
+    public async Task Confirm_email_with_valid_code_sets_confirmed()
     {
         var email = UniqueEmail();
         var userId = await Register(email);
-        var link = await BuildConfirmationLink(userId);
+        var code = await GetConfirmationCode(userId);
 
-        var client = CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
-        var response = await client.GetAsync(ToRelative(link));
+        var response = await Client.PostAsJsonAsync(
+            "/v1/accounts/confirm-email",
+            new { userId, code });
 
-        response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        AssertFrontendRedirect(response.Headers.Location, expectedStatus: "success");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         await WithDbAsync<AccountsWriteDbContext>(async db =>
         {
@@ -39,28 +38,29 @@ public sealed class ConfirmEmailTests(AccountsApp app) : AccountsIntegrationTest
     {
         var email = UniqueEmail();
         var userId = await Register(email);
-        var link = await BuildConfirmationLink(userId);
+        var code = await GetConfirmationCode(userId);
+        var request = new { userId, code };
 
-        var client = CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
-        (await client.GetAsync(ToRelative(link))).StatusCode.Should().Be(HttpStatusCode.Redirect);
+        (await Client.PostAsJsonAsync("/v1/accounts/confirm-email", request))
+            .StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var second = await client.GetAsync(ToRelative(link));
-        second.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        AssertFrontendRedirect(second.Headers.Location, expectedStatus: "success");
+        (await Client.PostAsJsonAsync("/v1/accounts/confirm-email", request))
+            .StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Fact]
-    public async Task Confirm_email_with_invalid_code_redirects_with_error()
+    public async Task Confirm_email_with_invalid_code_returns_bad_request()
     {
         var email = UniqueEmail();
         var userId = await Register(email);
 
-        var client = CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
-        var response = await client.GetAsync($"/v1/accounts/confirm-email?userId={userId}&code=not-a-valid-code");
+        var response = await Client.PostAsJsonAsync(
+            "/v1/accounts/confirm-email",
+            new { userId, code = "not-a-valid-code" });
 
-        response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        AssertFrontendRedirect(response.Headers.Location, expectedStatus: "error");
-        response.Headers.Location!.Query.Should().Contain("error=");
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+        error!.Errors.Should().Contain(e => e.Code == "invalid_email_confirmation_code");
 
         await WithDbAsync<AccountsWriteDbContext>(async db =>
         {
@@ -79,50 +79,16 @@ public sealed class ConfirmEmailTests(AccountsApp app) : AccountsIntegrationTest
         return body!.UserId;
     }
 
-    private async Task<string> BuildConfirmationLink(Guid userId)
+    private async Task<string> GetConfirmationCode(Guid userId)
     {
         return await UsingServicesAsync(async sp =>
         {
             var userManager = sp.GetRequiredService<UserManager<User>>();
-            var appUrls = sp.GetRequiredService<IAppUrls>();
             var user = await userManager.FindByIdAsync(userId.ToString());
             var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-            return EmailConfirmationLink.Build(appUrls.ApiBaseUrl, userId, token);
+            return EmailConfirmationLink.EncodeToken(token);
         });
     }
-
-    private static void AssertFrontendRedirect(Uri? location, string expectedStatus)
-    {
-        location.Should().NotBeNull();
-        location!.GetLeftPart(UriPartial.Path).Should().Be("http://localhost:4200/email-confirmed");
-        location.Query.Should().Contain($"status={expectedStatus}");
-
-        var ticket = GetQueryParam(location, "ticket");
-        ticket.Should().NotBeNullOrWhiteSpace();
-        ticket!.Length.Should().BeGreaterThanOrEqualTo(EmailConfirmationLink.TicketLength);
-    }
-
-    private static string? GetQueryParam(Uri location, string name)
-    {
-        foreach (var part in location.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))
-        {
-            var separator = part.IndexOf('=');
-            if (separator < 0)
-            {
-                continue;
-            }
-
-            var key = Uri.UnescapeDataString(part[..separator]);
-            if (string.Equals(key, name, StringComparison.OrdinalIgnoreCase))
-            {
-                return Uri.UnescapeDataString(part[(separator + 1)..]);
-            }
-        }
-
-        return null;
-    }
-
-    private static string ToRelative(string absoluteUrl) => new Uri(absoluteUrl).PathAndQuery;
 
     private static string UniqueEmail() => $"user-{Guid.NewGuid():N}@example.com";
 

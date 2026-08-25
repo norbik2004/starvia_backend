@@ -16,7 +16,7 @@ internal sealed class SimpleEmailTemplateRenderer : IEmailTemplateRenderer
         {
             EmailType.WelcomingEmail => RenderWelcome(displayName),
             EmailType.ConfirmAccountEmail => RenderConfirmAccount(displayName, model.Link),
-            EmailType.ResetPasswordEmail => RenderResetPassword(displayName, model.Code),
+            EmailType.ResetPasswordEmail => RenderResetPassword(displayName, model.Link),
             _ => throw new ArgumentOutOfRangeException(nameof(emailType), emailType, "Unsupported email type."),
         };
     }
@@ -58,16 +58,23 @@ internal sealed class SimpleEmailTemplateRenderer : IEmailTemplateRenderer
         return new EmailTemplate(subject, body);
     }
 
-    private static EmailTemplate RenderResetPassword(string displayName, string? code)
+    private static EmailTemplate RenderResetPassword(string displayName, string? link)
     {
         var subject = "Reset your Starvia password";
-        var resetCode = string.IsNullOrWhiteSpace(code) ? "—" : code;
+        var resetLink = string.IsNullOrWhiteSpace(link) ? "#" : link;
         var body = Wrap(
             subject,
             $"""
             <p>Hi {Encode(displayName)},</p>
-            <p>Use the code below to reset your password:</p>
-            <p style="font-size:24px;font-weight:700;letter-spacing:2px;">{Encode(resetCode)}</p>
+            <p>Please reset your password by clicking the button below:</p>
+            <p style="margin:28px 0;">
+              <a href="{Encode(resetLink)}"
+                 style="display:inline-block;background:#1a1a1a;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:600;">
+                Reset password
+              </a>
+            </p>
+            <p>If the button does not work, copy and paste this link into your browser:</p>
+            <p style="word-break:break-all;font-size:12px;color:#555;">{Encode(resetLink)}</p>
             <p>If you did not request a password reset, you can ignore this message.</p>
             """);
 
