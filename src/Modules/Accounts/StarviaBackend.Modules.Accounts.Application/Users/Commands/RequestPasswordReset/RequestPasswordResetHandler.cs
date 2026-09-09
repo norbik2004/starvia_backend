@@ -38,6 +38,7 @@ internal sealed class RequestPasswordResetHandler(
                 command.Email,
                 ResetPasswordEmailType,
                 Code: token.Token,
+                UserName: user.UserName,
                 Link: resetLink),
             cancellationToken);
     }

@@ -43,6 +43,7 @@ internal sealed class UserRegisteredConsumer(
                 context.Message.Email,
                 ConfirmAccountEmailType,
                 Code: code.Token,
+                UserName: context.Message.Email,
                 Link: confirmationLink),
             context.CancellationToken);
     }

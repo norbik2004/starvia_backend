@@ -47,7 +47,8 @@ internal sealed class ConfirmEmailHandler(
         await publishEndpoint.Publish(new SendEmailRequestedEvent(
             user.Id,
             user.Email!,
-            WelcomingEmailType),
+            WelcomingEmailType,
+            UserName: user.UserName),
             cancellationToken);
     }
 }

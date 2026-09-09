@@ -15,7 +15,7 @@ internal sealed class SmtpEmailSender(
 
     public async Task SendAsync(EmailMessage message, CancellationToken cancellationToken = default)
     {
-        var mimeMessage = new MimeMessage();
+        using var mimeMessage = new MimeMessage();
         mimeMessage.From.Add(new MailboxAddress(_settings.Name, _settings.EmailId));
         mimeMessage.To.Add(MailboxAddress.Parse(message.To));
         mimeMessage.Subject = message.Subject;
@@ -25,7 +25,9 @@ internal sealed class SmtpEmailSender(
             HtmlBody = message.HtmlBody,
             TextBody = message.TextBody ?? StripHtml(message.HtmlBody),
         };
+
         mimeMessage.Body = builder.ToMessageBody();
+        mimeMessage.Prepare(EncodingConstraint.SevenBit);
 
         using var client = new SmtpClient();
 
