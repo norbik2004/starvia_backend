@@ -3,6 +3,7 @@
   <PropertyGroup>
     <RootNamespace>ModularMonolith.Bootstrapper</RootNamespace>
     <PackageId>StarviaBackend.Bootstrapper</PackageId>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
   </PropertyGroup>
 
   <ItemGroup>

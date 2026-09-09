@@ -1,0 +1,114 @@
+@model StarviaBackend.Modules.Emails.Application.Emails.Templates.EmailTemplateContentModel
+@{
+    var year = DateTime.UtcNow.Year;
+}
+
+<!DOCTYPE html>
+<html lang="pl" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="color-scheme" content="light" />
+    <meta name="supported-color-schemes" content="light" />
+    <title>@Model.Title</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <style>
+        a { color: #29303d; font-weight: 600; text-decoration: underline; text-decoration-color: #e6fb2d; }
+        p { margin: 0 0 16px 0; }
+        h1, h2, h3 { color: #29303d; font-weight: 800; letter-spacing: -0.03em; }
+        img { border: 0; line-height: 100%; outline: none; text-decoration: none; }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #ecebe8; color: #29303d; font-family: 'Red Hat Display', Arial, Helvetica, sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+    <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all; font-size: 1px; line-height: 1px; color: #ecebe8;">
+        @Model.Title
+    </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ecebe8" style="margin: 0; padding: 0; background-color: #ecebe8;">
+        <tr>
+            <td align="center" style="padding: 40px 16px;">
+                <!--[if mso]>
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td>
+                <![endif]-->
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 100%; max-width: 600px; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 0 0 24px 0;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td valign="middle" style="padding: 0 10px 0 0;">
+                                        <a href="https://starvia.pl" style="text-decoration: none;">
+                                            <img
+                                                src="https://pl.wikipedia.org/wiki/Plik:LEGO_logo.svg"
+                                                alt="Starvia"
+                                                width="44"
+                                                height="44"
+                                                style="display: block; width: 44px; height: 44px; border: 0; border-radius: 9px;" />
+                                        </a>
+                                    </td>
+                                    <td valign="middle" style="padding: 0;">
+                                        <a href="https://starvia.pl" style="color: #29303d; font-family: 'Red Hat Display', Arial, Helvetica, sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; text-decoration: none;">
+                                            Starvia
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#ffffff" style="background-color: #ffffff; border: 1px solid #e0dfdb; border-radius: 16px; overflow: hidden;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td bgcolor="#e6fb2d" height="4" style="height: 4px; line-height: 4px; font-size: 0; background-color: #e6fb2d;">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 36px 40px 40px 40px; font-family: 'Red Hat Display', Arial, Helvetica, sans-serif; color: #29303d;">
+                                        <h1 style="margin: 0 0 8px 0; color: #29303d; font-family: 'Red Hat Display', Arial, Helvetica, sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.12;">
+                                            @Model.Title
+                                        </h1>
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 0 24px 0;">
+                                            <tr>
+                                                <td bgcolor="#e6fb2d" width="28" height="3" style="width: 28px; height: 3px; line-height: 3px; font-size: 0; background-color: #e6fb2d; border-radius: 999px;">&nbsp;</td>
+                                            </tr>
+                                        </table>
+                                        <div style="margin: 0; color: #29303d; font-family: 'Red Hat Display', Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 400; line-height: 1.6;">
+                                            @Raw(Model.Body)
+                                        </div>
+                                        <p style="margin: 32px 0 0 0; color: #29303d; font-family: 'Red Hat Display', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.6;">
+                                            Pozdrawiamy,<br />
+                                            <strong style="font-weight: 700;">Zespół Starvia</strong>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 28px 8px 0 8px; text-align: center;">
+                            <p style="margin: 0 0 10px 0; color: #898d94; font-family: 'Red Hat Display', Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.5;">
+                                © @year Starvia
+                            </p>
+                            <p style="margin: 0 0 10px 0; color: #898d94; font-family: 'Red Hat Display', Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.5;">
+                                <a href="mailto:hello@starvia.pl" style="color: #29303d; font-weight: 600; text-decoration: none;">hello@starvia.pl</a>
+                            </p>
+                            <p style="margin: 0; color: #29303d; font-family: 'Red Hat Display', Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.5;">
+                                Dla twórców, marketerów i zespołów social.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+                <!--[if mso]>
+                </td></tr></table>
+                <![endif]-->
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

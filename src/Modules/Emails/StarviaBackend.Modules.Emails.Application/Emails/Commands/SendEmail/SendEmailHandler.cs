@@ -17,27 +17,49 @@ internal sealed class SendEmailHandler(
     ILogger<SendEmailHandler> logger)
     : ICommandHandler<SendEmailCommand, SendEmailResult>
 {
-    public async Task<SendEmailResult> HandleAsync(SendEmailCommand command, CancellationToken cancellationToken = default)
+    public async Task<SendEmailResult> HandleAsync(
+        SendEmailCommand command,
+        CancellationToken cancellationToken = default)
     {
         var request = command.request;
-        var template = templateRenderer.Render(
+
+        var template = await templateRenderer.RenderAsync(
             request.EmailType,
-            new EmailTemplateModel(request.Email, request.Code, request.UserName, request.Link));
+            new EmailTemplateModel(
+                request.Email,
+                request.Code,
+                request.UserName,
+                request.Link));
 
         try
         {
             await emailSender.SendAsync(
-                new EmailMessage(request.Email, template.Subject, template.HtmlBody),
+                new EmailMessage(
+                    request.Email,
+                    template.Subject,
+                    template.HtmlBody),
                 cancellationToken);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to send {EmailType} email to {Email}", request.EmailType, request.Email);
+            logger.LogError(
+                ex,
+                "Failed to send {EmailType} email to {Email}",
+                request.EmailType,
+                request.Email);
+
             throw new EmailNotSentException(request.Email);
         }
 
-        var email = Email.Create(template.Subject, template.HtmlBody, clock.UtcNow, request.Email);
-        await emailRepository.AddAsync(email, cancellationToken);
+        var email = Email.Create(
+            template.Subject,
+            template.HtmlBody,
+            clock.UtcNow,
+            request.Email);
+
+        await emailRepository.AddAsync(
+            email,
+            cancellationToken);
 
         return new SendEmailResult(email.Id);
     }

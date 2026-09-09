@@ -6,6 +6,7 @@ using StarviaBackend.Modules.Emails.Core.Emails.Repositories;
 using StarviaBackend.Modules.Emails.Infrastructure.EF.Contexts;
 using StarviaBackend.Modules.Emails.Infrastructure.EF.Emails.Repositories;
 using StarviaBackend.Modules.Emails.Infrastructure.EF.Initializers;
+using StarviaBackend.Modules.Emails.Infrastructure.Mailing;
 using StarviaBackend.Modules.Emails.Infrastructure.Mailing.Templates;
 using StarviaBackend.Shared.Infrastructure.Cqrs;
 using StarviaBackend.Shared.Infrastructure.Postgres;
@@ -22,7 +23,8 @@ internal static class Extensions
         services.AddPostgres<EmailsReadDbContex>();
 
         services.AddScoped<IEmailRepository, EmailRepository>();
-        services.AddSingleton<IEmailTemplateRenderer, SimpleEmailTemplateRenderer>();
+        services.AddSingleton<IEmailTemplateRenderer, EmailTemplateRenderer>();
+        services.AddSingleton<IRazorEmailRenderer, RazorEmailRenderer>();
         services.AddHostedService<EmailsDataInitializer>();
 
         services.RegisterHandlers(Assembly.GetExecutingAssembly());
