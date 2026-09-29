@@ -25,11 +25,9 @@ internal sealed class SendEmailHandler(
 
         var template = await templateRenderer.RenderAsync(
             request.EmailType,
-            new EmailTemplateModel(
-                request.Email,
-                request.Code,
-                request.UserName,
-                request.Link));
+            command.UserId,
+            request.Email,
+            cancellationToken);
 
         try
         {

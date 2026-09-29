@@ -8,9 +8,6 @@ public sealed record SendEmailCommand(SendEmailRequest request, Guid UserId)
 
 public sealed record SendEmailRequest(
     string Email,
-    EmailType EmailType,
-    string? Code = null,
-    string? UserName = null,
-    string? Link = null);
+    EmailType EmailType);
 
 public sealed record SendEmailResult(Guid EmailId);

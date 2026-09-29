@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using StarviaBackend.Modules.Accounts.Application.Users;
 using StarviaBackend.Modules.Accounts.Application.Users.Commands.ConfirmEmail;
 using StarviaBackend.Modules.Accounts.Core.Users.Entities;
 using StarviaBackend.Modules.Accounts.Infrastructure.EF.Contexts;
@@ -86,7 +87,7 @@ public sealed class ConfirmEmailTests(AccountsApp app) : AccountsIntegrationTest
             var userManager = sp.GetRequiredService<UserManager<User>>();
             var user = await userManager.FindByIdAsync(userId.ToString());
             var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-            return EmailConfirmationLink.EncodeToken(token);
+            return IdentityTokenEncoder.Encode(token);
         });
     }
 

@@ -1,47 +1,40 @@
+using StarviaBackend.Modules.Emails.Application.Emails.Messages;
 using StarviaBackend.Modules.Emails.Application.Emails.Templates;
-using StarviaBackend.Modules.Emails.Application.Emails.Templates.Models;
 using StarviaBackend.Modules.Emails.Core.Emails.Enums;
 
 namespace StarviaBackend.Modules.Emails.Infrastructure.Mailing.Templates;
 
 internal sealed class EmailTemplateRenderer(
-    IRazorEmailRenderer razorRenderer) : IEmailTemplateRenderer
+    IRazorEmailRenderer razorRenderer,
+    ConfirmAccountEmail confirmAccountEmail,
+    ResetPasswordEmail resetPasswordEmail,
+    WelcomingEmail welcomingEmail) : IEmailTemplateRenderer
 {
-    private const string DefaultAppLink = "https://starvia.pl/login";
-
     public async Task<EmailTemplate> RenderAsync(
         EmailType emailType,
-        EmailTemplateModel model)
+        Guid userId,
+        string email,
+        CancellationToken cancellationToken = default)
     {
-        var displayName = string.IsNullOrWhiteSpace(model.UserName)
-            ? model.Email
-            : model.UserName;
-
         var (subject, body) = emailType switch
         {
             EmailType.WelcomingEmail => (
-                "Witamy w Starvia!",
+                WelcomingEmail.Subject,
                 await razorRenderer.RenderAsync(
                     "WelcomingEmail/WelcomingEmail.cshtml",
-                    new WelcomingEmailTemplateModel(
-                        displayName,
-                        model.Link ?? DefaultAppLink))),
+                    welcomingEmail.Create(email))),
 
             EmailType.ConfirmAccountEmail => (
-                "Potwierdź swoje konto w Starvia",
+                ConfirmAccountEmail.Subject,
                 await razorRenderer.RenderAsync(
                     "ConfirmAccountEmail/ConfirmAccountEmail.cshtml",
-                    new ConfirmAccountEmailTemplateModel(
-                        displayName,
-                        Required(model.Link, nameof(model.Link), emailType)))),
+                    await confirmAccountEmail.CreateAsync(userId, email, cancellationToken))),
 
             EmailType.ResetPasswordEmail => (
-                "Zresetuj hasło swojego konta w Starvia",
+                ResetPasswordEmail.Subject,
                 await razorRenderer.RenderAsync(
                     "ResetPasswordEmail/ResetPasswordEmail.cshtml",
-                    new ResetPasswordEmailTemplateModel(
-                        displayName,
-                        Required(model.Link, nameof(model.Link), emailType)))),
+                    await resetPasswordEmail.CreateAsync(userId, email, cancellationToken))),
 
             _ => throw new ArgumentOutOfRangeException(
                 nameof(emailType),
@@ -58,11 +51,4 @@ internal sealed class EmailTemplateRenderer(
 
         return new EmailTemplate(subject, htmlBody);
     }
-
-    private static string Required(string? value, string name, EmailType emailType) =>
-        string.IsNullOrWhiteSpace(value)
-            ? throw new ArgumentException(
-                $"{name} is required for {emailType}.",
-                name)
-            : value;
 }

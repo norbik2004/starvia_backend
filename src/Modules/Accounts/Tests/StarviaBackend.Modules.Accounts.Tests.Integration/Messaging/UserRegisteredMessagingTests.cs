@@ -2,13 +2,8 @@ using FluentAssertions;
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using StarviaBackend.Modules.Accounts.Application.Users.Commands.GenerateEmailConfirmationToken;
 using StarviaBackend.Modules.Accounts.Application.Users.Events.UserRegistered;
-using StarviaBackend.Shared.Abstractions.App;
-using StarviaBackend.Shared.Abstractions.Commands;
-using StarviaBackend.Shared.Abstractions.Dispatchers;
 using StarviaBackend.Shared.Abstractions.Email;
-using StarviaBackend.Shared.Abstractions.Queries;
 
 namespace StarviaBackend.Modules.Accounts.Tests.Integration.Messaging;
 
@@ -23,8 +18,6 @@ public sealed class UserRegisteredMessagingTests
     {
         await using var provider = new ServiceCollection()
             .AddLogging()
-            .AddSingleton<IDispatcher, StubDispatcher>()
-            .AddSingleton<IAppUrls, StubAppUrls>()
             .AddMassTransitTestHarness(x => x.AddConsumer<UserRegisteredConsumer>())
             .BuildServiceProvider(true);
 
@@ -43,36 +36,7 @@ public sealed class UserRegisteredMessagingTests
 
         var publishedEmail = harness.Published.Select<SendEmailRequestedEvent>().First();
         publishedEmail.Context.Message.EmailType.Should().Be("ConfirmAccountEmail");
-        publishedEmail.Context.Message.Link.Should().Contain("/email-confirmed");
-        publishedEmail.Context.Message.Link.Should().Contain($"userId={@event.UserId}");
-        publishedEmail.Context.Message.Link.Should().StartWith("http://front.test/");
-    }
-
-    private sealed class StubAppUrls : IAppUrls
-    {
-        public string ApiBaseUrl => "http://api.test";
-        public string FrontendBaseUrl => "http://front.test";
-    }
-
-    private sealed class StubDispatcher : IDispatcher
-    {
-        public Task SendAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default)
-            where TCommand : class, ICommand
-            => Task.CompletedTask;
-
-        public Task<TResult> SendAsync<TCommand, TResult>(TCommand command, CancellationToken cancellationToken = default)
-            where TCommand : class, ICommand<TResult>
-        {
-            if (typeof(TResult) == typeof(GenerateEmailConfirmationTokenResult))
-            {
-                object result = new GenerateEmailConfirmationTokenResult("test-token");
-                return Task.FromResult((TResult)result);
-            }
-
-            throw new NotSupportedException($"Unexpected command result type {typeof(TResult).Name}");
-        }
-
-        public Task<TResult> QueryAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
-            => throw new NotSupportedException();
+        publishedEmail.Context.Message.Email.Should().Be(@event.Email);
+        publishedEmail.Context.Message.UserId.Should().Be(@event.UserId);
     }
 }

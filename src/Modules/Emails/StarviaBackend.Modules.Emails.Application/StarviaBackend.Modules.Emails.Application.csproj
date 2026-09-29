@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Infrastructure\StarviaBackend.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Accounts\StarviaBackend.Modules.Accounts.Application\StarviaBackend.Modules.Accounts.Application.csproj" />
     <ProjectReference Include="..\StarviaBackend.Modules.Emails.Core\StarviaBackend.Modules.Emails.Core.csproj" />
   </ItemGroup>
 

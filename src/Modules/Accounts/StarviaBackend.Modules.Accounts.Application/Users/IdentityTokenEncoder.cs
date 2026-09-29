@@ -2,7 +2,7 @@ using System.Text;
 
 namespace StarviaBackend.Modules.Accounts.Application.Users;
 
-internal static class IdentityTokenEncoder
+public static class IdentityTokenEncoder
 {
     public static string Encode(string token)
     {

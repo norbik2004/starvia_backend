@@ -30,7 +30,7 @@ internal sealed class ConfirmEmailHandler(
 
         try
         {
-            token = EmailConfirmationLink.DecodeToken(command.Code);
+            token = IdentityTokenEncoder.Decode(command.Code);
         }
         catch (FormatException)
         {
@@ -47,8 +47,7 @@ internal sealed class ConfirmEmailHandler(
         await publishEndpoint.Publish(new SendEmailRequestedEvent(
             user.Id,
             user.Email!,
-            WelcomingEmailType,
-            UserName: user.UserName),
+            WelcomingEmailType),
             cancellationToken);
     }
 }

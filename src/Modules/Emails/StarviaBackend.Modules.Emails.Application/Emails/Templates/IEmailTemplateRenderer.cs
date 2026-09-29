@@ -6,15 +6,11 @@ internal interface IEmailTemplateRenderer
 {
     Task<EmailTemplate> RenderAsync(
         EmailType emailType,
-        EmailTemplateModel model);
+        Guid userId,
+        string email,
+        CancellationToken cancellationToken = default);
 }
 
 internal sealed record EmailTemplate(
     string Subject,
     string HtmlBody);
-
-internal sealed record EmailTemplateModel(
-    string Email,
-    string? Code = null,
-    string? UserName = null,
-    string? Link = null);

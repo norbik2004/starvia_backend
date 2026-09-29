@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using StarviaBackend.Modules.Accounts.Application.Users.Commands.ResetPassword;
+using StarviaBackend.Modules.Accounts.Application.Users;
 using StarviaBackend.Modules.Accounts.Core.Users.Entities;
 using StarviaBackend.Shared.Abstractions.Auth;
 using StarviaBackend.Shared.Abstractions.Exceptions;
@@ -94,7 +94,7 @@ public sealed class ResetPasswordTests(AccountsApp app) : AccountsIntegrationTes
             var userManager = sp.GetRequiredService<UserManager<User>>();
             var user = await userManager.FindByIdAsync(userId.ToString());
             var token = await userManager.GeneratePasswordResetTokenAsync(user!);
-            return PasswordResetLink.EncodeToken(token);
+            return IdentityTokenEncoder.Encode(token);
         });
     }
 

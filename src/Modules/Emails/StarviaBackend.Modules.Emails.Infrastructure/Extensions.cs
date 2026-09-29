@@ -23,7 +23,7 @@ internal static class Extensions
         services.AddPostgres<EmailsReadDbContex>();
 
         services.AddScoped<IEmailRepository, EmailRepository>();
-        services.AddSingleton<IEmailTemplateRenderer, EmailTemplateRenderer>();
+        services.AddScoped<IEmailTemplateRenderer, EmailTemplateRenderer>();
         services.AddSingleton<IRazorEmailRenderer, RazorEmailRenderer>();
         services.AddHostedService<EmailsDataInitializer>();
 
