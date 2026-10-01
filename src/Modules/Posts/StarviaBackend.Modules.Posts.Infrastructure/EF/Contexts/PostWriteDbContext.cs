@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using StarviaBackend.Modules.Posts.Core.Posts.Entities;
+using StarviaBackend.Modules.Posts.Infrastructure.EF.PostPublications.Configurations.Write;
+using StarviaBackend.Modules.Posts.Infrastructure.EF.Posts.Configurations.Write;
 
 namespace StarviaBackend.Modules.Posts.Infrastructure.EF.Contexts;
 
@@ -17,6 +19,7 @@ internal sealed class PostWriteDbContext(DbContextOptions<PostWriteDbContext> op
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema(Schema);
 
-
+        modelBuilder.ApplyConfiguration(new PostConfiguration());
+        modelBuilder.ApplyConfiguration(new PostPublicationConfiguration());
     }
 }

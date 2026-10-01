@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace StarviaBackend.Modules.Emails.Core.Emails.Enums;
+namespace StarviaBackend.Shared.Abstractions.Email;
 
 public enum EmailType
 {

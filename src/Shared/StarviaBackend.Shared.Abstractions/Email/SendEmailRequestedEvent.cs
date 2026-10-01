@@ -8,4 +8,4 @@ namespace StarviaBackend.Shared.Abstractions.Email;
 public sealed record SendEmailRequestedEvent(
     Guid UserId,
     string Email,
-    string EmailType) : IIntegrationEvent;
+    EmailType EmailType) : IIntegrationEvent;

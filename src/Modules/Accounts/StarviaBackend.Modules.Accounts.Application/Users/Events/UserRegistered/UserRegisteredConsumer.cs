@@ -13,8 +13,6 @@ internal sealed class UserRegisteredConsumer(
     IPublishEndpoint publishEndpoint)
     : IConsumer<UserRegisteredEvent>
 {
-    private const string ConfirmAccountEmailType = "ConfirmAccountEmail";
-
     public async Task Consume(ConsumeContext<UserRegisteredEvent> context)
     {
         logger.LogInformation(
@@ -27,7 +25,7 @@ internal sealed class UserRegisteredConsumer(
             new SendEmailRequestedEvent(
                 context.Message.UserId,
                 context.Message.Email,
-                ConfirmAccountEmailType),
+                EmailType.ConfirmAccountEmail),
             context.CancellationToken);
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using StarviaBackend.Shared.Abstractions.Domain;
+using StarviaBackend.Shared.Abstractions.Email;
 
 namespace StarviaBackend.Modules.Emails.Core.Emails.Entities;
 
@@ -10,6 +11,7 @@ internal sealed class Email : BaseEntity
     public string SentTo { get; private set; }
     public string Title { get; private set; }
     public string Body { get; private set; }
+    public EmailType Type { get; private set; }
     public DateTime SentAt { get; private set; }
 
     private Email()
@@ -17,7 +19,7 @@ internal sealed class Email : BaseEntity
 
     }
 
-    public static Email Create(string title, string body, DateTime sentAt, string sentTo)
+    public static Email Create(string title, string body, DateTime sentAt, string sentTo, EmailType type)
     {
         return new Email
         {
@@ -25,7 +27,8 @@ internal sealed class Email : BaseEntity
             Title = title,
             Body = body,
             SentAt = sentAt,
-            SentTo = sentTo
+            SentTo = sentTo,
+            Type = type,
         };
     }
 }

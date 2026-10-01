@@ -14,4 +14,8 @@
     <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Emails\Enums\" />
+  </ItemGroup>
+
 </Project>

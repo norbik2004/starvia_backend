@@ -20,7 +20,7 @@ internal sealed class Post : BaseEntity, IAuditable
     public DateTime? LastModifiedAt { get; set; }
     public string? LastModifiedBy { get; set; }
 
-    public IReadOnlyCollection<PostPublication> Roles => _postPublications.AsReadOnly();
+    public IReadOnlyCollection<PostPublication> PostPublications => _postPublications.AsReadOnly();
 
     private Post()
     {
@@ -39,4 +39,11 @@ internal sealed class Post : BaseEntity, IAuditable
     }
 
     public void UpdateStatus(PostStatus status) => Status = status;
+
+    public void Update(string title, string? body, PostStatus status)
+    {
+        Title = title;
+        Body = body;
+        Status = status;
+    }
 }

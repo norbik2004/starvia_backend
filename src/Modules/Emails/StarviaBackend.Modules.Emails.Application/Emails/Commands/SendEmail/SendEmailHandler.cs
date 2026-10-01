@@ -53,7 +53,8 @@ internal sealed class SendEmailHandler(
             template.Subject,
             template.HtmlBody,
             clock.UtcNow,
-            request.Email);
+            request.Email,
+            request.EmailType);
 
         await emailRepository.AddAsync(
             email,

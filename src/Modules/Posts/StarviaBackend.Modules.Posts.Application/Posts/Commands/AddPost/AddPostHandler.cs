@@ -14,6 +14,8 @@ internal sealed class AddPostHandler(IPostRepository postRepository, IClock cloc
     {
         var post = Post.Create(command.request.Title, clock.UtcNow, command.UserId);
 
-        await postRepository.Add
+        await postRepository.AddAsync(post);
+
+        return new AddPostResult(post.Id);
     }
 }

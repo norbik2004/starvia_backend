@@ -1,5 +1,6 @@
-using StarviaBackend.Modules.Emails.Core.Emails.Enums;
+
 using StarviaBackend.Shared.Abstractions.Commands;
+using StarviaBackend.Shared.Abstractions.Email;
 
 namespace StarviaBackend.Modules.Emails.Application.Emails.Commands.SendEmail;
 

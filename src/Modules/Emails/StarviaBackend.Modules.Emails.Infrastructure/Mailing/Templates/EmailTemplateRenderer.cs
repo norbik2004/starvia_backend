@@ -1,6 +1,6 @@
 using StarviaBackend.Modules.Emails.Application.Emails.Messages;
 using StarviaBackend.Modules.Emails.Application.Emails.Templates;
-using StarviaBackend.Modules.Emails.Core.Emails.Enums;
+using StarviaBackend.Shared.Abstractions.Email;
 
 namespace StarviaBackend.Modules.Emails.Infrastructure.Mailing.Templates;
 

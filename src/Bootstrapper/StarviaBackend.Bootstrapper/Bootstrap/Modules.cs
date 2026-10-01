@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Modules.Accounts.Api;
 using StarviaBackend.Modules.Emails.Api;
 using StarviaBackend.Modules.Platforms.Api;
+using StarviaBackend.Modules.Posts.Api;
 
 namespace ModularMonolith.Bootstrapper.Bootstrap;
 
@@ -17,6 +18,7 @@ internal static class Modules
         services.RegisterAccountsModule();
         services.RegisterPlatformsModule();
         services.RegisterEmailsModule();
+        services.RegisterPostsModule();
         return services;
     }
 }

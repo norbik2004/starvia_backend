@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using StarviaBackend.Modules.Emails.Infrastructure.EF.Contexts;
@@ -11,9 +12,11 @@ using StarviaBackend.Modules.Emails.Infrastructure.EF.Contexts;
 namespace StarviaBackend.Modules.Emails.Infrastructure.Migrations
 {
     [DbContext(typeof(EmailsWriteDbContext))]
-    partial class EmailsWriteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261001135454_FixEmailTyping")]
+    partial class FixEmailTyping
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -10,8 +10,6 @@ internal sealed class RequestPasswordResetHandler(
     IPublishEndpoint publishEndpoint)
     : ICommandHandler<RequestPasswordResetCommand>
 {
-    private const string ResetPasswordEmailType = "ResetPasswordEmail";
-
     public async Task HandleAsync(RequestPasswordResetCommand command, CancellationToken cancellationToken = default)
     {
         var user = await usersRepository.GetByEmailAsync(command.Email, cancellationToken);
@@ -24,7 +22,7 @@ internal sealed class RequestPasswordResetHandler(
             new SendEmailRequestedEvent(
                 user.Id,
                 command.Email,
-                ResetPasswordEmailType),
+                EmailType.ResetPasswordEmail),
             cancellationToken);
     }
 }

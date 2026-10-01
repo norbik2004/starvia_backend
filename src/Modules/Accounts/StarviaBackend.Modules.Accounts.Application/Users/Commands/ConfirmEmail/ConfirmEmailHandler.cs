@@ -14,8 +14,6 @@ internal sealed class ConfirmEmailHandler(
     IPublishEndpoint publishEndpoint)
     : ICommandHandler<ConfirmEmailCommand>
 {
-    private const string WelcomingEmailType = "WelcomingEmail";
-
     public async Task HandleAsync(ConfirmEmailCommand command, CancellationToken cancellationToken = default)
     {
         var user = await usersRepository.GetByIdAsync(command.UserId, cancellationToken)
@@ -47,7 +45,7 @@ internal sealed class ConfirmEmailHandler(
         await publishEndpoint.Publish(new SendEmailRequestedEvent(
             user.Id,
             user.Email!,
-            WelcomingEmailType),
+            EmailType.WelcomingEmail),
             cancellationToken);
     }
 }

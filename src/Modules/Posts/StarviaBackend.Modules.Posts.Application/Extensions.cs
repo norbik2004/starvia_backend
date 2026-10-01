@@ -3,9 +3,9 @@ using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Shared.Infrastructure.Cqrs;
 
-[assembly:InternalsVisibleTo("StarviaBackend.Modules.Platforms.Infrastructure")]
-[assembly:InternalsVisibleTo("StarviaBackend.Modules.Platforms.Api")]
-[assembly:InternalsVisibleTo("StarviaBackend.Modules.Platforms.Tests.Integration")]
+[assembly:InternalsVisibleTo("StarviaBackend.Modules.Posts.Infrastructure")]
+[assembly:InternalsVisibleTo("StarviaBackend.Modules.Posts.Api")]
+[assembly:InternalsVisibleTo("StarviaBackend.Modules.Posts.Tests.Integration")]
 namespace StarviaBackend.Modules.Posts.Application;
 
 internal static class Extensions
