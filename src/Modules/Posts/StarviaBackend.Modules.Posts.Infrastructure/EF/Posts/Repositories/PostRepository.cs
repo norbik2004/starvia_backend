@@ -20,6 +20,13 @@ internal class PostRepository(PostWriteDbContext dbContext) : IPostRepository
             .FirstOrDefaultAsync(p => p.Id == postId, cancellationToken);
     }
 
+    public async Task RemovePostAsync(Post post, CancellationToken cancellationToken)
+    {
+
+        _posts.Remove(post);
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task UpdateAsync(Post post)
     {
         _posts.Update(post);

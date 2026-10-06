@@ -15,6 +15,11 @@ internal class UpdatePostHandler(IPostRepository postRepository) : ICommandHandl
         var post = await postRepository.GetPostByIdAsync(command.request.PostId, cancellationToken)
             ?? throw new PostNotFoundException(command.request.PostId);
 
+        if (post.CreatedBy != command.UserId.ToString())
+        {
+            throw new UnauthorizedAccessException("You are not authorized to update this post.");
+        }
+
         post.Update(
             command.request.Title,
             command.request.Body,

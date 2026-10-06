@@ -11,4 +11,5 @@ internal interface IPostRepository
     Task AddAsync(Post post);
     Task UpdateAsync(Post post);
     Task<Post?> GetPostByIdAsync(Guid postId, CancellationToken cancellationToken);
+    Task RemovePostAsync(Post post, CancellationToken cancellationToken);
 }

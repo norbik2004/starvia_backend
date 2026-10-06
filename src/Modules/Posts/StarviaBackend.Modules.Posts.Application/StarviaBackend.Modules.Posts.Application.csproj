@@ -22,7 +22,6 @@
     <Folder Include="PostPublications\Events\" />
     <Folder Include="PostPublications\Queries\" />
     <Folder Include="Posts\Events\" />
-    <Folder Include="Posts\Queries\" />
   </ItemGroup>
 
 </Project>

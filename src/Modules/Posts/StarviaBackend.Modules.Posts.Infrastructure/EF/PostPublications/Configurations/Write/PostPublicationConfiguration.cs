@@ -11,6 +11,7 @@ internal sealed class PostPublicationConfiguration : IEntityTypeConfiguration<Po
 {
     public void Configure(EntityTypeBuilder<PostPublication> builder)
     {
+        builder.ToTable("PostPublications");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(x => x.PostId).IsRequired();
@@ -19,9 +20,15 @@ internal sealed class PostPublicationConfiguration : IEntityTypeConfiguration<Po
         builder.Property(x => x.ExternalPostId);
         builder.Property(x => x.UserPlatformId).IsRequired();
 
+        /*
+         * Configure the relationship between PostPublication and Post entities.
+         * A PostPublication has one Post, and a Post can have many PostPublications.
+         * The foreign key is PostId in the PostPublication entity.
+         * OnDelete behavior is set to NoAction to prevent c
         builder.HasOne(x => x.Post)
             .WithMany()
             .HasForeignKey(x => x.PostId)
             .OnDelete(DeleteBehavior.NoAction);
+        */
     }
 }

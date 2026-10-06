@@ -15,12 +15,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Infrastructure\StarviaBackend.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Posts.Application\StarviaBackend.Modules.Posts.Application.csproj" />
     <ProjectReference Include="..\StarviaBackend.Modules.Posts.Core\StarviaBackend.Modules.Posts.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="EF\PostPublications\Queries\" />
-    <Folder Include="EF\Posts\Queries\" />
   </ItemGroup>
 
 </Project>

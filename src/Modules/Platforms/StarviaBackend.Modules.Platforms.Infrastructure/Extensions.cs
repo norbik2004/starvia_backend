@@ -24,6 +24,7 @@ internal static class Extensions
 
         services.AddScoped<IPlatformRepository, PlatformRepository>();
         services.AddScoped<IUserPlatformRepository, UserPlatformRepository>();
+
         services.AddHostedService<PlatformsDataInitializer>();
 
         services.RegisterHandlers(Assembly.GetExecutingAssembly());

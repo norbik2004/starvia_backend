@@ -12,4 +12,6 @@ internal sealed class PostReadModel
     public string? Body { get; init; }
     public PostStatus Status { get; init; }
     public DateTime CreatedAt { get; init; }
+    public string CreatedBy { get; init; }
+    public DateTime? LastModifiedAt { get; init; }
 }

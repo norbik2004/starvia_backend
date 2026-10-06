@@ -19,7 +19,7 @@ internal sealed class AddUserPlatformEndpoint(IDispatcher dispatcher, IContext c
 {
     [HttpPost(UserPlatformsEndpoint.BasePath)]
     [SwaggerOperation(Summary = "Add user platform", Tags = [UserPlatformsEndpoint.Tag])]
-    [ProducesResponseType(typeof(PagedResult<AddUserPlatformResult>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedResult<AddUserPlatformResult>), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public override async Task<ActionResult<AddUserPlatformResult>> HandleAsync(
         [FromForm] AddUserPlatformRequest request,
@@ -33,6 +33,6 @@ internal sealed class AddUserPlatformEndpoint(IDispatcher dispatcher, IContext c
         var command = new AddUserPlatformCommand(request, userId);
 
         var result = await dispatcher.SendAsync<AddUserPlatformCommand, AddUserPlatformResult>(command, cancellationToken);
-        return Ok(result);
+        return StatusCode(StatusCodes.Status201Created, result);
     }
 }

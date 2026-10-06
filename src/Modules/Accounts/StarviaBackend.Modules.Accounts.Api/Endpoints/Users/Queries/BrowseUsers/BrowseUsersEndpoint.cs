@@ -15,7 +15,7 @@ internal sealed class BrowseUsersEndpoint(IDispatcher dispatcher)
 {
     [HttpGet(UsersEndpoint.BasePath)]
     [SwaggerOperation(Summary = "Browse users (admin only)", Tags = [UsersEndpoint.Tag])]
-    [ProducesResponseType(typeof(PagedResult<UserDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ActionResult<PagedResult<UserDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public override async Task<ActionResult<PagedResult<UserDto>>> HandleAsync(
         [FromQuery] BrowseUsersQuery request,
