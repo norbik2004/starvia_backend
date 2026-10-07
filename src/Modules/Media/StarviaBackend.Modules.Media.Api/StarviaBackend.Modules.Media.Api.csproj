@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ardalis.ApiEndpoints" />
+    <PackageReference Include="MassTransit" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Media.Application\StarviaBackend.Modules.Media.Application.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Media.Core\StarviaBackend.Modules.Media.Core.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Media.Infrastructure\StarviaBackend.Modules.Media.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

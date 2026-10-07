@@ -11,8 +11,8 @@ internal sealed class Post : BaseEntity, IAuditable
 {
     private readonly List<PostPublication> _postPublications = [];
 
-    public required string Title { get; set; }
-    public string? Body { get; set; }
+    public string Title { get; private set; }
+    public string? Body { get; private set; }
     public PostStatus Status { get; private set; }
 
     public DateTime CreatedAt { get; set; }

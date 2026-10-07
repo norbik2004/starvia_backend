@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Modules.Accounts.Api;
 using StarviaBackend.Modules.Emails.Api;
+using StarviaBackend.Modules.Media.Api;
 using StarviaBackend.Modules.Platforms.Api;
 using StarviaBackend.Modules.Posts.Api;
 
@@ -19,6 +20,7 @@ internal static class Modules
         services.RegisterPlatformsModule();
         services.RegisterEmailsModule();
         services.RegisterPostsModule();
+        services.RegisterMediaModule();
         return services;
     }
 }

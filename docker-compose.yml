@@ -1,5 +1,7 @@
 
 services:
+
+
   database:
     image: postgres:17.6
     container_name: PostgresDatabase
@@ -12,18 +14,23 @@ services:
     volumes:
       - database_pgdata:/var/lib/postgresql/data
 
-  minio:
-    image: minio/minio:latest
-    container_name: MiniO
+
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: starvia-rustfs
+    restart: unless-stopped
+
+    environment:
+      RUSTFS_ACCESS_KEY: admin
+      RUSTFS_SECRET_KEY: admin
+
     ports:
       - "9000:9000"
       - "9001:9001"
-    environment:
-      MINIO_ROOT_USER: miniouser
-      MINIO_ROOT_PASSWORD: miniopassword
+
     volumes:
-      - ./minio-data:/data
-    command: server /data --console-address ":9001"
+      - rustfs_data:/data
+
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -36,6 +43,8 @@ services:
       RABBITMQ_DEFAULT_PASS: password
     volumes:
       - rabbitmqdata:/var/lib/rabbitmq
+
+
   redis:
     image: redis:latest
     container_name: Redis
@@ -43,6 +52,7 @@ services:
       - "6379:6379"
     volumes:
       - redisdata:/data
+
 
   mailhog:
     image: mailhog/mailhog:latest
@@ -56,3 +66,4 @@ volumes:
   redisdata: { }
   miniodata: { }
   rabbitmqdata: { }
+  rustfs_data: { }
