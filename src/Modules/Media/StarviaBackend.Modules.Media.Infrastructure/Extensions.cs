@@ -3,14 +3,15 @@ using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Modules.Media.Infrastructure.EF.Contexts;
 using StarviaBackend.Modules.Media.Infrastructure.EF.Initializers;
+using StarviaBackend.Modules.Media.Core.Media.Repositories;
 using StarviaBackend.Modules.Media.Infrastructure.EF.MediaFiles.Repositories;
-using StarviaBackend.Modules.MediaFiles.Core.Media.Repositories;
+using StarviaBackend.Modules.Media.Infrastructure.Storage.RustFs;
 using StarviaBackend.Shared.Infrastructure.Cqrs;
 using StarviaBackend.Shared.Infrastructure.Postgres;
 
 [assembly:InternalsVisibleTo("StarviaBackend.Modules.Media.Api")]
 [assembly:InternalsVisibleTo("StarviaBackend.Modules.Media.Tests.Integration")]
-namespace StarviaBackend.Modules.MediaFiles.Infrastructure;
+namespace StarviaBackend.Modules.Media.Infrastructure;
 
 internal static class Extensions
 {
@@ -20,6 +21,8 @@ internal static class Extensions
         services.AddPostgres<MediaReadDbContext>();
 
         services.AddScoped<IMediaFileRepository, MediaFileRepository>();
+
+        services.AddRustFs();
 
         services.AddHostedService<MediaDataInitializer>();
 

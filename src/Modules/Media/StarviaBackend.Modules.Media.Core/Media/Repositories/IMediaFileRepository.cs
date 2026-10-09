@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
+using StarviaBackend.Modules.Media.Core.Media.Entities;
 
-namespace StarviaBackend.Modules.MediaFiles.Core.Media.Repositories;
+namespace StarviaBackend.Modules.Media.Core.Media.Repositories;
 
 internal interface IMediaFileRepository
 {
+    Task AddAsync(MediaFile mediaFile, CancellationToken cancellationToken = default);
 }

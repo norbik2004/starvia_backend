@@ -6,7 +6,7 @@ using StarviaBackend.Shared.Infrastructure.Cqrs;
 [assembly:InternalsVisibleTo("StarviaBackend.Modules.Media.Infrastructure")]
 [assembly:InternalsVisibleTo("StarviaBackend.Modules.Media.Api")]
 [assembly:InternalsVisibleTo("StarviaBackend.Modules.Media.Tests.Integration")]
-namespace StarviaBackend.Modules.MediaFiles.Application;
+namespace StarviaBackend.Modules.Media.Application;
 
 internal static class Extensions
 {

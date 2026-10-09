@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using StarviaBackend.Modules.MediaFiles.Core.Media.Enums;
+using StarviaBackend.Modules.Media.Core.Media.Enums;
 using StarviaBackend.Shared.Abstractions.Domain;
 
-namespace StarviaBackend.Modules.MediaFiles.Core.Media.Entities;
+namespace StarviaBackend.Modules.Media.Core.Media.Entities;
 
 internal sealed class MediaFile : AuditableEntity
 {
@@ -24,6 +24,7 @@ internal sealed class MediaFile : AuditableEntity
     {
         return new MediaFile
         {
+            Id = Guid.NewGuid(),
             FileName = fileName,
             FilePath = filePath,
             Description = description,

@@ -18,7 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="MediaFiles\Commands\AddFile\" />
     <Folder Include="MediaFiles\Commands\UpdateFile\" />
     <Folder Include="MediaFiles\Commands\RemoveFile\" />
     <Folder Include="MediaFiles\Events\" />

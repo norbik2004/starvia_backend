@@ -26,7 +26,7 @@ namespace StarviaBackend.Modules.Media.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("StarviaBackend.Modules.MediaFiles.Core.Media.Entities.MediaFile", b =>
+            modelBuilder.Entity("StarviaBackend.Modules.Media.Core.Media.Entities.MediaFile", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");

@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using MassTransit.Configuration;
 using Microsoft.EntityFrameworkCore;
-using StarviaBackend.Modules.MediaFiles.Core.Media.Entities;
-using StarviaBackend.Modules.MediaFiles.Infrastructure.EF.MediaFiles.Configurations.Write;
+using StarviaBackend.Modules.Media.Core.Media.Entities;
+using StarviaBackend.Modules.Media.Infrastructure.EF.MediaFiles.Configurations.Write;
 
 namespace StarviaBackend.Modules.Media.Infrastructure.EF.Contexts;
 

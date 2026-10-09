@@ -35,7 +35,7 @@ public sealed class UserRegisteredMessagingTests
         (await consumerHarness.Consumed.Any<UserRegisteredEvent>()).Should().BeTrue();
 
         var publishedEmail = harness.Published.Select<SendEmailRequestedEvent>().First();
-        publishedEmail.Context.Message.EmailType.Should().Be("ConfirmAccountEmail");
+        publishedEmail.Context.Message.EmailType.Should().Be(EmailType.ConfirmAccountEmail);
         publishedEmail.Context.Message.Email.Should().Be(@event.Email);
         publishedEmail.Context.Message.UserId.Should().Be(@event.UserId);
     }

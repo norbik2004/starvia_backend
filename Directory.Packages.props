@@ -32,6 +32,9 @@
   <ItemGroup Label="Email">
     <PackageVersion Include="MailKit" Version="4.17.0" />
   </ItemGroup>
+  <ItemGroup Label="Storage">
+    <PackageVersion Include="AWSSDK.S3" Version="4.0.104.2" />
+  </ItemGroup>
   <ItemGroup Label="Logging">
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
   </ItemGroup>
