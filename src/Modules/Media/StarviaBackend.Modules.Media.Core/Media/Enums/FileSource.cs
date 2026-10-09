@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace StarviaBackend.Modules.Media.Core.Media.Enums;
+namespace StarviaBackend.Modules.MediaFiles.Core.Media.Enums;
 
 public enum FileSource
 {

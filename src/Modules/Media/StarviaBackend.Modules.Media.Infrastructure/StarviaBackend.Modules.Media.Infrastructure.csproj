@@ -19,4 +19,8 @@
     <ProjectReference Include="..\StarviaBackend.Modules.Media.Core\StarviaBackend.Modules.Media.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="EF\MediaFiles\Queries\" />
+  </ItemGroup>
+
 </Project>

@@ -2,7 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Modules.Accounts.Api;
 using StarviaBackend.Modules.Emails.Api;
-using StarviaBackend.Modules.Media.Api;
+using StarviaBackend.Modules.MediaFiles.Api;
 using StarviaBackend.Modules.Platforms.Api;
 using StarviaBackend.Modules.Posts.Api;
 

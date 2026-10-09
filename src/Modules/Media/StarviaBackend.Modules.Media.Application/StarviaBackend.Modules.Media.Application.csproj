@@ -17,4 +17,12 @@
     <ProjectReference Include="..\StarviaBackend.Modules.Media.Core\StarviaBackend.Modules.Media.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="MediaFiles\Commands\AddFile\" />
+    <Folder Include="MediaFiles\Commands\UpdateFile\" />
+    <Folder Include="MediaFiles\Commands\RemoveFile\" />
+    <Folder Include="MediaFiles\Events\" />
+    <Folder Include="MediaFiles\Queries\" />
+  </ItemGroup>
+
 </Project>

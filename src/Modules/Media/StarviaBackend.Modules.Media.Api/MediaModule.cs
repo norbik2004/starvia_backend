@@ -1,10 +1,10 @@
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
-using StarviaBackend.Modules.Media.Core;
-using StarviaBackend.Modules.Media.Infrastructure;
-using StarviaBackend.Modules.Media.Application;
+using StarviaBackend.Modules.MediaFiles.Core;
+using StarviaBackend.Modules.MediaFiles.Infrastructure;
+using StarviaBackend.Modules.MediaFiles.Application;
 
-namespace StarviaBackend.Modules.Media.Api;
+namespace StarviaBackend.Modules.MediaFiles.Api;
 
 public static class MediaModule
 {

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using StarviaBackend.Modules.Media.Core.Media.Enums;
+using StarviaBackend.Modules.MediaFiles.Core.Media.Enums;
 using StarviaBackend.Shared.Abstractions.Domain;
 
-namespace StarviaBackend.Modules.Media.Core.Media.Entities;
+namespace StarviaBackend.Modules.MediaFiles.Core.Media.Entities;
 
-internal sealed class File : AuditableEntity
+internal sealed class MediaFile : AuditableEntity
 {
     public string FileName { get; private set; }
 
@@ -15,14 +15,14 @@ internal sealed class File : AuditableEntity
     public FileSource Source { get; private set; }
     public FileType Type { get; private set; }
 
-    private File()
+    private MediaFile()
     {
 
     }
 
-    public static File Create(string fileName, string filePath, FileSource source, FileType type, string? description)
+    public static MediaFile Create(string fileName, string filePath, FileSource source, FileType type, string? description)
     {
-        return new File
+        return new MediaFile
         {
             FileName = fileName,
             FilePath = filePath,
