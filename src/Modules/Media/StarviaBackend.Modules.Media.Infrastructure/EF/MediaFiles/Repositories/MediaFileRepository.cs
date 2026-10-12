@@ -18,6 +18,12 @@ internal sealed class MediaFileRepository(MediaWriteDbContext dbContext) : IMedi
         return await dbContext.MediaFiles.FirstOrDefaultAsync(mf => mf.Id == fileId, cancellationToken);
     }
 
+    public async Task UpdateAsync(MediaFile mediaFile, CancellationToken cancellationToken = default)
+    {
+        dbContext.MediaFiles.Update(mediaFile);
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task RemoveAsync(MediaFile mediaFile, CancellationToken cancellationToken = default)
     {
         dbContext.MediaFiles.Remove(mediaFile);

@@ -13,4 +13,6 @@ internal sealed class MediaFileReadModel
     public string? Description { get; init; }
     public FileSource Source { get; init; }
     public FileType Type { get; init; }
+    public DateTime CreatedAt { get; init; }
+    public string? CreatedBy { get; init; }
 }

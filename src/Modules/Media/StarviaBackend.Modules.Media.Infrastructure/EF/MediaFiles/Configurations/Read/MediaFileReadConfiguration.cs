@@ -18,5 +18,7 @@ internal class MediaFileReadConfiguration : IEntityTypeConfiguration<MediaFileRe
         builder.Property(m => m.Type);
         builder.Property(m => m.Source);
         builder.Property(m => m.Description);
+        builder.Property(m => m.CreatedAt);
+        builder.Property(m => m.CreatedBy);
     }
 }

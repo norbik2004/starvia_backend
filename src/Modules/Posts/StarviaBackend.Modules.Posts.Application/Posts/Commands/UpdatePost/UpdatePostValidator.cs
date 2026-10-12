@@ -12,7 +12,7 @@ internal sealed class UpdatePostValidator : AbstractValidator<UpdatePostCommand>
         RuleFor(x => x.request.Title).NotEmpty()
             .MinimumLength(3)
             .MaximumLength(100);
-        RuleFor(x => x.request.Body).NotEmpty()
+        RuleFor(x => x.request.Body)
             .MinimumLength(0)
             .MaximumLength(1000);
         RuleFor(x => x.request.Status).IsInEnum();
