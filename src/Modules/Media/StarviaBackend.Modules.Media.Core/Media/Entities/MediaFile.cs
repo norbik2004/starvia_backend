@@ -20,11 +20,11 @@ internal sealed class MediaFile : AuditableEntity
 
     }
 
-    public static MediaFile Create(string fileName, string filePath, FileSource source, FileType type, string? description)
+    public static MediaFile Create(Guid Id, string fileName, string filePath, FileSource source, FileType type, string? description)
     {
         return new MediaFile
         {
-            Id = Guid.NewGuid(),
+            Id = Id,
             FileName = fileName,
             FilePath = filePath,
             Description = description,

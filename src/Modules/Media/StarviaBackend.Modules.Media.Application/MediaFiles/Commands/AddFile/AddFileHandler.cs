@@ -4,6 +4,7 @@ using StarviaBackend.Modules.Media.Core.Media.Repositories;
 using StarviaBackend.Modules.Media.Core.Media.Storage;
 using StarviaBackend.Shared.Abstractions.Commands;
 using StarviaBackend.Shared.Abstractions.Storage;
+using StarviaBackend.Shared.Infrastructure.Files;
 
 namespace StarviaBackend.Modules.Media.Application.MediaFiles.Commands.AddFile;
 
@@ -17,13 +18,16 @@ internal sealed class AddFileHandler(IMediaFileRepository mediaFileRepository, I
         var bucketName = BucketNames.UserUploads;
 
         var fileName = Path.GetFileName(request.FileName);
-        var key = BuildStorageKey(command.UserEmail, fileName);
+
+        Guid fileId = Guid.NewGuid();
+        var key = FileHelper.BuildStorageKey(command.UserEmail, fileName, fileId);
 
         await fileStorage.UploadAsync(key, request.Content, request.ContentType, bucketName, cancellationToken);
 
         try
         {
             var mediaFile = MediaFile.Create(
+                fileId,
                 fileName,
                 key,
                 FileSource.User,
@@ -42,12 +46,6 @@ internal sealed class AddFileHandler(IMediaFileRepository mediaFileRepository, I
         }
     }
 
-    private static string BuildStorageKey(string userEmail, string fileName)
-    {
-        var name = Path.GetFileNameWithoutExtension(fileName);
-        var extension = Path.GetExtension(fileName).ToLowerInvariant();
-        return $"{userEmail}/{name}_{Guid.NewGuid():N}{extension}";
-    }
 
     private static FileType ResolveFileType(string contentType)
     {

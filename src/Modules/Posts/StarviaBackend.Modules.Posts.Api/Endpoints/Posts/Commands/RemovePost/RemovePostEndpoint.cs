@@ -14,7 +14,8 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace StarviaBackend.Modules.Posts.Api.Endpoints.Posts.Commands.RemovePost;
 
 [Authorize]
-internal sealed class RemovePostEndpoint(IDispatcher dispatcher, IContext context) : EndpointBaseAsync.WithRequest<RemovePostRequest>.WithActionResult
+internal sealed class RemovePostEndpoint(IDispatcher dispatcher, IContext context)
+    : EndpointBaseAsync.WithRequest<RemovePostRequest>.WithActionResult
 {
     [HttpDelete(PostsEndpoint.BasePath)]
     [SwaggerOperation(Summary = "Delete post", Tags = [PostsEndpoint.Tag])]

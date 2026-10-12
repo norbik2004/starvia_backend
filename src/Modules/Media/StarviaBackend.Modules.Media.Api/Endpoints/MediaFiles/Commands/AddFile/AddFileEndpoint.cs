@@ -9,7 +9,6 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace StarviaBackend.Modules.Media.Api.Endpoints.MediaFiles.Commands.AddFile;
 
-/// <summary>Multipart form: the file itself plus optional metadata.</summary>
 public sealed class AddFileFormRequest
 {
     public IFormFile File { get; set; } = default!;

@@ -14,3 +14,9 @@ internal sealed class MediaFileContentNotFoundException(string key)
 {
     public override string Code => "media_file_content_not_found";
 }
+
+internal sealed class MediaFileCannotBeDeletedException(Guid mediaId)
+    : BusinessException($"Media file '{mediaId}' cannot be deleted")
+{
+    public override string Code => "media_file_cannot_be_deleted";
+}
