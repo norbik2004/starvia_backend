@@ -9,6 +9,12 @@ internal sealed class MediaNotFoundException(Guid mediaId)
     public override string Code => "media_not_found";
 }
 
+internal sealed class MediaFileNotOwnedException(Guid mediaId)
+    : BusinessException($"User is not the owner of media file '{mediaId}'")
+{
+    public override string Code => "media_file_not_owned";
+}
+
 internal sealed class MediaFileContentNotFoundException(string key)
     : BusinessException($"Content of media file '{key}' was not found in the storage")
 {

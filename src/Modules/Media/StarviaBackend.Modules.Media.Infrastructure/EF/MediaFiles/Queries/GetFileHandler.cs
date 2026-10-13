@@ -19,10 +19,10 @@ internal sealed class GetFileHandler(MediaReadDbContext dbContext)
 
         if (file.CreatedBy != query.UserId.ToString())
         {
-            throw new UnauthorizedAccessException("You cannot see this file.");
+            throw new MediaFileNotOwnedException(query.FileId);
         }
 
         return new FileLongDto(file.Id, file.FileName, file.Description, file.Source, file.Type,
-            MediaFileRoutes.Content(file.Id), file.CreatedAt);
+            MediaFileRoutes.Content(file.Id), file.CreatedAt, file.CreatedBy);
     }
 }

@@ -15,9 +15,11 @@
     <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Infrastructure\StarviaBackend.Shared.Infrastructure.csproj" />
     <ProjectReference Include="..\StarviaBackend.Modules.Posts.Core\StarviaBackend.Modules.Posts.Core.csproj" />
+    <ProjectReference Include="..\..\Media\Integrations\StarviaBackend.Modules.Media.Integrations\StarviaBackend.Modules.Media.Integrations.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="PostAttachments\Queries\" />
     <Folder Include="PostPublications\Commands\" />
     <Folder Include="PostPublications\Events\" />
     <Folder Include="PostPublications\Queries\" />

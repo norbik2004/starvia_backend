@@ -93,6 +93,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarviaBackend.Modules.Medi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarviaBackend.Modules.Media.Api", "src\Modules\Media\StarviaBackend.Modules.Media.Api\StarviaBackend.Modules.Media.Api.csproj", "{17EA66CF-6032-47A5-8050-ACDF70A0CA72}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarviaBackend.Modules.Media.Integrations", "src\Modules\Media\Integrations\StarviaBackend.Modules.Media.Integrations\StarviaBackend.Modules.Media.Integrations.csproj", "{F6F84C58-E445-4DA4-BB50-439295299A7E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -427,6 +429,18 @@ Global
 		{17EA66CF-6032-47A5-8050-ACDF70A0CA72}.Release|x64.Build.0 = Release|Any CPU
 		{17EA66CF-6032-47A5-8050-ACDF70A0CA72}.Release|x86.ActiveCfg = Release|Any CPU
 		{17EA66CF-6032-47A5-8050-ACDF70A0CA72}.Release|x86.Build.0 = Release|Any CPU
+		{F6F84C58-E445-4DA4-BB50-439295299A7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6F84C58-E445-4DA4-BB50-439295299A7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6F84C58-E445-4DA4-BB50-439295299A7E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F6F84C58-E445-4DA4-BB50-439295299A7E}.Debug|x64.Build.0 = Debug|Any CPU
+		{F6F84C58-E445-4DA4-BB50-439295299A7E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F6F84C58-E445-4DA4-BB50-439295299A7E}.Debug|x86.Build.0 = Debug|Any CPU
+		{F6F84C58-E445-4DA4-BB50-439295299A7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6F84C58-E445-4DA4-BB50-439295299A7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6F84C58-E445-4DA4-BB50-439295299A7E}.Release|x64.ActiveCfg = Release|Any CPU
+		{F6F84C58-E445-4DA4-BB50-439295299A7E}.Release|x64.Build.0 = Release|Any CPU
+		{F6F84C58-E445-4DA4-BB50-439295299A7E}.Release|x86.ActiveCfg = Release|Any CPU
+		{F6F84C58-E445-4DA4-BB50-439295299A7E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -475,6 +489,7 @@ Global
 		{5B7D21AB-267B-49C9-86E8-84802ED95068} = {720B1916-2F7A-4FB5-86AB-DB793FEAA8BA}
 		{9CBFD37A-C3AC-4261-83E1-E8683CB0038D} = {720B1916-2F7A-4FB5-86AB-DB793FEAA8BA}
 		{17EA66CF-6032-47A5-8050-ACDF70A0CA72} = {720B1916-2F7A-4FB5-86AB-DB793FEAA8BA}
+		{F6F84C58-E445-4DA4-BB50-439295299A7E} = {9005FD4F-A07E-412F-89CD-D4EF709D0CCF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {06F57D9F-0013-49B6-A091-060DF8AFE057}

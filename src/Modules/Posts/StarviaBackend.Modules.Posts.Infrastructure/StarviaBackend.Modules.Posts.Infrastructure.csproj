@@ -17,6 +17,7 @@
     <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Infrastructure\StarviaBackend.Shared.Infrastructure.csproj" />
     <ProjectReference Include="..\StarviaBackend.Modules.Posts.Application\StarviaBackend.Modules.Posts.Application.csproj" />
     <ProjectReference Include="..\StarviaBackend.Modules.Posts.Core\StarviaBackend.Modules.Posts.Core.csproj" />
+    <ProjectReference Include="..\..\Media\Integrations\StarviaBackend.Modules.Media.Integrations\StarviaBackend.Modules.Media.Integrations.csproj" />
   </ItemGroup>
 
   <ItemGroup>

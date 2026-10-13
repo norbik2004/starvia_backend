@@ -19,7 +19,7 @@ internal static class Modules
         services.RegisterAccountsModule();
         services.RegisterPlatformsModule();
         services.RegisterEmailsModule();
-        services.RegisterPostsModule();
+        services.RegisterPostsModule(configuration);
         services.RegisterMediaModule();
         return services;
     }

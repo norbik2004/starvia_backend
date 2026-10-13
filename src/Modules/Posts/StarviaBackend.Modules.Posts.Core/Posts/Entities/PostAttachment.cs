@@ -27,4 +27,9 @@ internal sealed class PostAttachment : AuditableEntity
             Order = order
         };
     }
+
+    public void UpdateOrder(int order)
+    {
+        Order = order;
+    }
 }
