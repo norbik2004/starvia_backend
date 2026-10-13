@@ -57,6 +57,39 @@ namespace StarviaBackend.Modules.Posts.Infrastructure.Migrations
                     b.ToTable("Posts", "posts");
                 });
 
+            modelBuilder.Entity("StarviaBackend.Modules.Posts.Core.Posts.Entities.PostAttachment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("FileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("PostAttachments", "posts");
+                });
+
             modelBuilder.Entity("StarviaBackend.Modules.Posts.Core.Posts.Entities.PostPublication", b =>
                 {
                     b.Property<Guid>("Id")
@@ -96,6 +129,17 @@ namespace StarviaBackend.Modules.Posts.Infrastructure.Migrations
                     b.ToTable("PostPublications", "posts");
                 });
 
+            modelBuilder.Entity("StarviaBackend.Modules.Posts.Core.Posts.Entities.PostAttachment", b =>
+                {
+                    b.HasOne("StarviaBackend.Modules.Posts.Core.Posts.Entities.Post", "Post")
+                        .WithMany("PostAttachments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+                });
+
             modelBuilder.Entity("StarviaBackend.Modules.Posts.Core.Posts.Entities.PostPublication", b =>
                 {
                     b.HasOne("StarviaBackend.Modules.Posts.Core.Posts.Entities.Post", "Post")
@@ -109,6 +153,8 @@ namespace StarviaBackend.Modules.Posts.Infrastructure.Migrations
 
             modelBuilder.Entity("StarviaBackend.Modules.Posts.Core.Posts.Entities.Post", b =>
                 {
+                    b.Navigation("PostAttachments");
+
                     b.Navigation("PostPublications");
                 });
 #pragma warning restore 612, 618

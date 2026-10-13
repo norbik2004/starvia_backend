@@ -10,6 +10,7 @@ namespace StarviaBackend.Modules.Posts.Core.Posts.Entities;
 internal sealed class Post : BaseEntity, IAuditable
 {
     private readonly List<PostPublication> _postPublications = [];
+    private readonly List<PostAttachment> _postAttachments = [];
 
     public string Title { get; private set; }
     public string? Body { get; private set; }
@@ -21,19 +22,18 @@ internal sealed class Post : BaseEntity, IAuditable
     public string? LastModifiedBy { get; set; }
 
     public IReadOnlyCollection<PostPublication> PostPublications => _postPublications.AsReadOnly();
+    public IReadOnlyCollection<PostAttachment> PostAttachments => _postAttachments.AsReadOnly();
 
     private Post()
     {
     }
 
-    public static Post Create(string title, DateTime createdAt, Guid createdBy)
+    public static Post Create(string title)
     {
         return new Post
         {
             Id = Guid.NewGuid(),
             Title = title,
-            CreatedAt = createdAt,
-            CreatedBy = createdBy.ToString(),
             Status = PostStatus.Draft
         };
     }

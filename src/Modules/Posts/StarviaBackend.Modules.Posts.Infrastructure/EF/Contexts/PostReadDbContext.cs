@@ -1,7 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
+using StarviaBackend.Modules.Posts.Infrastructure.EF.PostAttachments.Configurations.Read;
+using StarviaBackend.Modules.Posts.Infrastructure.EF.PostAttachments.Configurations.Read.Models;
 using StarviaBackend.Modules.Posts.Infrastructure.EF.PostPublications.Configurations.Read;
 using StarviaBackend.Modules.Posts.Infrastructure.EF.PostPublications.Configurations.Read.Models;
 using StarviaBackend.Modules.Posts.Infrastructure.EF.Posts.Configurations.Read;
@@ -13,12 +12,14 @@ internal sealed class PostReadDbContext(DbContextOptions<PostReadDbContext> opti
 {
     public DbSet<PostReadModel> Posts => Set<PostReadModel>();
     public DbSet<PostPublicationReadModel> PostPublications => Set<PostPublicationReadModel>();
+    public DbSet<PostAttachmentReadModel> PostAttachments => Set<PostAttachmentReadModel>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema(PostWriteDbContext.Schema);
         modelBuilder.ApplyConfiguration(new PostReadConfiguration());
         modelBuilder.ApplyConfiguration(new PostPublicationReadConfiguration());
+        modelBuilder.ApplyConfiguration(new PostAttachmentReadConfiguration());
     }
 
     public override int SaveChanges() => throw new InvalidOperationException("Read context is read-only.");

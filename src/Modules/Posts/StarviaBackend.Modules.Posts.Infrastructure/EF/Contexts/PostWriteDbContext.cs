@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using StarviaBackend.Modules.Posts.Core.Posts.Entities;
+using StarviaBackend.Modules.Posts.Infrastructure.EF.PostAttachments.Configurations.Write;
 using StarviaBackend.Modules.Posts.Infrastructure.EF.PostPublications.Configurations.Write;
 using StarviaBackend.Modules.Posts.Infrastructure.EF.Posts.Configurations.Write;
 
@@ -13,6 +14,7 @@ internal sealed class PostWriteDbContext(DbContextOptions<PostWriteDbContext> op
     public const string Schema = "posts";
     public DbSet<Post> Posts => Set<Post>();
     public DbSet<PostPublication> PostPublications => Set<PostPublication>();
+    public DbSet<PostAttachment> PostAttachments => Set<PostAttachment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,5 +23,6 @@ internal sealed class PostWriteDbContext(DbContextOptions<PostWriteDbContext> op
 
         modelBuilder.ApplyConfiguration(new PostConfiguration());
         modelBuilder.ApplyConfiguration(new PostPublicationConfiguration());
+        modelBuilder.ApplyConfiguration(new PostAttachmentConfiguration());
     }
 }
