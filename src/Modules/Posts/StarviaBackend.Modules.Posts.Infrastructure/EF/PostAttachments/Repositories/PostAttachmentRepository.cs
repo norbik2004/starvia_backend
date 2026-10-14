@@ -16,6 +16,21 @@ internal class PostAttachmentRepository(PostWriteDbContext dbContext) : IPostAtt
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task<List<PostAttachment>> GetByPostIdAsync(Guid postId, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.PostAttachments
+            .Where(pa => pa.PostId == postId)
+            .OrderBy(pa => pa.Order)
+            .ThenBy(pa => pa.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task UpdateRangeAsync(IEnumerable<PostAttachment> postAttachments, CancellationToken cancellationToken = default)
+    {
+        dbContext.PostAttachments.UpdateRange(postAttachments);
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task<PostAttachment?> GetByIdAsync(Guid postAttachmentId, CancellationToken cancellationToken = default)
     {
         return await dbContext.PostAttachments.FirstOrDefaultAsync(pa => pa.Id == postAttachmentId, cancellationToken);

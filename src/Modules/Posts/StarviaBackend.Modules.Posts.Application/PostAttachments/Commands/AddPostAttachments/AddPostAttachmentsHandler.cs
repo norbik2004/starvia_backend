@@ -26,23 +26,34 @@ internal sealed class AddPostAttachmentsHandler(
             throw new UnauthorizedAccessException("You are not authorized to add attachments to this post.");
         }
 
+        var existingAttachments = await postAttachmentRepository.GetByPostIdAsync(request.postId, cancellationToken);
+        if (existingAttachments.Count + request.fileIds.Count > PostAttachment.MaxPerPost)
+        {
+            throw new TooManyPostAttachmentsException(PostAttachment.MaxPerPost);
+        }
+
         var files = await mediaClient.GetFilesAsync(command.userId, request.fileIds, cancellationToken);
+
         var filesById = files.ToDictionary(file => file.Id);
 
-        var attachmentIds = new List<Guid>(request.fileIds.Count);
-        for (var index = 0; index < request.fileIds.Count; index++)
+        var nextOrder = existingAttachments.Count == 0 ? 0 : existingAttachments.Max(pa => pa.Order) + 1;
+
+        var attachments = new List<PostAttachment>(request.fileIds.Count);
+        foreach (var fileId in request.fileIds)
         {
-            var fileId = request.fileIds[index];
             if (!filesById.TryGetValue(fileId, out var file))
             {
                 throw new MediaIntegrationException($"File '{fileId}' was not found in the media API.");
             }
 
-            var attachment = PostAttachment.Create(request.postId, file.Id, request.order + index);
-            await postAttachmentRepository.AddAsync(attachment, cancellationToken);
-            attachmentIds.Add(attachment.Id);
+            attachments.Add(PostAttachment.Create(request.postId, file.Id, nextOrder++));
         }
 
-        return new AddPostAttachmentsResult(attachmentIds);
+        foreach (var attachment in attachments)
+        {
+            await postAttachmentRepository.AddAsync(attachment, cancellationToken);
+        }
+
+        return new AddPostAttachmentsResult(attachments.Select(a => a.Id).ToList());
     }
 }

@@ -8,6 +8,8 @@ namespace StarviaBackend.Modules.Posts.Core.Posts.Entities;
 
 internal sealed class PostAttachment : AuditableEntity
 {
+    public const int MaxPerPost = 5;
+
     public Guid PostId { get; private set; }
     public Post Post { get; private set; } = null!;
     public Guid FileId { get; private set; }

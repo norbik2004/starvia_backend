@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using StarviaBackend.Modules.Posts.Application.PostAttachments.Queries.BrowsePostAttachments;
 using StarviaBackend.Modules.Posts.Core.Posts.Enums;
 using StarviaBackend.Shared.Abstractions.Queries;
 
@@ -14,4 +15,4 @@ internal sealed record GetPostQuery(string UserId, Guid PostId) : IQuery<PostLon
  * najlepiej liste<PostPublicationDto>
  */
 public sealed record PostLongDto(Guid Id, string Title, string Body, PostStatus Status,
-    DateTime CreatedAt, string CreatedBy, DateTime? LastModifiedAt);
+    DateTime CreatedAt, string CreatedBy, DateTime? LastModifiedAt, ICollection<PostAttachmentDto> postAttachments);

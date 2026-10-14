@@ -6,4 +6,4 @@ internal sealed record AddPostAttachmentsCommand(AddPostAttachmentsRequest reque
 
 public sealed record AddPostAttachmentsResult(List<Guid> postAttachmentIds);
 
-public sealed record AddPostAttachmentsRequest(Guid postId, List<Guid> fileIds, int order);
+public sealed record AddPostAttachmentsRequest(Guid postId, List<Guid> fileIds);

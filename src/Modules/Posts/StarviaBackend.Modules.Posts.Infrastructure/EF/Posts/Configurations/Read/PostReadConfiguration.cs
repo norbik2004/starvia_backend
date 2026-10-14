@@ -19,5 +19,10 @@ internal sealed class PostReadConfiguration : IEntityTypeConfiguration<PostReadM
         builder.Property(p => p.Status);
         builder.Property(p => p.CreatedAt);
         builder.Property(p => p.LastModifiedAt);
+
+        builder.HasMany(p => p.PostAttachments)
+               .WithOne()
+               .HasForeignKey(pp => pp.PostId)
+               .OnDelete(DeleteBehavior.Cascade);
     }
 }
