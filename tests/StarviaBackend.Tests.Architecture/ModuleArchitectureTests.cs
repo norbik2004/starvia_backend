@@ -22,12 +22,7 @@ public abstract class ModuleArchitectureTests
     /// Known, tolerated cross-module references (consumer module -> referenced module).
     /// Keep this list empty if possible; every entry is architectural debt.
     /// </summary>
-    private static readonly HashSet<(string Consumer, string Referenced)> KnownCrossModuleDependencies =
-    [
-        // Emails.Application builds its messages from Accounts.Application commands/results.
-        // TODO: move the shared contract to Accounts.Integrations / Shared.Abstractions.
-        ("Emails", "Accounts"),
-    ];
+    private static readonly HashSet<(string Consumer, string Referenced)> KnownCrossModuleDependencies = [];
 
     private readonly string _module;
     private readonly Assembly _core;

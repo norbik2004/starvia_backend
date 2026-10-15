@@ -2,6 +2,8 @@ using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Modules.Accounts.Application;
 using StarviaBackend.Modules.Accounts.Application.Users.Events.UserRegistered;
+using StarviaBackend.Modules.Accounts.Application.Users.Requests.GenerateEmailConfirmationToken;
+using StarviaBackend.Modules.Accounts.Application.Users.Requests.GeneratePasswordResetToken;
 using StarviaBackend.Modules.Accounts.Core;
 using StarviaBackend.Modules.Accounts.Infrastructure;
 
@@ -28,5 +30,11 @@ public static class AccountsModule
         {
             cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(60)));
         });
+
+        // Responders for the Emails module's token requests (see Shared.Abstractions.Accounts).
+        // No retry here: business failures are answered, anything else faults the request and the
+        // requester (Emails) owns the retry policy.
+        configurator.AddConsumer<GenerateEmailConfirmationTokenConsumer>();
+        configurator.AddConsumer<GeneratePasswordResetTokenConsumer>();
     }
 }

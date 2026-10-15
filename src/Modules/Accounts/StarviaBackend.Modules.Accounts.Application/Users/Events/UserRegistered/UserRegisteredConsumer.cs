@@ -6,7 +6,7 @@ namespace StarviaBackend.Modules.Accounts.Application.Users.Events.UserRegistere
 
 /// <summary>
 /// After registration: queue a confirm-account email via MassTransit.
-/// The email module generates the confirmation token and builds the link.
+/// The email module requests the confirmation token from Accounts over the bus and builds the link.
 /// </summary>
 internal sealed class UserRegisteredConsumer(
     ILogger<UserRegisteredConsumer> logger,

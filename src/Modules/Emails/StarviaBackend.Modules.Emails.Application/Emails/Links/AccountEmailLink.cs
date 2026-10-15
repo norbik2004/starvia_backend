@@ -1,4 +1,4 @@
-using StarviaBackend.Modules.Accounts.Application.Users;
+using StarviaBackend.Shared.Infrastructure.Auth;
 
 namespace StarviaBackend.Modules.Emails.Application.Emails.Links;
 

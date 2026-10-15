@@ -3,6 +3,7 @@ using StarviaBackend.Modules.Accounts.Core.Users.Entities;
 using StarviaBackend.Modules.Accounts.Core.Users.Exceptions;
 using StarviaBackend.Modules.Accounts.Core.Users.Repositories;
 using StarviaBackend.Shared.Abstractions.Commands;
+using StarviaBackend.Shared.Infrastructure.Auth;
 
 namespace StarviaBackend.Modules.Accounts.Application.Users.Commands.ResetPassword;
 

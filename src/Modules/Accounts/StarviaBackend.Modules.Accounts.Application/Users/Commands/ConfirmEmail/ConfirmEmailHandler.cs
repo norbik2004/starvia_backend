@@ -5,6 +5,7 @@ using StarviaBackend.Modules.Accounts.Core.Users.Exceptions;
 using StarviaBackend.Modules.Accounts.Core.Users.Repositories;
 using StarviaBackend.Shared.Abstractions.Commands;
 using StarviaBackend.Shared.Abstractions.Email;
+using StarviaBackend.Shared.Infrastructure.Auth;
 
 namespace StarviaBackend.Modules.Accounts.Application.Users.Commands.ConfirmEmail;
 

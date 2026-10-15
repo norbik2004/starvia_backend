@@ -1,12 +1,11 @@
-using StarviaBackend.Modules.Accounts.Application.Users.Commands.GeneratePasswordResetToken;
 using StarviaBackend.Modules.Emails.Application.Emails.Links;
 using StarviaBackend.Modules.Emails.Application.Emails.Templates.Models;
+using StarviaBackend.Modules.Emails.Application.Emails.Tokens;
 using StarviaBackend.Shared.Abstractions.App;
-using StarviaBackend.Shared.Abstractions.Dispatchers;
 
 namespace StarviaBackend.Modules.Emails.Application.Emails.Messages;
 
-internal sealed class ResetPasswordEmail(IDispatcher dispatcher, IAppUrls appUrls)
+internal sealed class ResetPasswordEmail(IAccountTokenProvider tokenProvider, IAppUrls appUrls)
 {
     public const string Subject = "Zresetuj hasło swojego konta w Starvia";
 
@@ -15,11 +14,9 @@ internal sealed class ResetPasswordEmail(IDispatcher dispatcher, IAppUrls appUrl
         string email,
         CancellationToken cancellationToken)
     {
-        var code = await dispatcher.SendAsync<GeneratePasswordResetTokenCommand, GeneratePasswordResetTokenResult>(
-            new GeneratePasswordResetTokenCommand(userId),
-            cancellationToken);
+        var token = await tokenProvider.GetPasswordResetTokenAsync(userId, cancellationToken);
 
-        var link = AccountEmailLink.ResetPassword(appUrls.FrontendBaseUrl, userId, code.Token);
+        var link = AccountEmailLink.ResetPassword(appUrls.FrontendBaseUrl, userId, token);
         return new ResetPasswordEmailTemplateModel(email, link);
     }
 }

@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace StarviaBackend.Modules.Accounts.Application.Users;
+namespace StarviaBackend.Shared.Infrastructure.Auth;
 
 public static class IdentityTokenEncoder
 {

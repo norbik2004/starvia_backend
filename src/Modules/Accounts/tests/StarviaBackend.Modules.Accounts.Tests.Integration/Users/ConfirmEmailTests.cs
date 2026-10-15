@@ -9,6 +9,7 @@ using StarviaBackend.Modules.Accounts.Application.Users.Commands.ConfirmEmail;
 using StarviaBackend.Modules.Accounts.Core.Users.Entities;
 using StarviaBackend.Modules.Accounts.Infrastructure.EF.Contexts;
 using StarviaBackend.Shared.Abstractions.Exceptions;
+using StarviaBackend.Shared.Infrastructure.Auth;
 
 namespace StarviaBackend.Modules.Accounts.Tests.Integration.Users;
 

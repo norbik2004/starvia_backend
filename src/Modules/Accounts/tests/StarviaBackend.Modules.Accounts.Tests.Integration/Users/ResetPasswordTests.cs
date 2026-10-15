@@ -7,6 +7,7 @@ using StarviaBackend.Modules.Accounts.Application.Users;
 using StarviaBackend.Modules.Accounts.Core.Users.Entities;
 using StarviaBackend.Shared.Abstractions.Auth;
 using StarviaBackend.Shared.Abstractions.Exceptions;
+using StarviaBackend.Shared.Infrastructure.Auth;
 
 namespace StarviaBackend.Modules.Accounts.Tests.Integration.Users;
 
