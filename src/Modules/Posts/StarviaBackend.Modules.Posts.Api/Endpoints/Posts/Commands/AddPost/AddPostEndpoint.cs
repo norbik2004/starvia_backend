@@ -13,7 +13,7 @@ internal sealed class AddPostEndpoint(IDispatcher dispatcher, IContext context)
 {
     [HttpPost(PostsEndpoint.BasePath)]
     [SwaggerOperation(Summary = "Add post", Tags = [PostsEndpoint.Tag])]
-    [ProducesResponseType(typeof(PagedResult<AddPostResult>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(AddPostResult), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public override async Task<ActionResult<AddPostResult>> HandleAsync([FromBody] AddPostRequest request,
         CancellationToken cancellationToken = default)

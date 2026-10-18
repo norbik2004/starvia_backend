@@ -17,4 +17,8 @@
     <ProjectReference Include="..\StarviaBackend.Modules.Calendar.Core\StarviaBackend.Modules.Calendar.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CalednarEntry\" />
+  </ItemGroup>
+
 </Project>

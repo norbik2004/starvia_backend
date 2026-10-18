@@ -19,4 +19,10 @@
     <ProjectReference Include="..\StarviaBackend.Modules.Calendar.Core\StarviaBackend.Modules.Calendar.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="EF\CalendarEntries\Queries\" />
+    <Folder Include="EF\ContentCalendars\Queries\" />
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
