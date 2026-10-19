@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <Folder Include="EF\CalendarEntries\Queries\" />
-    <Folder Include="EF\ContentCalendars\Queries\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 

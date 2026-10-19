@@ -10,6 +10,6 @@ internal class ContentCalendarReadModel
     public Guid Id { get; init; }
     public string Name { get; init; }
     public DateTime CreatedAt { get; init; }
-    public Guid CreatedBy { get; init; }
+    public string CreatedBy { get; init; }
     public ICollection<CalendarEntryReadModel> CalendarEntries { get; init; } = [];
 }
