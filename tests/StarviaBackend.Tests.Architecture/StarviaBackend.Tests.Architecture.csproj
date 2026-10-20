@@ -23,6 +23,11 @@
     <ProjectReference Include="..\..\src\Modules\Accounts\StarviaBackend.Modules.Accounts.Infrastructure\StarviaBackend.Modules.Accounts.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Modules\Accounts\StarviaBackend.Modules.Accounts.Api\StarviaBackend.Modules.Accounts.Api.csproj" />
 
+    <ProjectReference Include="..\..\src\Modules\Calendar\StarviaBackend.Modules.Calendar.Core\StarviaBackend.Modules.Calendar.Core.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Calendar\StarviaBackend.Modules.Calendar.Application\StarviaBackend.Modules.Calendar.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Calendar\StarviaBackend.Modules.Calendar.Infrastructure\StarviaBackend.Modules.Calendar.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Calendar\StarviaBackend.Modules.Calendar.Api\StarviaBackend.Modules.Calendar.Api.csproj" />
+
     <ProjectReference Include="..\..\src\Modules\Emails\StarviaBackend.Modules.Emails.Core\StarviaBackend.Modules.Emails.Core.csproj" />
     <ProjectReference Include="..\..\src\Modules\Emails\StarviaBackend.Modules.Emails.Application\StarviaBackend.Modules.Emails.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\Emails\StarviaBackend.Modules.Emails.Infrastructure\StarviaBackend.Modules.Emails.Infrastructure.csproj" />

@@ -22,7 +22,7 @@ internal sealed class GetPostHandler(PostReadDbContext dbContext) : IQueryHandle
 
         if (item.CreatedBy != query.UserId)
         {
-            throw new UnauthorizedAccessException("You cannot see this post.");
+            throw new PostNotOwnedException(query.PostId);
         }
 
         ICollection<PostAttachmentDto> postAttachments = item.PostAttachments

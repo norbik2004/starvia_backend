@@ -22,15 +22,3 @@ internal sealed record MediaFileApiResponse
     [JsonPropertyName("createdBy")]
     public string? CreatedBy { get; init; }
 }
-
-internal sealed record MediaApiErrorResponse
-{
-    [JsonPropertyName("errors")]
-    public IReadOnlyList<MediaApiError> Errors { get; init; } = [];
-}
-
-internal sealed record MediaApiError
-{
-    [JsonPropertyName("code")]
-    public string Code { get; init; } = string.Empty;
-}

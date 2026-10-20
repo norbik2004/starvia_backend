@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\Shared\StarviaBackend.Shared.Infrastructure\StarviaBackend.Shared.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

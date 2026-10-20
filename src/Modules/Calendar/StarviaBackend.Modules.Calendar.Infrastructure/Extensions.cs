@@ -7,6 +7,7 @@ using StarviaBackend.Modules.Calendar.Infrastructure.EF.CalendarEntries.Reposito
 using StarviaBackend.Modules.Calendar.Infrastructure.EF.ContentCalendars.Repositories;
 using StarviaBackend.Modules.Calendar.Infrastructure.EF.Contexts;
 using StarviaBackend.Modules.Calendar.Infrastructure.EF.Initializers;
+using StarviaBackend.Modules.Posts.Integrations;
 using StarviaBackend.Shared.Infrastructure.Cqrs;
 using StarviaBackend.Shared.Infrastructure.Postgres;
 
@@ -23,6 +24,8 @@ internal static class Extensions
 
         services.AddScoped<ICalendarEntryRepository, CalendarEntryRepository>();
         services.AddScoped<ICalendarRepository, ContentCalendarRepository>();
+
+        services.AddPostsIntegration(configuration);
 
         services.AddHostedService<CalendarDataInitializer>();
 

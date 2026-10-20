@@ -8,3 +8,9 @@ internal sealed class PostNotFoundException(Guid postId)
 {
     public override string Code => "post_not_found";
 }
+
+internal sealed class PostNotOwnedException(Guid postId)
+    : BusinessException($"User is not the owner of post '{postId}'")
+{
+    public override string Code => "post_not_owned";
+}

@@ -16,7 +16,7 @@ public abstract class ModuleArchitectureTests
     private static readonly string[] Layers = ["Core", "Application", "Infrastructure", "Api"];
 
     /// <summary>All modules of the solution. Add a new module name here to isolate it from the others.</summary>
-    private static readonly string[] AllModules = ["Accounts", "Emails", "Media", "Platforms", "Posts"];
+    private static readonly string[] AllModules = ["Accounts", "Calendar", "Emails", "Media", "Platforms", "Posts"];
 
     /// <summary>
     /// Known, tolerated cross-module references (consumer module -> referenced module).

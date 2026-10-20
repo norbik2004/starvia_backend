@@ -1,8 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Text.Json;
 using StarviaBackend.Modules.Media.Integrations.External;
-using StarviaBackend.Shared.Abstractions.Exceptions;
+using StarviaBackend.Shared.Infrastructure.Integrations;
 
 namespace StarviaBackend.Modules.Media.Integrations;
 
@@ -44,7 +43,7 @@ internal sealed class MediaClient(HttpClient httpClient) : IMediaClient
 
         if (!response.IsSuccessStatusCode)
         {
-            throw await ToFailureAsync(userId, fileId, response, cancellationToken);
+            throw await response.ToFailureAsync(FailureRules(fileId), cancellationToken);
         }
 
         var payload = await response.Content.ReadFromJsonAsync<MediaFileApiResponse>(cancellationToken)
@@ -58,49 +57,17 @@ internal sealed class MediaClient(HttpClient httpClient) : IMediaClient
         return new MediaFile(payload.Id, payload.FileName, payload.Url, payload.CreatedAt);
     }
 
-    private static async Task<BusinessException> ToFailureAsync(
-        Guid userId,
-        Guid fileId,
-        HttpResponseMessage response,
-        CancellationToken cancellationToken)
-    {
-        if (response.StatusCode == HttpStatusCode.NotFound)
-        {
-            return new MediaIntegrationException($"File '{fileId}' was not found in the media API.");
-        }
+    private static IntegrationFailureRules FailureRules(Guid fileId) =>
+        new IntegrationFailureRules(status => new MediaIntegrationException($"Media API returned {(int)status}."))
+            .OnStatus(HttpStatusCode.NotFound, () => FileNotFound(fileId))
+            .OnCode("media_not_found", () => FileNotFound(fileId))
+            .OnCode("media_file_not_owned", () => new MediaIntegrationNotOwnerException("User is not the owner of file."));
 
-        var error = await TryReadErrorAsync(response, cancellationToken);
-        if (error?.Errors.Any(item => item.Code == "media_not_found") == true)
-        {
-            return new MediaIntegrationException($"File '{fileId}' was not found in the media API.");
-        }
-
-        if (error?.Errors.Any(item => item.Code == "media_file_not_owned") == true)
-        {
-            return new MediaIntegrationNotOwnerException($"User is not the owner of file.");
-        }
-
-        return new MediaIntegrationException($"Media API returned {(int)response.StatusCode}.");
-    }
-
-    private static async Task<MediaApiErrorResponse?> TryReadErrorAsync(
-        HttpResponseMessage response,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            return await response.Content.ReadFromJsonAsync<MediaApiErrorResponse>(cancellationToken);
-        }
-        catch (JsonException)
-        {
-            return null;
-        }
-    }
+    private static MediaIntegrationException FileNotFound(Guid fileId) =>
+        new($"File '{fileId}' was not found in the media API.");
 
     private static bool IsOwner(string? createdBy, Guid userId) =>
         Guid.TryParse(createdBy, out var ownerId) && ownerId == userId;
-
-
 
     private async Task<HttpResponseMessage> SendAsync(string path, CancellationToken cancellationToken)
     {

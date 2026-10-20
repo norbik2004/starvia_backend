@@ -17,6 +17,7 @@
     <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Infrastructure\StarviaBackend.Shared.Infrastructure.csproj" />
     <ProjectReference Include="..\StarviaBackend.Modules.Calendar.Application\StarviaBackend.Modules.Calendar.Application.csproj" />
     <ProjectReference Include="..\StarviaBackend.Modules.Calendar.Core\StarviaBackend.Modules.Calendar.Core.csproj" />
+    <ProjectReference Include="..\..\Posts\Integrations\StarviaBackend.Modules.Posts.Integrations\StarviaBackend.Modules.Posts.Integrations.csproj" />
   </ItemGroup>
 
   <ItemGroup>

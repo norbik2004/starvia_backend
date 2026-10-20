@@ -12,6 +12,12 @@ internal sealed class CalendarNotFoundException(Guid calendarId)
 }
 
 
+internal sealed class CalendarNotOwnedException(Guid calendarId)
+    : BusinessException($"User is not the owner of calendar '{calendarId}'")
+{
+    public override string Code => "calendar_not_owned";
+}
+
 internal sealed class CantCreateCalendarException(Guid userId)
     : BusinessException($"User {userId} has arleady created a calendar")
 {
