@@ -18,6 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="StarviaBackend.Modules.Media.Tests.Unit" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="MediaFiles\Commands\UpdateFile\" />
     <Folder Include="MediaFiles\Events\" />
     <Folder Include="MediaFiles\Queries\" />

@@ -5,7 +5,7 @@ using StarviaBackend.Shared.Infrastructure.Cqrs;
 
 [assembly:InternalsVisibleTo("StarviaBackend.Modules.Calendar.Infrastructure")]
 [assembly:InternalsVisibleTo("StarviaBackend.Modules.Calendar.Api")]
-[assembly:InternalsVisibleTo("StarviaBackend.Modules.PoCalendarsts.Tests.Integration")]
+[assembly:InternalsVisibleTo("StarviaBackend.Modules.Calendar.Tests.Integration")]
 namespace StarviaBackend.Modules.Calendar.Application;
 
 internal static class Extensions

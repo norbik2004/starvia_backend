@@ -16,6 +16,11 @@ internal sealed class RemoveFileHandler(IMediaFileRepository mediaFileRepository
         var file = await mediaFileRepository.GetByIdAsync(command.FileId, cancellationToken)
             ?? throw new MediaNotFoundException(command.FileId);
 
+        if(file.CreatedBy != command.UserId.ToString())
+        {
+            throw new MediaFileCannotBeDeletedException(file.Id);
+        }
+
         try
         {
             await fileStorageService.DeleteAsync(file.FilePath, BucketName, cancellationToken);

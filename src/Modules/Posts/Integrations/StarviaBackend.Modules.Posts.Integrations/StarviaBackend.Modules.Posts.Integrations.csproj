@@ -14,4 +14,8 @@
     <ProjectReference Include="..\..\..\..\Shared\StarviaBackend.Shared.Infrastructure\StarviaBackend.Shared.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="StarviaBackend.Modules.Posts.Tests.Unit" />
+  </ItemGroup>
+
 </Project>

@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="StarviaBackend.Modules.Posts.Tests.Unit" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="PostPublications\Commands\" />
     <Folder Include="PostPublications\Events\" />
     <Folder Include="PostPublications\Queries\" />

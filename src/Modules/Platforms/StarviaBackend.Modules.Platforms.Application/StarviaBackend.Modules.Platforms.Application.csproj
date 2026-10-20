@@ -18,6 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="StarviaBackend.Modules.Platforms.Tests.Unit" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="UserPlatforms\Events\" />
     <Folder Include="Platforms\Commands\" />
     <Folder Include="Platforms\Events\" />

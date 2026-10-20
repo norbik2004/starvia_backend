@@ -3,7 +3,10 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <PackageId>StarviaBackend.Shared.Tests.Integration</PackageId>
-    <!-- Shared harness library (not a runnable test project). -->
+    <!-- Shared harness library (not a runnable test project). The xunit package marks every project
+         that references it as a test project, which makes `dotnet test` on the solution try to run
+         this library and fail, so opt out explicitly. -->
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>

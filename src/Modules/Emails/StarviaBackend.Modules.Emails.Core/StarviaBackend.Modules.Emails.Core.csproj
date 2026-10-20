@@ -18,4 +18,8 @@
     <Folder Include="Emails\Enums\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="StarviaBackend.Modules.Emails.Tests.Unit" />
+  </ItemGroup>
+
 </Project>

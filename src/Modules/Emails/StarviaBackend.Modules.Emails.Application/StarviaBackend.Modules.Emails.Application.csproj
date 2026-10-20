@@ -21,4 +21,8 @@
     <Folder Include="Emails\Events\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="StarviaBackend.Modules.Emails.Tests.Unit" />
+  </ItemGroup>
+
 </Project>

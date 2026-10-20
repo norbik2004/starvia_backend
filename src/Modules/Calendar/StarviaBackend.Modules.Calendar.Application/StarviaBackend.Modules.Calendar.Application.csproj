@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="StarviaBackend.Modules.Calendar.Tests.Unit" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="CalednarEntry\" />
   </ItemGroup>
 
