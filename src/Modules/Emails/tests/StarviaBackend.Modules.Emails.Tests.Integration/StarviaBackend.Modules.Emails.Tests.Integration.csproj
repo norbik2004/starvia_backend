@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <PackageId>StarviaBackend.Modules.Emails.Tests.Integration</PackageId>
+    <!-- RazorLight compiles the e-mail templates at runtime and needs the compilation context. -->
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="MassTransit" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Deliberately no reference to any other module (and not to the Bootstrapper): Emails talks to
+      them only via bus contracts. The Emails endpoints are exercised through a minimal in-test host
+      that mounts just this module's Api assembly.
+    -->
+    <ProjectReference Include="..\..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
+    <ProjectReference Include="..\..\StarviaBackend.Modules.Emails.Core\StarviaBackend.Modules.Emails.Core.csproj" />
+    <ProjectReference Include="..\..\StarviaBackend.Modules.Emails.Application\StarviaBackend.Modules.Emails.Application.csproj" />
+    <ProjectReference Include="..\..\StarviaBackend.Modules.Emails.Infrastructure\StarviaBackend.Modules.Emails.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\StarviaBackend.Modules.Emails.Api\StarviaBackend.Modules.Emails.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

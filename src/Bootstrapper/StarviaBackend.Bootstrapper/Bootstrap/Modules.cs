@@ -1,0 +1,28 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using StarviaBackend.Modules.Accounts.Api;
+using StarviaBackend.Modules.Calendar.Api;
+using StarviaBackend.Modules.Emails.Api;
+using StarviaBackend.Modules.Media.Api;
+using StarviaBackend.Modules.Platforms.Api;
+using StarviaBackend.Modules.Posts.Api;
+
+namespace ModularMonolith.Bootstrapper.Bootstrap;
+
+/// <summary>
+/// Explicit module composition. Add a new module by registering it here (and its consumers
+/// in <see cref="Messaging"/>). No reflection/magic — the wiring stays greppable.
+/// </summary>
+internal static class Modules
+{
+    public static IServiceCollection AddModules(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.RegisterAccountsModule();
+        services.RegisterPlatformsModule();
+        services.RegisterEmailsModule();
+        services.RegisterPostsModule(configuration);
+        services.RegisterMediaModule();
+        services.RegisterCalendarsModule(configuration);
+        return services;
+    }
+}
