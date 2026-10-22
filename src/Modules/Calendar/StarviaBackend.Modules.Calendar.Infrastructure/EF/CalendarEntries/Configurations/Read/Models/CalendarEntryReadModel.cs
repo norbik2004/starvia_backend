@@ -9,7 +9,7 @@ namespace StarviaBackend.Modules.Calendar.Infrastructure.EF.CalendarEntries.Conf
 internal class CalendarEntryReadModel
 {
     public Guid Id { get; init; }
-    public Guid CalendarId { get; init; }
+    public Guid ContentCalendarId { get; init; }
     public Guid PostId { get; init; }
     public DateTimeOffset ScheduledAt { get; init; }
     public CalendarEntryStatus Status { get; init; }

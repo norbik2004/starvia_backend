@@ -17,5 +17,9 @@ internal sealed class ContentCalendarReadConfiguration : IEntityTypeConfiguratio
         builder.Property(u => u.Name).IsRequired().HasMaxLength(100);
         builder.Property(u => u.CreatedAt).IsRequired();
         builder.Property(u => u.CreatedBy).IsRequired();
+
+        builder.HasMany(u => u.CalendarEntries)
+            .WithOne()
+            .HasForeignKey(e => e.ContentCalendarId);
     }
 }

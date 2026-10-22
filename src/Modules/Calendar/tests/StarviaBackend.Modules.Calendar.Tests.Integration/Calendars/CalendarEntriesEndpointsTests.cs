@@ -12,6 +12,10 @@ public sealed class CalendarEntriesEndpointsTests(CalendarApp app) : CalendarInt
 {
     private static readonly DateTimeOffset ScheduledAt = new(2027, 3, 14, 9, 30, 0, TimeSpan.Zero);
 
+    private sealed record CalendarWithEntriesResponse(Guid Id, List<CalendarEntryResponse> CalendarEntries);
+
+    private sealed record CalendarEntryResponse(Guid Id, Guid PostId, DateTimeOffset ScheduledAt);
+
     private static object EntryRequest(Guid calendarId, Guid postId) => new { calendarId, postId, scheduledAt = ScheduledAt };
 
     [Fact]
@@ -54,6 +58,26 @@ public sealed class CalendarEntriesEndpointsTests(CalendarApp app) : CalendarInt
         var count = await WithDbAsync<CalendarWriteDbContext, int>(db =>
             db.Set<CalendarEntry>().CountAsync(e => e.ContentCalendarId == calendarId));
         count.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task Get_calendar_returns_its_entries()
+    {
+        // Arrange
+        var client = CreateUserClient();
+        var calendarId = await CreateCalendarAsync(client);
+        var firstPostId = Guid.NewGuid();
+        var secondPostId = Guid.NewGuid();
+        await client.PostAsJsonAsync("/v1/calendar-entries", EntryRequest(calendarId, firstPostId));
+        await client.PostAsJsonAsync("/v1/calendar-entries", EntryRequest(calendarId, secondPostId));
+
+        // Act
+        var calendar = await client.GetFromJsonAsync<CalendarWithEntriesResponse>("/v1/calendars");
+
+        // Assert
+        calendar!.Id.Should().Be(calendarId);
+        calendar.CalendarEntries.Select(e => e.PostId).Should().BeEquivalentTo([firstPostId, secondPostId]);
+        calendar.CalendarEntries.Should().OnlyContain(e => e.ScheduledAt == ScheduledAt);
     }
 
     [Fact]

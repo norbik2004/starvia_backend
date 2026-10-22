@@ -14,7 +14,7 @@ internal sealed class CalendarEntryReadConfiguration : IEntityTypeConfiguration<
         builder.ToTable("CalendarEntries");
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Id).IsRequired();
-        builder.Property(u => u.CalendarId).IsRequired();
+        builder.Property(u => u.ContentCalendarId).IsRequired();
         builder.Property(u => u.PostId).IsRequired();
         builder.Property(u => u.ScheduledAt).IsRequired();
         builder.Property(u => u.Status).IsRequired();

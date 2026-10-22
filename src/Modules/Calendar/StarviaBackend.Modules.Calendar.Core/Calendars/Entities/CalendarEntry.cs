@@ -30,4 +30,20 @@ internal class CalendarEntry : AuditableEntity
             Status = CalendarEntryStatus.Scheduled
         };
     }
+
+    public void UpdateScheulde(DateTimeOffset scheduledAt)
+    {
+        ScheduledAt = scheduledAt;
+    }
+
+    public void UpdateStatus(CalendarEntryStatus status)
+    {
+        Status = status;
+    }
+
+    public void Update(DateTimeOffset scheduledAt, CalendarEntryStatus status)
+    {
+        ScheduledAt = scheduledAt;
+        Status = status;
+    }
 }

@@ -19,4 +19,8 @@
     <ProjectReference Include="..\StarviaBackend.Modules.Posts.Infrastructure\StarviaBackend.Modules.Posts.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Endpoints\PostAttachments\Queries\" />
+  </ItemGroup>
+
 </Project>

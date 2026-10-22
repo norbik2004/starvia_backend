@@ -14,6 +14,7 @@ internal sealed class GetContentCalendar(CalendarReadDbContext dbContext) : IQue
     public async Task<ContentCalendarLongDto> HandleAsync(GetContentCalendarQuery query, CancellationToken cancellationToken = default)
     {
         var item = await dbContext.ContentCalendars
+            .Include(cc => cc.CalendarEntries)
             .FirstOrDefaultAsync(cc => cc.CreatedBy == query.UserId, cancellationToken);
 
         if(item == null)
@@ -21,6 +22,11 @@ internal sealed class GetContentCalendar(CalendarReadDbContext dbContext) : IQue
             throw new CalendarNotFoundException(Guid.Parse(query.UserId));
         }
 
-        return new ContentCalendarLongDto(item.Id, item.Name, item.CreatedAt);
+        ICollection<CalendarEntryLongDto> calendarEntries = item.CalendarEntries
+            .Select(ce => new CalendarEntryLongDto(ce.Id, ce.PostId, ce.ScheduledAt, ce.Status))
+            .ToList()
+            .AsReadOnly();
+
+        return new ContentCalendarLongDto(item.Id, item.Name, item.CreatedAt, calendarEntries);
     }
 }
