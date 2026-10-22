@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="MassTransit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Infrastructure\StarviaBackend.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Media.Core\StarviaBackend.Modules.Media.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="StarviaBackend.Modules.Media.Tests.Unit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="MediaFiles\Commands\UpdateFile\" />
+    <Folder Include="MediaFiles\Events\" />
+    <Folder Include="MediaFiles\Queries\" />
+  </ItemGroup>
+
+</Project>

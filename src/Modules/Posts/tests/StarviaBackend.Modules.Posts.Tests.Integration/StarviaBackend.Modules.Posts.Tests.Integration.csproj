@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <PackageId>StarviaBackend.Modules.Posts.Tests.Integration</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="FluentAssertions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Shared\StarviaBackend.Shared.Tests.Integration\StarviaBackend.Shared.Tests.Integration.csproj" />
+    <ProjectReference Include="..\..\StarviaBackend.Modules.Posts.Infrastructure\StarviaBackend.Modules.Posts.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\StarviaBackend.Modules.Posts.Application\StarviaBackend.Modules.Posts.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

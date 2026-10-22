@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Infrastructure\StarviaBackend.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Calendar.Application\StarviaBackend.Modules.Calendar.Application.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Calendar.Core\StarviaBackend.Modules.Calendar.Core.csproj" />
+    <ProjectReference Include="..\..\Posts\Integrations\StarviaBackend.Modules.Posts.Integrations\StarviaBackend.Modules.Posts.Integrations.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="EF\CalendarEntries\Queries\" />
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
+</Project>

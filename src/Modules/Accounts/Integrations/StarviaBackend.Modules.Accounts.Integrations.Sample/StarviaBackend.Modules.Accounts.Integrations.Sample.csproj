@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>StarviaBackend.Modules.Accounts.Integrations.Sample</RootNamespace>
+    <PackageId>StarviaBackend.Modules.Accounts.Integrations.Sample</PackageId>
+  </PropertyGroup>
+
+  <!--
+    EXAMPLE ONLY. This project demonstrates the "clean integration" (anti-corruption layer)
+    pattern and is intentionally NOT referenced by the module. See README.md ("Integrations").
+  -->
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
