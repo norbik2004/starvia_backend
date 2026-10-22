@@ -1,11 +1,14 @@
 using System.Net;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Modules.Emails.Application.Emails.Links;
 using StarviaBackend.Modules.Emails.Application.Emails.Messages;
+using StarviaBackend.Modules.Emails.Application.Emails.Tokens;
 using StarviaBackend.Modules.Emails.Core.Emails.Exceptions;
 using StarviaBackend.Modules.Emails.Infrastructure.Mailing;
 using StarviaBackend.Modules.Emails.Infrastructure.Mailing.Templates;
 using StarviaBackend.Modules.Emails.Tests.Integration.Support;
+using StarviaBackend.Shared.Abstractions.App;
 using StarviaBackend.Shared.Abstractions.Email;
 
 namespace StarviaBackend.Modules.Emails.Tests.Integration.Mailing;
@@ -27,11 +30,14 @@ public sealed class EmailTemplateRendererTests
     public EmailTemplateRendererTests()
     {
         var urls = new StubAppUrls("https://app.example.com/");
-        _renderer = new EmailTemplateRenderer(
-            Razor,
-            new ConfirmAccountEmail(_tokens, urls),
-            new ResetPasswordEmail(_tokens, urls),
-            new WelcomingEmail(urls));
+        var services = new ServiceCollection();
+        services.AddScoped<IAccountTokenProvider>(_ => _tokens);
+        services.AddScoped<IAppUrls>(_ => urls);
+        services.AddScoped<ConfirmAccountEmail>();
+        services.AddScoped<ResetPasswordEmail>();
+        services.AddScoped<WelcomingEmail>();
+
+        _renderer = new EmailTemplateRenderer(Razor, services.BuildServiceProvider());
     }
 
     [Fact]
@@ -111,6 +117,27 @@ public sealed class EmailTemplateRendererTests
         var act = () => _renderer.RenderAsync(EmailType.ConfirmAccountEmail, UserId, "user@example.com");
 
         await act.Should().ThrowAsync<AccountTokenRejectedException>();
+    }
+
+    [Theory]
+    [InlineData(EmailType.WelcomingEmail, typeof(WelcomingEmail))]
+    [InlineData(EmailType.ConfirmAccountEmail, typeof(ConfirmAccountEmail))]
+    [InlineData(EmailType.ResetPasswordEmail, typeof(ResetPasswordEmail))]
+    public async Task Only_the_message_for_the_requested_type_is_resolved(EmailType type, Type expected)
+    {
+        var urls = new StubAppUrls("https://app.example.com/");
+        var resolved = new List<Type>();
+        var services = new ServiceCollection();
+        services.AddScoped<IAccountTokenProvider>(_ => _tokens);
+        services.AddScoped<IAppUrls>(_ => urls);
+        services.AddScoped(_ => { resolved.Add(typeof(ConfirmAccountEmail)); return new ConfirmAccountEmail(_tokens, urls); });
+        services.AddScoped(_ => { resolved.Add(typeof(ResetPasswordEmail)); return new ResetPasswordEmail(_tokens, urls); });
+        services.AddScoped(_ => { resolved.Add(typeof(WelcomingEmail)); return new WelcomingEmail(urls); });
+        var renderer = new EmailTemplateRenderer(Razor, services.BuildServiceProvider());
+
+        await renderer.RenderAsync(type, UserId, "user@example.com");
+
+        resolved.Should().Equal(expected);
     }
 
     [Fact]
