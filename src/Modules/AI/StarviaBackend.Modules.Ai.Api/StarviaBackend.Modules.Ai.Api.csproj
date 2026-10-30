@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ardalis.ApiEndpoints" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Ai.Application\StarviaBackend.Modules.Ai.Application.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Ai.Core\StarviaBackend.Modules.Ai.Core.csproj" />
+    <ProjectReference Include="..\StarviaBackend.Modules.Ai.Infrastructure\StarviaBackend.Modules.Ai.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
