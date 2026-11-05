@@ -95,6 +95,7 @@ public sealed class GeneratePostHandlerTests
         chat.UserId.Should().Be(_userId);
         chat.Type.Should().Be(ChatType.PostContentGeneration);
         chat.Status.Should().Be(ChatStatus.Active);
+        chat.PostId.Should().Be(_postId);
         chat.Title.Should().Be($"Generowanie postu: Post {_postId}");
         chat.LastMessageAt.Should().Be(Now);
 
@@ -136,10 +137,12 @@ public sealed class GeneratePostHandlerTests
         await handler.HandleAsync(Command("First prompt"));
         _model.Requests.Clear();
 
-        // Act — same post id would reuse chat history in the DB, but the model must not see it
+        // Act — same post id reuses the chat in the DB, but the model must not see that history
         await handler.HandleAsync(Command("Second prompt"));
 
         // Assert
+        _chats.Chats.Should().ContainSingle();
+        _chats.UpdateCalls.Should().Be(1);
         _model.Requests.Should().ContainSingle().Subject.Messages.Select(m => m.Text).Should().Equal(
             PostGenerationPrompt.Instructions,
             PostGenerationPrompt.CurrentContentOf($"Body of {_postId}"),

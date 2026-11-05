@@ -28,16 +28,13 @@ internal sealed class GeneratePostHandler(
         var posts = await postsClient.GetPostsAsync(command.UserId, [request.PostId], cancellationToken);
         var post = posts.Single();
 
-        if(post == null)
-        {
-            throw new ChatNotFoundException(request.PostId);
-        }
-
         var chat = await chatRepository.GetByPostIdAsync(request.PostId, cancellationToken);
+        var isNewChat = chat is null;
 
-        if(chat is null)
+        if (chat is null)
         {
             chat = Chat.Create(command.UserId, ChatType.PostContentGeneration, $"Generowanie postu: {post.Title}");
+            chat.LinkPost(request.PostId);
         }
 
         if (chat.Type != ChatType.PostContentGeneration)
@@ -79,7 +76,14 @@ internal sealed class GeneratePostHandler(
             inputTokens,
             outputTokens);
 
-        await chatRepository.AddAsync(chat, cancellationToken);
+        if (isNewChat)
+        {
+            await chatRepository.AddAsync(chat, cancellationToken);
+        }
+        else
+        {
+            await chatRepository.UpdateAsync(chat, cancellationToken);
+        }
 
         return new GeneratePostResult(
             chat.Id,

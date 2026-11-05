@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using FluentAssertions;
 using Microsoft.Extensions.AI;
+using StarviaBackend.Modules.Ai.Application.PostGeneration;
 using StarviaBackend.Modules.Ai.Core.Chats.Enums;
 using StarviaBackend.Modules.Ai.Infrastructure.GoogleAiStudio;
 
@@ -11,30 +12,31 @@ namespace StarviaBackend.Modules.Ai.Tests.Integration.PostGeneration;
 public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(app)
 {
     private FakeChatClient TextModel => App.TextModel;
+    private FakePostsClient Posts => App.Posts;
 
-    private static Task<HttpResponseMessage> GenerateAsync(HttpClient client, string prompt, Guid? chatId = null) =>
-        client.PostAsJsonAsync(GeneratePostUrl, new { prompt, chatId });
+    private static Task<HttpResponseMessage> GenerateAsync(HttpClient client, string prompt, Guid postId) =>
+        client.PostAsJsonAsync(GeneratePostUrl, new { prompt, postId });
 
-    private static async Task<GeneratedPostResponse> GenerateOkAsync(HttpClient client, string prompt, Guid? chatId = null)
+    private static async Task<GeneratedPostResponse> GenerateOkAsync(HttpClient client, string prompt, Guid postId)
     {
-        var response = await GenerateAsync(client, prompt, chatId);
+        var response = await GenerateAsync(client, prompt, postId);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         return (await response.Content.ReadFromJsonAsync<GeneratedPostResponse>())!;
     }
 
-    // --- a new chat --------------------------------------------------------------------------
+    // --- a new generation for a post ---------------------------------------------------------
 
     [Fact]
-    public async Task Generate_returns_the_post_written_by_the_model()
+    public async Task Generate_returns_the_post_body_written_by_the_model()
     {
         // Arrange
         var client = CreateUserClient();
+        var postId = Guid.NewGuid();
 
         // Act
-        var post = await GenerateOkAsync(client, "A post about our new coffee blend");
+        var post = await GenerateOkAsync(client, "A post about our new coffee blend", postId);
 
         // Assert
-        post.Title.Should().Be(FakeChatClient.DefaultTitle);
         post.Body.Should().Be(FakeChatClient.DefaultBody);
         post.Model.Should().Be(FakeChatClient.DefaultModel);
         post.InputTokens.Should().Be(42);
@@ -44,24 +46,26 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     }
 
     [Fact]
-    public async Task Generate_without_a_chat_starts_a_post_generation_chat_with_the_whole_exchange()
+    public async Task Generate_starts_a_post_generation_chat_named_after_the_post()
     {
         // Arrange
         var client = CreateUserClient();
+        var postId = Guid.NewGuid();
 
         // Act
-        var post = await GenerateOkAsync(client, "  A post about our\nnew coffee blend  ");
+        var post = await GenerateOkAsync(client, "  A post about our\nnew coffee blend  ", postId);
 
         // Assert
         var chat = await GetChatAsync(client, post.ChatId);
         chat.Type.Should().Be(ChatType.PostContentGeneration);
         chat.Status.Should().Be(ChatStatus.Active);
-        chat.Title.Should().Be("A post about our new coffee blend");
+        chat.PostId.Should().Be(postId);
+        chat.Title.Should().Be($"Generowanie postu: Post {postId}");
         chat.LastMessageAt.Should().NotBeNull();
 
         chat.Messages.Select(m => m.Role).Should().Equal(ChatMessageRole.System, ChatMessageRole.User, ChatMessageRole.Assistant);
         chat.Messages.Select(m => m.Sequence).Should().Equal(1, 2, 3);
-        chat.Messages[0].Content.Should().Contain("JSON");
+        chat.Messages[0].Content.Should().Be(PostGenerationPrompt.Instructions);
         chat.Messages[1].Content.Should().Be("  A post about our\nnew coffee blend  ");
 
         var answer = chat.Messages[2];
@@ -73,69 +77,65 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     }
 
     [Fact]
-    public async Task Generate_asks_the_model_for_a_json_post()
+    public async Task Generate_asks_the_model_with_instructions_current_post_and_prompt()
     {
+        // Arrange
+        var postId = Guid.NewGuid();
+
         // Act
-        await GenerateOkAsync(CreateUserClient(), "A post about coffee");
+        await GenerateOkAsync(CreateUserClient(), "A post about coffee", postId);
 
         // Assert
         var request = TextModel.Requests.Should().ContainSingle().Subject;
         request.Options!.ResponseFormat.Should().Be(ChatResponseFormat.Json);
-        request.Options.MaxOutputTokens.Should().BePositive();
-        request.Messages.Select(m => m.Role).Should().Equal(ChatRole.System, ChatRole.User);
-        request.Messages[1].Text.Should().Be("A post about coffee");
+        request.Options.MaxOutputTokens.Should().Be(PostGenerationPrompt.MaxTokens);
+        request.Messages.Select(m => (m.Role, m.Text)).Should().Equal(
+            (ChatRole.System, PostGenerationPrompt.Instructions),
+            (ChatRole.System, PostGenerationPrompt.CurrentContentOf($"Body of {postId}")),
+            (ChatRole.User, "A post about coffee"));
     }
 
     [Fact]
-    public async Task Generate_called_twice_without_a_chat_creates_two_independent_chats()
+    public async Task Generate_for_two_posts_creates_two_independent_chats()
     {
         // Arrange
         var client = CreateUserClient();
+        var firstPostId = Guid.NewGuid();
+        var secondPostId = Guid.NewGuid();
 
         // Act
-        var first = await GenerateOkAsync(client, "Same prompt");
-        var second = await GenerateOkAsync(client, "Same prompt");
+        var first = await GenerateOkAsync(client, "Same prompt", firstPostId);
+        var second = await GenerateOkAsync(client, "Same prompt", secondPostId);
 
         // Assert
         first.ChatId.Should().NotBe(second.ChatId);
+        (await GetChatAsync(client, first.ChatId)).PostId.Should().Be(firstPostId);
+        (await GetChatAsync(client, second.ChatId)).PostId.Should().Be(secondPostId);
         (await GetChatAsync(client, first.ChatId)).Messages.Should().HaveCount(3);
         (await GetChatAsync(client, second.ChatId)).Messages.Should().HaveCount(3);
     }
 
+    // --- refining the same post --------------------------------------------------------------
+
     [Fact]
-    public async Task Generate_shortens_a_long_prompt_to_fit_the_chat_title()
+    public async Task Generate_for_the_same_post_reuses_the_chat_and_appends_the_exchange()
     {
         // Arrange
         var client = CreateUserClient();
-
-        // Act
-        var post = await GenerateOkAsync(client, new string('a', 400));
-
-        // Assert
-        var chat = await GetChatAsync(client, post.ChatId);
-        chat.Title.Should().HaveLength(150).And.EndWith("…");
-    }
-
-    // --- an existing chat --------------------------------------------------------------------
-
-    [Fact]
-    public async Task Generate_with_a_chat_id_refines_the_post_in_the_same_chat()
-    {
-        // Arrange
-        var client = CreateUserClient();
-        var first = await GenerateOkAsync(client, "A post about coffee");
+        var postId = Guid.NewGuid();
+        var first = await GenerateOkAsync(client, "A post about coffee", postId);
         TextModel.Reply = FakeChatClient.PostJson("Shorter title", "Shorter body");
 
         // Act
-        var second = await GenerateOkAsync(client, "Make it shorter", first.ChatId);
+        var second = await GenerateOkAsync(client, "Make it shorter", postId);
 
         // Assert
         second.ChatId.Should().Be(first.ChatId);
         second.MessageId.Should().NotBe(first.MessageId);
-        second.Title.Should().Be("Shorter title");
         second.Body.Should().Be("Shorter body");
 
         var chat = await GetChatAsync(client, first.ChatId);
+        chat.PostId.Should().Be(postId);
         chat.Messages.Select(m => m.Role).Should().Equal(
             ChatMessageRole.System,
             ChatMessageRole.User,
@@ -148,128 +148,77 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     }
 
     [Fact]
-    public async Task Generate_with_a_chat_id_sends_the_whole_history_to_the_model()
+    public async Task Generate_for_the_same_post_does_not_send_chat_history_to_the_model()
     {
         // Arrange
         var client = CreateUserClient();
-        var first = await GenerateOkAsync(client, "A post about coffee");
+        var postId = Guid.NewGuid();
+        await GenerateOkAsync(client, "A post about coffee", postId);
 
         // Act
-        await GenerateOkAsync(client, "Make it shorter", first.ChatId);
+        await GenerateOkAsync(client, "Make it shorter", postId);
 
         // Assert
         var followUp = TextModel.Requests.Should().HaveCount(2).And.Subject.Last();
-        followUp.Messages.Select(m => m.Role).Should().Equal(
-            ChatRole.System,
-            ChatRole.User,
-            ChatRole.Assistant,
-            ChatRole.User);
-        followUp.Messages[1].Text.Should().Be("A post about coffee");
-        followUp.Messages[2].Text.Should().Be(FakeChatClient.PostJson(FakeChatClient.DefaultTitle, FakeChatClient.DefaultBody));
-        followUp.Messages[3].Text.Should().Be("Make it shorter");
+        followUp.Messages.Select(m => (m.Role, m.Text)).Should().Equal(
+            (ChatRole.System, PostGenerationPrompt.Instructions),
+            (ChatRole.System, PostGenerationPrompt.CurrentContentOf($"Body of {postId}")),
+            (ChatRole.User, "Make it shorter"));
     }
 
     [Fact]
-    public async Task Generate_can_use_an_empty_chat_created_through_the_chats_endpoint()
+    public async Task Generate_for_an_archived_post_chat_returns_chat_archived_and_does_not_call_the_model()
     {
         // Arrange
         var client = CreateUserClient();
-        var chatId = await CreateChatAsync(client, ChatType.PostContentGeneration, "Prepared chat");
-
-        // Act
-        var post = await GenerateOkAsync(client, "A post about coffee", chatId);
-
-        // Assert
-        post.ChatId.Should().Be(chatId);
-        var chat = await GetChatAsync(client, chatId);
-        chat.Title.Should().Be("Prepared chat");
-        chat.Messages.Select(m => m.Role).Should().Equal(ChatMessageRole.System, ChatMessageRole.User, ChatMessageRole.Assistant);
-    }
-
-    [Fact]
-    public async Task Generate_in_a_chat_that_already_holds_prompts_keeps_them_and_adds_the_instructions_to_the_request_only()
-    {
-        // Arrange
-        var client = CreateUserClient();
-        var chatId = await CreateChatAsync(client, ChatType.PostContentGeneration);
-        (await AddMessageAsync(client, chatId, "It is about coffee")).StatusCode.Should().Be(HttpStatusCode.Created);
-
-        // Act
-        await GenerateOkAsync(client, "Write it for Instagram", chatId);
-
-        // Assert
-        var request = TextModel.Requests.Should().ContainSingle().Subject;
-        request.Messages.Select(m => m.Role).Should().Equal(
-            ChatRole.System,
-            ChatRole.User,
-            ChatRole.User);
-
-        var chat = await GetChatAsync(client, chatId);
-        chat.Messages.Select(m => m.Role).Should().Equal(
-            ChatMessageRole.User,
-            ChatMessageRole.User,
-            ChatMessageRole.Assistant);
-    }
-
-    [Fact]
-    public async Task Generate_in_an_ask_agent_chat_returns_chat_type_not_supported_and_does_not_call_the_model()
-    {
-        // Arrange
-        var client = CreateUserClient();
-        var chatId = await CreateChatAsync(client, ChatType.AskAgent);
-
-        // Act
-        var response = await GenerateAsync(client, "A post about coffee", chatId);
-
-        // Assert
-        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "chat_type_not_supported");
-        TextModel.Requests.Should().BeEmpty();
-        (await GetChatAsync(client, chatId)).Messages.Should().BeEmpty();
-    }
-
-    [Fact]
-    public async Task Generate_in_an_unknown_chat_returns_chat_not_found()
-    {
-        // Act
-        var response = await GenerateAsync(CreateUserClient(), "A post about coffee", Guid.NewGuid());
-
-        // Assert
-        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "chat_not_found");
-        TextModel.Requests.Should().BeEmpty();
-    }
-
-    [Fact]
-    public async Task Generate_in_a_chat_of_another_user_returns_forbidden_and_stores_nothing()
-    {
-        // Arrange
-        var owner = CreateUserClient();
-        var chatId = await CreateChatAsync(owner, ChatType.PostContentGeneration);
-
-        // Act
-        var response = await GenerateAsync(CreateUserClient(), "A post about coffee", chatId);
-
-        // Assert
-        await AssertErrorCodeAsync(response, HttpStatusCode.Forbidden, "chat_access_denied");
-        TextModel.Requests.Should().BeEmpty();
-        (await GetChatAsync(owner, chatId)).Messages.Should().BeEmpty();
-    }
-
-    [Fact]
-    public async Task Generate_in_an_archived_chat_returns_chat_archived_and_does_not_call_the_model()
-    {
-        // Arrange
-        var client = CreateUserClient();
-        var chatId = await CreateChatAsync(client, ChatType.PostContentGeneration, "Done");
-        (await client.PutAsJsonAsync($"{ChatsUrl}/{chatId}", new { title = "Done", status = ChatStatus.Archived }))
+        var postId = Guid.NewGuid();
+        var first = await GenerateOkAsync(client, "A post about coffee", postId);
+        TextModel.Requests.Clear();
+        (await client.PutAsJsonAsync($"{ChatsUrl}/{first.ChatId}", new { title = $"Generowanie postu: Post {postId}", status = ChatStatus.Archived }))
             .StatusCode.Should().Be(HttpStatusCode.NoContent);
 
         // Act
-        var response = await GenerateAsync(client, "A post about coffee", chatId);
+        var response = await GenerateAsync(client, "Make it shorter", postId);
 
         // Assert
         await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "chat_archived");
         TextModel.Requests.Should().BeEmpty();
-        (await GetChatAsync(client, chatId)).Messages.Should().BeEmpty();
+        (await GetChatAsync(client, first.ChatId)).Messages.Should().HaveCount(3);
+    }
+
+    // --- post access -------------------------------------------------------------------------
+
+    [Fact]
+    public async Task Generate_for_an_unknown_post_returns_posts_integration_failure()
+    {
+        // Arrange
+        var client = CreateUserClient();
+        var postId = Guid.NewGuid();
+        Posts.UnknownPostIds.Add(postId);
+
+        // Act
+        var response = await GenerateAsync(client, "A post about coffee", postId);
+
+        // Assert
+        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "posts_integration_failed");
+        TextModel.Requests.Should().BeEmpty();
+        var chats = await client.GetFromJsonAsync<ChatPageResponse>(ChatsUrl);
+        chats!.Items.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Generate_for_someone_elses_post_returns_post_not_owned()
+    {
+        // Arrange
+        var postId = Guid.NewGuid();
+        Posts.ForeignPostIds.Add(postId);
+
+        // Act
+        var response = await GenerateAsync(CreateUserClient(), "A post about coffee", postId);
+
+        // Assert
+        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "post_not_owned");
+        TextModel.Requests.Should().BeEmpty();
     }
 
     // --- failures ----------------------------------------------------------------------------
@@ -279,10 +228,11 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     {
         // Arrange
         var client = CreateUserClient();
+        var postId = Guid.NewGuid();
         TextModel.Failure = new GoogleAiStudioIntegrationException("Google AI Studio returned 500.");
 
         // Act
-        var response = await GenerateAsync(client, "A post about coffee");
+        var response = await GenerateAsync(client, "A post about coffee", postId);
 
         // Assert
         await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "google_ai_studio_integration_failed");
@@ -298,9 +248,10 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
         // Arrange
         App.UseRealChatClient = true;
         var client = CreateUserClient();
+        var postId = Guid.NewGuid();
 
         // Act
-        var response = await GenerateAsync(client, "A post about coffee");
+        var response = await GenerateAsync(client, "A post about coffee", postId);
 
         // Assert
         await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "google_ai_studio_integration_failed");
@@ -311,17 +262,18 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     }
 
     [Fact]
-    public async Task Generate_when_google_ai_studio_fails_in_an_existing_chat_keeps_its_history_unchanged_and_a_retry_works()
+    public async Task Generate_when_google_ai_studio_fails_for_an_existing_post_keeps_history_unchanged_and_a_retry_works()
     {
         // Arrange
         var client = CreateUserClient();
-        var first = await GenerateOkAsync(client, "A post about coffee");
+        var postId = Guid.NewGuid();
+        var first = await GenerateOkAsync(client, "A post about coffee", postId);
         TextModel.Failure = new GoogleAiStudioIntegrationException("Google AI Studio returned 500.");
 
         // Act
-        var failed = await GenerateAsync(client, "Make it shorter", first.ChatId);
+        var failed = await GenerateAsync(client, "Make it shorter", postId);
         TextModel.Failure = null;
-        var retried = await GenerateOkAsync(client, "Make it shorter", first.ChatId);
+        var retried = await GenerateOkAsync(client, "Make it shorter", postId);
 
         // Assert
         await AssertErrorCodeAsync(failed, HttpStatusCode.BadRequest, "google_ai_studio_integration_failed");
@@ -334,16 +286,17 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     [Theory]
     [InlineData("I am sorry, I cannot help with that.")]
     [InlineData("{\"title\": \"Only a title\"}")]
-    [InlineData("{\"title\": \"\", \"body\": \"Only a body\"}")]
+    [InlineData("{\"title\": \"Title\", \"body\": \"   \"}")]
     [InlineData("{\"title\": \"Broken")]
     public async Task Generate_when_the_model_does_not_return_a_post_returns_generated_post_invalid_and_stores_nothing(string reply)
     {
         // Arrange
         var client = CreateUserClient();
+        var postId = Guid.NewGuid();
         TextModel.Reply = reply;
 
         // Act
-        var response = await GenerateAsync(client, "A post about coffee");
+        var response = await GenerateAsync(client, "A post about coffee", postId);
 
         // Assert
         await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "generated_post_invalid");
@@ -355,13 +308,13 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     public async Task Generate_accepts_a_post_wrapped_in_a_code_block()
     {
         // Arrange
+        var postId = Guid.NewGuid();
         TextModel.Reply = "```json\n" + FakeChatClient.PostJson("Wrapped", "Still a post") + "\n```";
 
         // Act
-        var post = await GenerateOkAsync(CreateUserClient(), "A post about coffee");
+        var post = await GenerateOkAsync(CreateUserClient(), "A post about coffee", postId);
 
         // Assert
-        post.Title.Should().Be("Wrapped");
         post.Body.Should().Be("Still a post");
     }
 
@@ -373,7 +326,7 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     public async Task Generate_with_a_blank_prompt_returns_bad_request(string prompt)
     {
         // Act
-        var response = await GenerateAsync(CreateUserClient(), prompt);
+        var response = await GenerateAsync(CreateUserClient(), prompt, Guid.NewGuid());
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -384,7 +337,7 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     public async Task Generate_without_a_prompt_returns_bad_request()
     {
         // Act
-        var response = await CreateUserClient().PostAsJsonAsync(GeneratePostUrl, new { });
+        var response = await CreateUserClient().PostAsJsonAsync(GeneratePostUrl, new { postId = Guid.NewGuid() });
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -396,10 +349,11 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     {
         // Arrange
         var client = CreateUserClient();
+        var postId = Guid.NewGuid();
 
         // Act
-        var atLimit = await GenerateAsync(client, new string('a', 4000));
-        var overLimit = await GenerateAsync(client, new string('a', 4001));
+        var atLimit = await GenerateAsync(client, new string('a', 4000), postId);
+        var overLimit = await GenerateAsync(client, new string('a', 4001), Guid.NewGuid());
 
         // Assert
         atLimit.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -408,7 +362,7 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     }
 
     [Fact]
-    public async Task Generate_with_an_empty_chat_id_returns_bad_request()
+    public async Task Generate_with_an_empty_post_id_returns_bad_request()
     {
         // Act
         var response = await GenerateAsync(CreateUserClient(), "A post about coffee", Guid.Empty);
@@ -422,7 +376,7 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     public async Task Generate_without_identity_returns_unauthorized()
     {
         // Act
-        var response = await GenerateAsync(App.CreateClient(), "A post about coffee");
+        var response = await GenerateAsync(App.CreateClient(), "A post about coffee", Guid.NewGuid());
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -451,7 +405,6 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     private sealed record GeneratedPostResponse(
         Guid ChatId,
         Guid MessageId,
-        string Title,
         string Body,
         string Model,
         int? InputTokens,

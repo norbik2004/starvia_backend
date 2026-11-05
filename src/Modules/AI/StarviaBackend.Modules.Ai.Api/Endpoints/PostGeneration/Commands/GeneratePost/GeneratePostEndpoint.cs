@@ -15,8 +15,8 @@ internal sealed class GeneratePostEndpoint(IDispatcher dispatcher, IContext cont
     [HttpPost($"{PostGenerationEndpoint.BasePath}/generate")]
     [SwaggerOperation(
         Summary = "Generate a post with AI",
-        Description = "Writes a post from the prompt. Without a chat id a new post generation chat is started; "
-                      + "send the returned chat id back with the next prompt to ask for changes to the post.",
+        Description = "Writes or refines post content from the prompt for the given post id. "
+                      + "A post-generation chat is created (or reused) for that post; send the same post id with the next prompt to ask for changes.",
         Tags = [PostGenerationEndpoint.Tag])]
     [ProducesResponseType(typeof(GeneratePostResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
