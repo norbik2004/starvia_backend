@@ -18,6 +18,7 @@ concurrency:
 env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  MSBUILDENSURESTDOUTFORTASKPROCESSES: "1"
   SOLUTION: StarviaBackend.sln
 
 jobs:
@@ -49,7 +50,7 @@ jobs:
       - name: Build solution
         run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore
 
-      # Covers: Accounts, AI, Calendar, Emails, Media, Platforms, Posts (*.Tests.Unit)
+
       - name: Run unit tests
         run: >
           dotnet test ${{ env.SOLUTION }}
@@ -57,30 +58,37 @@ jobs:
           --no-build
           --verbosity normal
           --filter "FullyQualifiedName~Tests.Unit"
-          --logger "trx;LogFileName=unit.trx"
+          --logger "trx;LogFilePrefix=unit"
           --results-directory ./TestResults
 
-      # Covers: tests/StarviaBackend.Tests.Architecture
       - name: Run architecture tests
         run: >
           dotnet test tests/StarviaBackend.Tests.Architecture/StarviaBackend.Tests.Architecture.csproj
           --configuration Release
           --no-build
           --verbosity normal
-          --logger "trx;LogFileName=architecture.trx"
+          --logger "trx;LogFilePrefix=architecture"
           --results-directory ./TestResults
 
-      # Covers: Accounts, AI, Calendar, Emails, Media, Platforms, Posts (*.Tests.Integration)
-      # Uses Testcontainers (Postgres) — Docker is available on ubuntu-latest
       - name: Run integration tests
-        run: >
-          dotnet test ${{ env.SOLUTION }}
-          --configuration Release
-          --no-build
-          --verbosity normal
-          --filter "FullyQualifiedName~Tests.Integration"
-          --logger "trx;LogFileName=integration.trx"
-          --results-directory ./TestResults
+        run: |
+          set -euo pipefail
+          mapfile -t projects < <(find src -path '*/tests/*.Tests.Integration.csproj' | sort)
+          if [ ${#projects[@]} -eq 0 ]; then
+            echo "No integration test projects found under src/*/tests"
+            exit 1
+          fi
+          for proj in "${projects[@]}"; do
+            name="$(basename "$proj" .csproj)"
+            echo "::group::Integration: $name"
+            dotnet test "$proj" \
+              --configuration Release \
+              --no-build \
+              --verbosity normal \
+              --logger "trx;LogFilePrefix=${name}" \
+              --results-directory ./TestResults
+            echo "::endgroup::"
+          done
 
       - name: Upload test results
         if: always()
