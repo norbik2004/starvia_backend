@@ -17,5 +17,6 @@ internal sealed class EmailReadConfiguration : IEntityTypeConfiguration<EmailRea
         builder.Property(x => x.SentAt);
         builder.Property(x => x.SentTo);
         builder.Property(x => x.Title);
+        builder.Property(x => x.Type);
     }
 }

@@ -17,6 +17,7 @@ public sealed class PostsClientTests
     {
         id = _postId,
         title = "Hello",
+        body = "Try our new blend.",
         createdAt = new DateTime(2026, 5, 1, 12, 0, 0, DateTimeKind.Utc),
         createdBy = createdBy ?? _userId.ToString(),
     };
@@ -37,6 +38,7 @@ public sealed class PostsClientTests
         var post = posts.Should().ContainSingle().Subject;
         post.Id.Should().Be(_postId);
         post.Title.Should().Be("Hello");
+        post.Body.Should().Be("Try our new blend.");
         post.CreatedAt.Should().Be(new DateTime(2026, 5, 1, 12, 0, 0, DateTimeKind.Utc));
         handler.RequestedUris.Should().ContainSingle().Which.AbsolutePath.Should().Be($"/v1/posts/{_postId}");
     }

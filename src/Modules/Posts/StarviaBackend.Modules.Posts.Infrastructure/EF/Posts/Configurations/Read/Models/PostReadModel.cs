@@ -17,4 +17,5 @@ internal sealed class PostReadModel
     public string CreatedBy { get; init; }
     public DateTime? LastModifiedAt { get; init; }
     public ICollection<PostAttachmentReadModel> PostAttachments { get; init; } = new List<PostAttachmentReadModel>();
+    public ICollection<PostPublicationReadModel> PostPublications { get; init; } = new List<PostPublicationReadModel>();
 }

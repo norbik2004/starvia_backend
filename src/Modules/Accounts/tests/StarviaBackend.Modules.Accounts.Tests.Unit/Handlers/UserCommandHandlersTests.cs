@@ -117,14 +117,15 @@ public sealed class RegisterUserHandlerTests : HandlerTestBase
 
 public sealed class ChangeUserNameHandlerTests : HandlerTestBase
 {
-    private ChangeUserNameHandler Handler => new(Repository);
+    private ChangeUserNameHandler HandlerFor(Guid? callerId, bool isAdmin = false) =>
+        new(Repository, TestAccess.For(callerId, isAdmin));
 
     [Fact]
     public async Task Renames_the_user_and_saves_it()
     {
         var user = AddUser();
 
-        var result = await Handler.HandleAsync(new ChangeUserNameCommand("Newname", user.Id));
+        var result = await HandlerFor(user.Id).HandleAsync(new ChangeUserNameCommand("Newname", user.Id));
 
         user.UserName.Should().Be("Newname");
         Repository.Updated.Should().ContainSingle().Which.Should().BeSameAs(user);
@@ -134,10 +135,53 @@ public sealed class ChangeUserNameHandlerTests : HandlerTestBase
     [Fact]
     public async Task Unknown_user_is_reported_and_nothing_is_saved()
     {
-        var act = () => Handler.HandleAsync(new ChangeUserNameCommand("Newname", Guid.NewGuid()));
+        var missingId = Guid.NewGuid();
+
+        var act = () => HandlerFor(missingId).HandleAsync(new ChangeUserNameCommand("Newname", missingId));
 
         await act.Should().ThrowAsync<UserNotFoundException>();
         Repository.Updated.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Renaming_someone_elses_account_is_forbidden_and_nothing_is_saved()
+    {
+        var victim = AddUser();
+
+        var act = () => HandlerFor(Guid.NewGuid()).HandleAsync(new ChangeUserNameCommand("Hacked", victim.Id));
+
+        await act.Should().ThrowAsync<AccountAccessDeniedException>();
+        victim.UserName.Should().Be("user@example.com");
+        Repository.Updated.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task A_forbidden_caller_learns_nothing_about_whether_the_account_exists()
+    {
+        var act = () => HandlerFor(Guid.NewGuid()).HandleAsync(new ChangeUserNameCommand("Hacked", Guid.NewGuid()));
+
+        await act.Should().ThrowAsync<AccountAccessDeniedException>();
+    }
+
+    [Fact]
+    public async Task An_admin_may_rename_any_account()
+    {
+        var user = AddUser();
+
+        await HandlerFor(Guid.NewGuid(), isAdmin: true).HandleAsync(new ChangeUserNameCommand("ByAdmin", user.Id));
+
+        user.UserName.Should().Be("ByAdmin");
+        Repository.Updated.Should().ContainSingle();
+    }
+
+    [Fact]
+    public async Task An_anonymous_caller_is_forbidden()
+    {
+        var user = AddUser();
+
+        var act = () => HandlerFor(null).HandleAsync(new ChangeUserNameCommand("Anon", user.Id));
+
+        await act.Should().ThrowAsync<AccountAccessDeniedException>();
     }
 }
 
@@ -368,7 +412,7 @@ public sealed class SignInHandlerTests : HandlerTestBase
 {
     private readonly FakeAuthManager _auth = new();
 
-    private SignInHandler Handler => new(UserManager, _auth, Clock);
+    private SignInHandler Handler => new(UserManager, Repository, _auth, Clock);
 
     private User AddUserWithPassword(string email = "user@example.com", string password = "Passw0rd!", bool confirmed = true)
     {
@@ -399,6 +443,7 @@ public sealed class SignInHandlerTests : HandlerTestBase
         await Handler.HandleAsync(new SignInCommand("user@example.com", "Passw0rd!"));
 
         user.LastLoginAt.Should().Be(Now);
+        Repository.Updated.Should().ContainSingle().Which.Should().BeSameAs(user);
     }
 
     [Fact]

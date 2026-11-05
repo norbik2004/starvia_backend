@@ -1,3 +1,4 @@
+using StarviaBackend.Modules.Media.Core.Media.Access;
 using StarviaBackend.Shared.Abstractions.Exceptions;
 
 namespace StarviaBackend.Modules.Media.Core.Media.Exceptions;
@@ -9,10 +10,10 @@ internal sealed class MediaNotFoundException(Guid mediaId)
     public override string Code => "media_not_found";
 }
 
-internal sealed class MediaFileNotOwnedException(Guid mediaId)
-    : BusinessException($"User is not the owner of media file '{mediaId}'")
+internal sealed class MediaAccessDeniedException(Guid mediaId, MediaAction action)
+    : ForbiddenException($"You are not allowed to {action} media file '{mediaId}'")
 {
-    public override string Code => "media_file_not_owned";
+    public override string Code => "media_access_denied";
 }
 
 internal sealed class MediaFileContentNotFoundException(string key)

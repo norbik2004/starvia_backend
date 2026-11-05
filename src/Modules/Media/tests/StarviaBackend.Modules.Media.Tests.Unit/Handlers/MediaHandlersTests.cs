@@ -3,6 +3,7 @@ using FluentAssertions;
 using StarviaBackend.Modules.Media.Application.MediaFiles.Commands.AddFile;
 using StarviaBackend.Modules.Media.Application.MediaFiles.Commands.RemoveFile;
 using StarviaBackend.Modules.Media.Application.MediaFiles.Commands.UpdateFile;
+using StarviaBackend.Modules.Media.Core.Media.Access;
 using StarviaBackend.Modules.Media.Core.Media.Enums;
 using StarviaBackend.Modules.Media.Core.Media.Exceptions;
 using StarviaBackend.Modules.Media.Tests.Unit.Fakes;
@@ -134,7 +135,8 @@ public sealed class UpdateFileHandlerTests
     private readonly InMemoryMediaFileRepository _files = new();
     private readonly Guid _ownerId = Guid.NewGuid();
 
-    private UpdateFileHandler CreateHandler() => new(_files);
+    private UpdateFileHandler CreateHandler(Guid? actingUserId = null, bool isAdmin = false) =>
+        new(_files, TestAccess.For(actingUserId ?? _ownerId, isAdmin));
 
     private static UpdateFileCommand Command(Guid fileId, Guid userId, string? description = "Updated") =>
         new(new UpdateFileRequest(fileId, description), userId);
@@ -157,10 +159,12 @@ public sealed class UpdateFileHandlerTests
         var file = _files.Seed(_ownerId, description: "Original");
 
         // Act
-        var act = () => CreateHandler().HandleAsync(Command(file.Id, Guid.NewGuid()));
+        var stranger = Guid.NewGuid();
+        var act = () => CreateHandler(stranger).HandleAsync(Command(file.Id, stranger));
 
         // Assert
-        await act.Should().ThrowAsync<UnauthorizedAccessException>();
+        var exception = await act.Should().ThrowAsync<MediaAccessDeniedException>();
+        exception.Which.Code.Should().Be("media_access_denied");
         file.Description.Should().Be("Original");
         _files.Updated.Should().BeEmpty();
     }
@@ -178,6 +182,20 @@ public sealed class UpdateFileHandlerTests
         result.FileId.Should().Be(file.Id);
         file.Description.Should().Be("Updated");
         _files.Updated.Should().ContainSingle().Which.Should().BeSameAs(file);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserIsAnAdmin_UpdatesSomeoneElsesFile()
+    {
+        // Arrange
+        var file = _files.Seed(_ownerId, description: "Original");
+        var admin = Guid.NewGuid();
+
+        // Act
+        await CreateHandler(admin, isAdmin: true).HandleAsync(Command(file.Id, admin, "By admin"));
+
+        // Assert
+        file.Description.Should().Be("By admin");
     }
 
     [Fact]
@@ -200,7 +218,8 @@ public sealed class RemoveFileHandlerTests
     private readonly InMemoryFileStorageService _storage = new();
     private readonly Guid _ownerId = Guid.NewGuid();
 
-    private RemoveFileHandler CreateHandler() => new(_files, _storage);
+    private RemoveFileHandler CreateHandler(Guid? actingUserId = null, bool isAdmin = false) =>
+        new(_files, _storage, TestAccess.For(actingUserId ?? _ownerId, isAdmin));
 
     private static RemoveFileCommand Command(Guid fileId, Guid userId) => new(fileId, userId, "user@example.com");
 
@@ -255,11 +274,28 @@ public sealed class RemoveFileHandlerTests
         var file = _files.Seed(_ownerId);
 
         // Act
-        var act = () => CreateHandler().HandleAsync(Command(file.Id, Guid.NewGuid()));
+        var stranger = Guid.NewGuid();
+        var act = () => CreateHandler(stranger).HandleAsync(Command(file.Id, stranger));
 
         // Assert
-        await act.Should().ThrowAsync<Exception>();
+        await act.Should().ThrowAsync<MediaAccessDeniedException>();
         _files.Files.Should().ContainSingle();
         _storage.Deletes.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserIsAnAdmin_DeletesSomeoneElsesFile()
+    {
+        // Arrange
+        var file = _files.Seed(_ownerId, filePath: "owner/file_1.png");
+        _storage.Objects[(BucketNames.UserUploads, "owner/file_1.png")] = [1, 2, 3];
+        var admin = Guid.NewGuid();
+
+        // Act
+        await CreateHandler(admin, isAdmin: true).HandleAsync(Command(file.Id, admin));
+
+        // Assert
+        _files.Files.Should().BeEmpty();
+        _storage.Objects.Should().BeEmpty();
     }
 }

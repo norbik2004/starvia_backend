@@ -91,7 +91,7 @@ public sealed class CalendarEntriesEndpointsTests(CalendarApp app) : CalendarInt
     }
 
     [Fact]
-    public async Task Add_entry_to_someone_elses_calendar_returns_calendar_not_owned()
+    public async Task Add_entry_to_someone_elses_calendar_returns_forbidden()
     {
         // Arrange
         var calendarId = await CreateCalendarAsync(CreateUserClient());
@@ -101,7 +101,7 @@ public sealed class CalendarEntriesEndpointsTests(CalendarApp app) : CalendarInt
         var response = await stranger.PostAsJsonAsync("/v1/calendar-entries", EntryRequest(calendarId, Guid.NewGuid()));
 
         // Assert
-        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "calendar_not_owned");
+        await AssertErrorCodeAsync(response, HttpStatusCode.Forbidden, "calendar_access_denied");
         var count = await WithDbAsync<CalendarWriteDbContext, int>(db =>
             db.Set<CalendarEntry>().CountAsync(e => e.ContentCalendarId == calendarId));
         count.Should().Be(0);

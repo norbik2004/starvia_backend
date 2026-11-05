@@ -9,9 +9,16 @@ internal sealed class ForwardAuthorizationHandler(IHttpContextAccessor httpConte
 {
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var authorization = httpContextAccessor.HttpContext?.Request.Headers.Authorization.ToString();
-        if (!string.IsNullOrWhiteSpace(authorization))
+        if (!request.Headers.Contains("Authorization"))
         {
+            var authorization = httpContextAccessor.HttpContext?.Request.Headers.Authorization.ToString();
+            if (string.IsNullOrWhiteSpace(authorization))
+            {
+                throw new PostsIntegrationException(
+                    "Cannot call the posts API without the caller's Authorization header. "
+                    + "The posts integration must run inside an authenticated HTTP request.");
+            }
+
             request.Headers.TryAddWithoutValidation("Authorization", authorization);
         }
 

@@ -61,6 +61,7 @@ internal sealed class MediaClient(HttpClient httpClient) : IMediaClient
         new IntegrationFailureRules(status => new MediaIntegrationException($"Media API returned {(int)status}."))
             .OnStatus(HttpStatusCode.NotFound, () => FileNotFound(fileId))
             .OnCode("media_not_found", () => FileNotFound(fileId))
+            .OnCode("media_access_denied", () => new MediaIntegrationNotOwnerException("User is not the owner of file."))
             .OnCode("media_file_not_owned", () => new MediaIntegrationNotOwnerException("User is not the owner of file."));
 
     private static MediaIntegrationException FileNotFound(Guid fileId) =>

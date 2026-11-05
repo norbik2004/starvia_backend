@@ -15,6 +15,7 @@ internal sealed class UserPlatformReadConfiguration
     {
         builder.ToTable("UserPlatforms");
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.UserId);
         builder.Property(x => x.AccountUsername);
         builder.Property(x => x.CreatedAt);
         builder.Property(x => x.AccountComment);

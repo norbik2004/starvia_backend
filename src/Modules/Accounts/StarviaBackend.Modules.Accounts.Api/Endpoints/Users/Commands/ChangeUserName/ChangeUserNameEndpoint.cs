@@ -18,6 +18,7 @@ internal sealed class ChangeUserNameEndpoint(IDispatcher dispatcher, IContext co
     [SwaggerOperation(Summary = "Change account's username", Tags = [UsersEndpoint.Tag])]
     [ProducesResponseType(typeof(RegisterUserResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public override async Task<ActionResult<ChangeUserNameResult>> HandleAsync(
         ChangeUserNameRequest request,
         CancellationToken cancellationToken = default)

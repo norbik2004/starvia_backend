@@ -14,9 +14,11 @@ internal sealed class BrowsePlatformsEndpoint(IDispatcher dispatcher)
     : EndpointBaseAsync.WithRequest<BrowsePlatformsQuery>.WithActionResult<PagedResult<PlatformDto>>
 {
     [HttpGet(PlatformsEndpoint.BasePath)]
-    [SwaggerOperation(Summary = "Browse all platforms", Tags = [PlatformsEndpoint.Tag])]
+    [SwaggerOperation(
+        Summary = "Browse the platforms catalogue",
+        Description = "Public reference data; supports filtering by platform type and online status.",
+        Tags = [PlatformsEndpoint.Tag])]
     [ProducesResponseType(typeof(PagedResult<PlatformDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public override async Task<ActionResult<PagedResult<PlatformDto>>> HandleAsync(
         [FromQuery] BrowsePlatformsQuery query,
         CancellationToken cancellationToken = default)

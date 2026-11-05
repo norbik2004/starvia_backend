@@ -23,7 +23,7 @@ public abstract class PlatformsIntegrationTest(PlatformsApp app) : IntegrationTe
     protected HttpClient CreateUserClient(Guid? userId = null) =>
         CreateClient(userId ?? Guid.NewGuid(), UserRoles.User);
 
-    protected HttpClient CreateAdminClient() => CreateClient(Guid.NewGuid(), UserRoles.Admin);
+    protected HttpClient CreateAdminClient(Guid? userId = null) => CreateClient(userId ?? Guid.NewGuid(), UserRoles.Admin);
 
     protected static async Task<List<PlatformResponse>> GetPlatformsAsync(HttpClient client)
     {
@@ -87,7 +87,8 @@ public abstract class PlatformsIntegrationTest(PlatformsApp app) : IntegrationTe
         DateTime CreatedAt,
         string? ExternalAccountId,
         string? AccountComment,
-        string? ProfilePictureLink);
+        string? ProfilePictureLink,
+        Guid OwnerId);
 }
 
 [CollectionDefinition(PlatformsCollection.Name)]

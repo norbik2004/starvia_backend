@@ -62,7 +62,7 @@ public sealed class SignInEdgeCaseTests(AccountsApp app) : AccountsFlowTest(app)
         token.Roles.Should().Equal(UserRoles.User);
     }
 
-    [Fact(Skip = "Finding: SignInHandler calls user.RecordLogin(...) but never saves the user, so LastLoginAt stays null in the database.")]
+    [Fact]
     public async Task Signing_in_persists_the_last_login_time()
     {
         var (userId, email) = await RegisterAndConfirmAsync();

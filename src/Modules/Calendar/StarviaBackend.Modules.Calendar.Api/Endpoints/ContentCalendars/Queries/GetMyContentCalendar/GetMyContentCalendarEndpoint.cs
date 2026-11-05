@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,9 +17,8 @@ internal sealed class GetMyContentCalendarEndpoint(
     [HttpGet($"{ContentCalendarsEndpoint.BasePath}")]
     [SwaggerOperation(Summary = "Get My Calendar", Tags = [ContentCalendarsEndpoint.Tag])]
     [ProducesResponseType(typeof(ContentCalendarLongDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public override async Task<ActionResult<ContentCalendarLongDto>> HandleAsync(CancellationToken cancellationToken = default)
     {
         if (context.Identity.UserId is not { } userId)
@@ -30,12 +26,7 @@ internal sealed class GetMyContentCalendarEndpoint(
             return Unauthorized();
         }
 
-        var query = new GetContentCalendarQuery(
-            UserId: userId.ToString());
-
-        var result = await dispatcher.QueryAsync(
-            query,
-            cancellationToken);
+        var result = await dispatcher.QueryAsync(new GetMyContentCalendarQuery(userId), cancellationToken);
 
         return Ok(result);
     }

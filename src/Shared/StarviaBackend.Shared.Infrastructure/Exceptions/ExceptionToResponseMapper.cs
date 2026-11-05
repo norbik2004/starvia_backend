@@ -14,6 +14,10 @@ internal sealed class ExceptionToResponseMapper : IExceptionToResponseMapper
                 .ToArray()),
             (int)HttpStatusCode.BadRequest),
 
+        ForbiddenException forbidden => new ExceptionResponse(
+            ErrorResponse.Single(forbidden.Code, forbidden.Message),
+            (int)HttpStatusCode.Forbidden),
+
         BusinessException business => new ExceptionResponse(
             ErrorResponse.Single(business.Code, business.Message),
             (int)HttpStatusCode.BadRequest),

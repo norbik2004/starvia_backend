@@ -13,6 +13,9 @@ internal sealed record PostApiResponse
     [JsonPropertyName("title")]
     public string Title { get; init; } = string.Empty;
 
+    [JsonPropertyName("body")]
+    public string Body { get; init; } = string.Empty;
+
     [JsonPropertyName("createdAt")]
     public DateTime CreatedAt { get; init; }
 

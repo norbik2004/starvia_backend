@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Identity;
+using StarviaBackend.Modules.Accounts.Application.Users.Access;
 using StarviaBackend.Modules.Accounts.Application.Users.Queries.GetAccount;
+using StarviaBackend.Modules.Accounts.Core.Users.Access;
 using StarviaBackend.Modules.Accounts.Core.Users.Entities;
 using StarviaBackend.Modules.Accounts.Core.Users.Exceptions;
 using StarviaBackend.Modules.Accounts.Core.Users.Repositories;
@@ -7,11 +9,17 @@ using StarviaBackend.Shared.Abstractions.Queries;
 
 namespace StarviaBackend.Modules.Accounts.Infrastructure.EF.Users.Queries;
 
-internal sealed class GetAccountHandler(IUsersRepository usersRepository, UserManager<User> userManager)
+internal sealed class GetAccountHandler(
+    IUsersRepository usersRepository,
+    UserManager<User> userManager,
+    IAccountAccessService access)
     : IQueryHandler<GetAccountQuery, AccountDto>
 {
     public async Task<AccountDto> HandleAsync(GetAccountQuery query, CancellationToken cancellationToken = default)
     {
+        // Checked before the lookup so a forbidden caller cannot probe which accounts exist.
+        access.EnsureAllowed(AccountAction.ViewAccount, query.UserId);
+
         var user = await usersRepository.GetByIdAsync(query.UserId, cancellationToken)
                    ?? throw new UserNotFoundException(query.UserId);
 

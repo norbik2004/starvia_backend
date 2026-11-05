@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using FluentValidation;
+using StarviaBackend.Shared.Abstractions.Posts;
 
 namespace StarviaBackend.Modules.Posts.Application.Posts.Commands.UpdatePost;
 
@@ -14,7 +12,7 @@ internal sealed class UpdatePostValidator : AbstractValidator<UpdatePostCommand>
             .MaximumLength(100);
         RuleFor(x => x.request.Body)
             .MinimumLength(0)
-            .MaximumLength(1000);
+            .MaximumLength(PostLimits.MaxBodyLength);
         RuleFor(x => x.request.Status).IsInEnum();
     }
 }

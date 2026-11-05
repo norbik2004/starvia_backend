@@ -144,6 +144,19 @@ public sealed class MediaClientTests
     }
 
     [Fact]
+    public async Task GetFilesAsync_OnMediaAccessDeniedErrorCode_ThrowsNotOwner()
+    {
+        // Arrange
+        var client = CreateClient(StubHttpMessageHandler.Json(HttpStatusCode.Forbidden, ErrorBody("media_access_denied")));
+
+        // Act
+        var act = () => client.GetFilesAsync(_userId, [_fileId]);
+
+        // Assert
+        await act.Should().ThrowAsync<MediaIntegrationNotOwnerException>();
+    }
+
+    [Fact]
     public async Task GetFilesAsync_OnUnknownServerError_ThrowsGenericFailure()
     {
         // Arrange

@@ -3,6 +3,7 @@ using StarviaBackend.Modules.Posts.Application.Posts.Commands.AddPost;
 using StarviaBackend.Modules.Posts.Application.Posts.Commands.RemovePost;
 using StarviaBackend.Modules.Posts.Application.Posts.Commands.UpdatePost;
 using StarviaBackend.Modules.Posts.Core.Posts.Enums;
+using StarviaBackend.Shared.Abstractions.Posts;
 
 namespace StarviaBackend.Modules.Posts.Tests.Unit.Validators;
 
@@ -60,10 +61,10 @@ public sealed class UpdatePostValidatorTests
     }
 
     [Fact]
-    public void Body_longer_than_1000_characters_fails()
+    public void Body_at_max_length_passes_and_one_over_fails()
     {
-        _validator.TestValidate(Command(body: new string('b', 1000))).ShouldNotHaveAnyValidationErrors();
-        _validator.TestValidate(Command(body: new string('b', 1001))).ShouldHaveValidationErrorFor(x => x.request.Body);
+        _validator.TestValidate(Command(body: new string('b', PostLimits.MaxBodyLength))).ShouldNotHaveAnyValidationErrors();
+        _validator.TestValidate(Command(body: new string('b', PostLimits.MaxBodyLength + 1))).ShouldHaveValidationErrorFor(x => x.request.Body);
     }
 
     [Fact]

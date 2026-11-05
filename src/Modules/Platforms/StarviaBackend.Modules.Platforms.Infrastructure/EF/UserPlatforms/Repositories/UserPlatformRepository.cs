@@ -17,10 +17,4 @@ internal class UserPlatformRepository(PlatformsWriteDbContext dbContext) : IUser
         await _userPlatforms.AddAsync(userPlatform);
         await dbContext.SaveChangesAsync();
     }
-
-    public async Task<UserPlatform?> GetByIdAndUserIdAsync(Guid userPlatformId, Guid UserId, CancellationToken cancellationToken = default)
-    {
-        return await _userPlatforms.Include(c => c.Platform).FirstOrDefaultAsync(u => userPlatformId == u.Id &&
-        u.UserId == UserId, cancellationToken);
-    }
 }

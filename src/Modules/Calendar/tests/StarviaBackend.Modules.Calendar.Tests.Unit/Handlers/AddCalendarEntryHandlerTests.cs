@@ -15,7 +15,8 @@ public sealed class AddCalendarEntryHandlerTests
     private readonly Guid _ownerId = Guid.NewGuid();
     private readonly DateTimeOffset _scheduledAt = new(2026, 12, 24, 10, 30, 0, TimeSpan.Zero);
 
-    private AddCalendarEntryHandler CreateHandler() => new(_calendars, _entries, _posts);
+    private AddCalendarEntryHandler CreateHandler(Guid? actingUserId = null, bool isAdmin = false) =>
+        new(_calendars, _entries, _posts, TestAccess.For(actingUserId ?? _ownerId, isAdmin));
 
     private AddCalendarEntryCommand Command(Guid calendarId, Guid postId, Guid userId) =>
         new(new AddCalendarEntryRequest(calendarId, postId, _scheduledAt), userId);
@@ -40,13 +41,28 @@ public sealed class AddCalendarEntryHandlerTests
         var calendar = _calendars.Seed(_ownerId);
 
         // Act
-        var act = () => CreateHandler().HandleAsync(Command(calendar.Id, Guid.NewGuid(), Guid.NewGuid()));
+        var stranger = Guid.NewGuid();
+        var act = () => CreateHandler(stranger).HandleAsync(Command(calendar.Id, Guid.NewGuid(), stranger));
 
         // Assert
-        var exception = await act.Should().ThrowAsync<CalendarNotOwnedException>();
-        exception.Which.Code.Should().Be("calendar_not_owned");
+        var exception = await act.Should().ThrowAsync<CalendarAccessDeniedException>();
+        exception.Which.Code.Should().Be("calendar_access_denied");
         _posts.Calls.Should().BeEmpty();
         _entries.Entries.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserIsAnAdmin_AddsAnEntryToSomeoneElsesCalendar()
+    {
+        // Arrange
+        var calendar = _calendars.Seed(_ownerId);
+        var admin = Guid.NewGuid();
+
+        // Act
+        await CreateHandler(admin, isAdmin: true).HandleAsync(Command(calendar.Id, Guid.NewGuid(), admin));
+
+        // Assert
+        _entries.Entries.Should().ContainSingle().Which.ContentCalendarId.Should().Be(calendar.Id);
     }
 
     [Fact]

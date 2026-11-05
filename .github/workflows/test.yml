@@ -1,29 +1,100 @@
-name: .NET CI
+name: test
 
 on:
+  push:
+    branches:
+      - main
+      - dev
   pull_request:
     branches:
       - main
       - dev
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  MSBUILDENSURESTDOUTFORTASKPROCESSES: "1"
+  SOLUTION: StarviaBackend.sln
 
 jobs:
-  test:
+  build-and-test:
+    name: Build & Test
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET 
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/Directory.Packages.props', '**/*.csproj', '**/*.sln') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
       - name: Restore dependencies
-        run: dotnet restore starvia_backend.sln
+        run: dotnet restore ${{ env.SOLUTION }}
 
       - name: Build solution
-        run: dotnet build starvia_backend.sln --no-restore
+        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore
 
-      - name: Run ArchitectureTests
-        run: dotnet test ArchitectureTests/ArchitectureTests.csproj --no-build --verbosity normal
+
+      - name: Run unit tests
+        run: >
+          dotnet test ${{ env.SOLUTION }}
+          --configuration Release
+          --no-build
+          --verbosity normal
+          --filter "FullyQualifiedName~Tests.Unit"
+          --logger "trx;LogFilePrefix=unit"
+          --results-directory ./TestResults
+
+      - name: Run architecture tests
+        run: >
+          dotnet test tests/StarviaBackend.Tests.Architecture/StarviaBackend.Tests.Architecture.csproj
+          --configuration Release
+          --no-build
+          --verbosity normal
+          --logger "trx;LogFilePrefix=architecture"
+          --results-directory ./TestResults
+
+      - name: Run integration tests
+        run: |
+          set -euo pipefail
+          mapfile -t projects < <(find src -path '*/tests/*.Tests.Integration.csproj' | sort)
+          if [ ${#projects[@]} -eq 0 ]; then
+            echo "No integration test projects found under src/*/tests"
+            exit 1
+          fi
+          for proj in "${projects[@]}"; do
+            name="$(basename "$proj" .csproj)"
+            echo "::group::Integration: $name"
+            dotnet test "$proj" \
+              --configuration Release \
+              --no-build \
+              --verbosity normal \
+              --logger "trx;LogFilePrefix=${name}" \
+              --results-directory ./TestResults
+            echo "::endgroup::"
+          done
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/**
+          if-no-files-found: ignore
+          retention-days: 14

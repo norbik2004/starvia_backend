@@ -1,3 +1,4 @@
+using StarviaBackend.Modules.Accounts.Core.Users.Access;
 using StarviaBackend.Shared.Abstractions.Exceptions;
 
 namespace StarviaBackend.Modules.Accounts.Core.Users.Exceptions;
@@ -12,6 +13,14 @@ internal sealed class UserNotFoundException(Guid userId)
     : BusinessException($"User '{userId}' was not found.")
 {
     public override string Code => "user_not_found";
+}
+
+internal sealed class AccountAccessDeniedException(Guid? userId, AccountAction action)
+    : ForbiddenException(userId is null
+        ? $"You are not allowed to {action}."
+        : $"You are not allowed to {action} on the account of user '{userId}'.")
+{
+    public override string Code => "account_access_denied";
 }
 
 internal sealed class InvalidCredentialsException()

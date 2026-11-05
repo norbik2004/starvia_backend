@@ -5,14 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using StarviaBackend.Modules.Media.Application.MediaFiles;
 using StarviaBackend.Modules.Media.Application.MediaFiles.Queries.DownloadFile;
-using StarviaBackend.Shared.Abstractions.Contexts;
 using StarviaBackend.Shared.Abstractions.Dispatchers;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace StarviaBackend.Modules.Media.Api.Endpoints.MediaFiles.Queries.DownloadFile;
 
 [Authorize]
-internal sealed class DownloadFileEndpoint(IDispatcher dispatcher, IContext context)
+internal sealed class DownloadFileEndpoint(IDispatcher dispatcher)
     : EndpointBaseAsync.WithRequest<Guid>.WithActionResult
 {
     private const string DefaultContentType = "application/octet-stream";
@@ -28,12 +27,7 @@ internal sealed class DownloadFileEndpoint(IDispatcher dispatcher, IContext cont
     public override async Task<ActionResult> HandleAsync([FromRoute] Guid fileId,
         CancellationToken cancellationToken = default)
     {
-        if (context.Identity.UserId is not { } userId)
-        {
-            return Unauthorized();
-        }
-
-        var query = new DownloadFileQuery(userId, fileId);
+        var query = new DownloadFileQuery(fileId);
         var result = await dispatcher.QueryAsync(query, cancellationToken);
 
         if (!ContentTypeProvider.TryGetContentType(result.FileName, out var contentType))

@@ -17,7 +17,8 @@ public sealed class AddPostAttachmentsHandlerTests
     private readonly FakeMediaClient _media = new();
     private readonly Guid _ownerId = Guid.NewGuid();
 
-    private AddPostAttachmentsHandler CreateHandler() => new(_posts, _attachments, _media);
+    private AddPostAttachmentsHandler CreateHandler(Guid? actingUserId = null, bool isAdmin = false) =>
+        new(_posts, _attachments, _media, TestAccess.For(actingUserId ?? _ownerId, isAdmin));
 
     private static AddPostAttachmentsCommand Command(Guid postId, Guid userId, params Guid[] fileIds) =>
         new(new AddPostAttachmentsRequest(postId, fileIds.ToList()), userId);
@@ -40,12 +41,27 @@ public sealed class AddPostAttachmentsHandlerTests
         var post = _posts.Seed(_ownerId);
 
         // Act
-        var act = () => CreateHandler().HandleAsync(Command(post.Id, Guid.NewGuid(), Guid.NewGuid()));
+        var stranger = Guid.NewGuid();
+        var act = () => CreateHandler(stranger).HandleAsync(Command(post.Id, stranger, Guid.NewGuid()));
 
         // Assert
-        await act.Should().ThrowAsync<UnauthorizedAccessException>();
+        await act.Should().ThrowAsync<PostAccessDeniedException>();
         _media.Calls.Should().BeEmpty();
         _attachments.Attachments.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserIsAnAdmin_AddsAttachmentsToSomeoneElsesPost()
+    {
+        // Arrange
+        var post = _posts.Seed(_ownerId);
+        var admin = Guid.NewGuid();
+
+        // Act
+        await CreateHandler(admin, isAdmin: true).HandleAsync(Command(post.Id, admin, Guid.NewGuid()));
+
+        // Assert
+        _attachments.Attachments.Should().ContainSingle().Which.PostId.Should().Be(post.Id);
     }
 
     [Fact]
@@ -155,7 +171,8 @@ public sealed class RemovePostAttachmentHandlerTests
     private readonly InMemoryPostAttachmentRepository _attachments = new();
     private readonly Guid _ownerId = Guid.NewGuid();
 
-    private RemovePostAttachmentHandler CreateHandler() => new(_posts, _attachments);
+    private RemovePostAttachmentHandler CreateHandler(Guid? actingUserId = null, bool isAdmin = false) =>
+        new(_posts, _attachments, TestAccess.For(actingUserId ?? _ownerId, isAdmin));
 
     private static RemovePostAttachmentCommand Command(Guid postId, Guid attachmentId, Guid userId) =>
         new(new RemovePostAttachmentRequest(postId, attachmentId), userId);
@@ -178,10 +195,11 @@ public sealed class RemovePostAttachmentHandlerTests
         var attachment = _attachments.Seed(post.Id, 0);
 
         // Act
-        var act = () => CreateHandler().HandleAsync(Command(post.Id, attachment.Id, Guid.NewGuid()));
+        var stranger = Guid.NewGuid();
+        var act = () => CreateHandler(stranger).HandleAsync(Command(post.Id, attachment.Id, stranger));
 
         // Assert
-        await act.Should().ThrowAsync<UnauthorizedAccessException>();
+        await act.Should().ThrowAsync<PostAccessDeniedException>();
         _attachments.Attachments.Should().ContainSingle();
     }
 
@@ -226,7 +244,8 @@ public sealed class UpdatePostAttachmentOrderHandlerTests
     private readonly InMemoryPostAttachmentRepository _attachments = new();
     private readonly Guid _ownerId = Guid.NewGuid();
 
-    private UpdatePostAttachmentOrderHandler CreateHandler() => new(_posts, _attachments);
+    private UpdatePostAttachmentOrderHandler CreateHandler(Guid? actingUserId = null, bool isAdmin = false) =>
+        new(_posts, _attachments, TestAccess.For(actingUserId ?? _ownerId, isAdmin));
 
     private static UpdatePostAttachmentOrderCommand Command(Guid postId, Guid attachmentId, int order, Guid userId) =>
         new(new UpdatePostAttachmentOrderRequest(postId, attachmentId, order), userId);
@@ -254,10 +273,11 @@ public sealed class UpdatePostAttachmentOrderHandlerTests
         var (post, a, _, _) = SeedPostWithThreeAttachments();
 
         // Act
-        var act = () => CreateHandler().HandleAsync(Command(post.Id, a.Id, 1, Guid.NewGuid()));
+        var stranger = Guid.NewGuid();
+        var act = () => CreateHandler(stranger).HandleAsync(Command(post.Id, a.Id, 1, stranger));
 
         // Assert
-        await act.Should().ThrowAsync<UnauthorizedAccessException>();
+        await act.Should().ThrowAsync<PostAccessDeniedException>();
         a.Order.Should().Be(0);
     }
 

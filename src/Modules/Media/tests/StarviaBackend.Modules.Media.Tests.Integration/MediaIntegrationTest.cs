@@ -32,6 +32,9 @@ public abstract class MediaIntegrationTest : IntegrationTest<MediaApp>
         return client;
     }
 
+    protected HttpClient CreateAdminClient(Guid? userId = null) =>
+        CreateClient(userId ?? Guid.NewGuid(), UserRoles.Admin);
+
     protected static Task<HttpResponseMessage> PostFileAsync(
         HttpClient client,
         string fileName = "photo.png",
@@ -101,7 +104,8 @@ public abstract class MediaIntegrationTest : IntegrationTest<MediaApp>
         int Source,
         int Type,
         string Url,
-        DateTime CreatedAt);
+        DateTime CreatedAt,
+        string? CreatedBy);
 
     protected sealed record PagedFilesResponse(List<FileSummaryResponse> Items, int Page, int PageSize, long TotalCount);
 }
