@@ -3,7 +3,8 @@ using StarviaBackend.Shared.Abstractions.Queries;
 
 namespace StarviaBackend.Modules.Ai.Application.Chats.Queries.GetChat;
 
-internal sealed record GetChatQuery(Guid ChatId, Guid UserId) : IQuery<ChatLongDto>;
+/// <summary>One chat with its history, if the caller may view it (see the chat access policy).</summary>
+internal sealed record GetChatQuery(Guid ChatId) : IQuery<ChatLongDto>;
 
 /// <summary>A chat together with its whole history, ordered from the first message to the last.</summary>
 public sealed record ChatLongDto(
@@ -14,6 +15,7 @@ public sealed record ChatLongDto(
     Guid? PostId,
     DateTime? LastMessageAt,
     DateTime CreatedAt,
+    Guid OwnerId,
     ICollection<ChatMessageDto> Messages);
 
 public sealed record ChatMessageDto(

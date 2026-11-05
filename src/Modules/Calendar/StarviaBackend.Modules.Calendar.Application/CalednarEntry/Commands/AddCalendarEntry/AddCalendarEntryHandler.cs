@@ -1,3 +1,5 @@
+using StarviaBackend.Modules.Calendar.Application.Access;
+using StarviaBackend.Modules.Calendar.Core.Calendars.Access;
 using StarviaBackend.Modules.Calendar.Core.Calendars.Entities;
 using StarviaBackend.Modules.Calendar.Core.Calendars.Exceptions;
 using StarviaBackend.Modules.Calendar.Core.Calendars.Repositories;
@@ -9,7 +11,8 @@ namespace StarviaBackend.Modules.Calendar.Application.CalednarEntry.Commands.Add
 internal sealed class AddCalendarEntryHandler(
     ICalendarRepository calendarRepository,
     ICalendarEntryRepository calendarEntryRepository,
-    IPostsClient postsClient)
+    IPostsClient postsClient,
+    ICalendarAccessService access)
     : ICommandHandler<AddCalendarEntryCommand, AddCalendarEntryResult>
 {
     public async Task<AddCalendarEntryResult> HandleAsync(
@@ -21,10 +24,7 @@ internal sealed class AddCalendarEntryHandler(
         var calendar = await calendarRepository.GetByIdAsync(request.CalendarId, cancellationToken)
             ?? throw new CalendarNotFoundException(request.CalendarId);
 
-        if (calendar.CreatedBy != command.UserId.ToString())
-        {
-            throw new CalendarNotOwnedException(calendar.Id);
-        }
+        access.EnsureAllowed(CalendarAction.ManageEntries, calendar);
 
         // Throws when the post does not exist or its creator is not the requesting user.
         var posts = await postsClient.GetPostsAsync(command.UserId, [request.PostId], cancellationToken);

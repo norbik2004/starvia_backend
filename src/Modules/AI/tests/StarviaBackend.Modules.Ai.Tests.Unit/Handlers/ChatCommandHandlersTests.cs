@@ -71,7 +71,7 @@ public sealed class UpdateChatHandlerTests
     private readonly InMemoryChatRepository _chats = new();
     private readonly Guid _ownerId = Guid.NewGuid();
 
-    private UpdateChatHandler CreateHandler() => new(_chats);
+    private UpdateChatHandler CreateHandler(Guid? actingUserId = null) => new(_chats, TestAccess.For(actingUserId ?? _ownerId));
 
     private static UpdateChatCommand Command(Guid chatId, Guid userId, string title, ChatStatus status) =>
         new(chatId, new UpdateChatRequest(title, status), userId);
@@ -138,11 +138,12 @@ public sealed class UpdateChatHandlerTests
         var chat = _chats.Seed(_ownerId, title: "Private");
 
         // Act
-        var act = () => CreateHandler().HandleAsync(Command(chat.Id, Guid.NewGuid(), "Hijacked", ChatStatus.Archived));
+        var stranger = Guid.NewGuid();
+        var act = () => CreateHandler(stranger).HandleAsync(Command(chat.Id, stranger, "Hijacked", ChatStatus.Archived));
 
         // Assert
-        var exception = await act.Should().ThrowAsync<ChatNotOwnedException>();
-        exception.Which.Code.Should().Be("chat_not_owned");
+        var exception = await act.Should().ThrowAsync<ChatAccessDeniedException>();
+        exception.Which.Code.Should().Be("chat_access_denied");
         chat.Title.Should().Be("Private");
         chat.Status.Should().Be(ChatStatus.Active);
         _chats.UpdateCalls.Should().Be(0);
@@ -169,7 +170,7 @@ public sealed class RemoveChatHandlerTests
     private readonly InMemoryChatRepository _chats = new();
     private readonly Guid _ownerId = Guid.NewGuid();
 
-    private RemoveChatHandler CreateHandler() => new(_chats);
+    private RemoveChatHandler CreateHandler(Guid? actingUserId = null) => new(_chats, TestAccess.For(actingUserId ?? _ownerId));
 
     [Fact]
     public async Task HandleAsync_RemovesOnlyTheRequestedChat()
@@ -202,10 +203,11 @@ public sealed class RemoveChatHandlerTests
         var chat = _chats.Seed(_ownerId);
 
         // Act
-        var act = () => CreateHandler().HandleAsync(new RemoveChatCommand(chat.Id, Guid.NewGuid()));
+        var stranger = Guid.NewGuid();
+        var act = () => CreateHandler(stranger).HandleAsync(new RemoveChatCommand(chat.Id, stranger));
 
         // Assert
-        await act.Should().ThrowAsync<ChatNotOwnedException>();
+        await act.Should().ThrowAsync<ChatAccessDeniedException>();
         _chats.Chats.Should().ContainSingle();
     }
 }
@@ -218,7 +220,7 @@ public sealed class AddChatMessageHandlerTests
     private readonly FakeClock _clock = new(Now);
     private readonly Guid _ownerId = Guid.NewGuid();
 
-    private AddChatMessageHandler CreateHandler() => new(_chats, _clock);
+    private AddChatMessageHandler CreateHandler(Guid? actingUserId = null) => new(_chats, TestAccess.For(actingUserId ?? _ownerId), _clock);
 
     private static AddChatMessageCommand Command(Guid chatId, Guid userId, string content) =>
         new(chatId, new AddChatMessageRequest(content), userId);
@@ -278,10 +280,11 @@ public sealed class AddChatMessageHandlerTests
         var chat = _chats.Seed(_ownerId);
 
         // Act
-        var act = () => CreateHandler().HandleAsync(Command(chat.Id, Guid.NewGuid(), "Hello"));
+        var stranger = Guid.NewGuid();
+        var act = () => CreateHandler(stranger).HandleAsync(Command(chat.Id, stranger, "Hello"));
 
         // Assert
-        await act.Should().ThrowAsync<ChatNotOwnedException>();
+        await act.Should().ThrowAsync<ChatAccessDeniedException>();
         chat.Messages.Should().BeEmpty();
         _chats.UpdateCalls.Should().Be(0);
     }

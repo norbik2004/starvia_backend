@@ -1,5 +1,7 @@
 using MassTransit;
 using Microsoft.AspNetCore.Identity;
+using StarviaBackend.Modules.Accounts.Application.Users.Access;
+using StarviaBackend.Modules.Accounts.Core.Users.Access;
 using StarviaBackend.Modules.Accounts.Core.Users.Entities;
 using StarviaBackend.Modules.Accounts.Core.Users.Exceptions;
 using StarviaBackend.Modules.Accounts.Core.Users.Repositories;
@@ -10,19 +12,19 @@ using StarviaBackend.Shared.Abstractions.Time;
 namespace StarviaBackend.Modules.Accounts.Application.Users.Commands.ChangeUserName;
 
 internal sealed class ChangeUserNameHandler(
-    IUsersRepository usersRepository)
+    IUsersRepository usersRepository,
+    IAccountAccessService access)
     : ICommandHandler<ChangeUserNameCommand, ChangeUserNameResult>
 {
     public async Task<ChangeUserNameResult> HandleAsync(
         ChangeUserNameCommand command,
         CancellationToken cancellationToken = default)
     {
-        var user = await usersRepository.GetByIdAsync(command.UserId, cancellationToken);
+        // Checked before the lookup so a forbidden caller cannot probe which accounts exist.
+        access.EnsureAllowed(AccountAction.UpdateAccount, command.UserId);
 
-        if (user == null)
-        {
-            throw new UserNotFoundException(command.UserId);
-        }
+        var user = await usersRepository.GetByIdAsync(command.UserId, cancellationToken)
+            ?? throw new UserNotFoundException(command.UserId);
 
         user.ChangeUserName(command.UserName);
 

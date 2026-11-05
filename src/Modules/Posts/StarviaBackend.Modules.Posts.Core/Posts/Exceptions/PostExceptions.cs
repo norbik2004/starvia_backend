@@ -1,3 +1,4 @@
+using StarviaBackend.Modules.Posts.Core.Posts.Access;
 using StarviaBackend.Shared.Abstractions.Exceptions;
 
 namespace StarviaBackend.Modules.Posts.Core.Posts.Exceptions;
@@ -9,8 +10,8 @@ internal sealed class PostNotFoundException(Guid postId)
     public override string Code => "post_not_found";
 }
 
-internal sealed class PostNotOwnedException(Guid postId)
-    : BusinessException($"User is not the owner of post '{postId}'")
+internal sealed class PostAccessDeniedException(Guid postId, PostAction action)
+    : ForbiddenException($"You are not allowed to {action} post '{postId}'")
 {
-    public override string Code => "post_not_owned";
+    public override string Code => "post_access_denied";
 }

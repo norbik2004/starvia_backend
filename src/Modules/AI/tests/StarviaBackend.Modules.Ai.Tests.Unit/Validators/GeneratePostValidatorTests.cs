@@ -9,20 +9,14 @@ public sealed class GeneratePostValidatorTests
 
     private static GeneratePostCommand Command(
         string prompt = "A post about coffee",
-        Guid? chatId = null,
+        Guid? postId = null,
         Guid? userId = null) =>
-        new(new GeneratePostRequest(prompt, chatId), userId ?? Guid.NewGuid());
+        new(new GeneratePostRequest(prompt, postId ?? Guid.NewGuid()), userId ?? Guid.NewGuid());
 
     [Fact]
-    public void Valid_command_for_a_new_chat_passes()
+    public void Valid_command_passes()
     {
         _validator.TestValidate(Command()).ShouldNotHaveAnyValidationErrors();
-    }
-
-    [Fact]
-    public void Valid_command_for_an_existing_chat_passes()
-    {
-        _validator.TestValidate(Command(chatId: Guid.NewGuid())).ShouldNotHaveAnyValidationErrors();
     }
 
     [Theory]
@@ -57,11 +51,11 @@ public sealed class GeneratePostValidatorTests
     }
 
     [Fact]
-    public void Empty_chat_id_fails()
+    public void Empty_post_id_fails()
     {
-        _validator.TestValidate(Command(chatId: Guid.Empty))
-            .ShouldHaveValidationErrorFor(x => x.Request.ChatId)
-            .WithErrorMessage("Chat ID cannot be empty.");
+        _validator.TestValidate(Command(postId: Guid.Empty))
+            .ShouldHaveValidationErrorFor(x => x.Request.PostId)
+            .WithErrorMessage("Post ID cannot be empty.");
     }
 
     [Fact]

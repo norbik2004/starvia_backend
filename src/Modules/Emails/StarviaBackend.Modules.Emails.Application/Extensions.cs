@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
+using StarviaBackend.Modules.Emails.Application.Emails.Access;
 using StarviaBackend.Modules.Emails.Application.Emails.Messages;
 using StarviaBackend.Shared.Infrastructure.Cqrs;
 
@@ -14,6 +15,7 @@ internal static class Extensions
     /// <summary>Registers this assembly's command handlers and validators.</summary>
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        services.AddScoped<IEmailAccessService, EmailAccessService>();
         services.AddScoped<ConfirmAccountEmail>();
         services.AddScoped<ResetPasswordEmail>();
         services.AddScoped<WelcomingEmail>();

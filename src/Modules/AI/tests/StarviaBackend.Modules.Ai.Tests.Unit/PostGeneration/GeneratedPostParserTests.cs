@@ -12,7 +12,6 @@ public sealed class GeneratedPostParserTests
         var post = GeneratedPostParser.Parse("""{"title": "Fresh coffee", "body": "Try our new blend."}""");
 
         // Assert
-        post.Title.Should().Be("Fresh coffee");
         post.Body.Should().Be("Try our new blend.");
     }
 
@@ -33,18 +32,16 @@ public sealed class GeneratedPostParserTests
         var post = GeneratedPostParser.Parse("""{"title": "Świeża kawa ☕", "body": "Zażółć gęślą jaźń 🎉"}""");
 
         // Assert
-        post.Title.Should().Be("Świeża kawa ☕");
         post.Body.Should().Be("Zażółć gęślą jaźń 🎉");
     }
 
     [Fact]
-    public void Parse_TrimsTheTitleAndTheBody()
+    public void Parse_TrimsTheBody()
     {
         // Act
         var post = GeneratedPostParser.Parse("""{"title": "  Hello  ", "body": "\n Body \n"}""");
 
         // Assert
-        post.Title.Should().Be("Hello");
         post.Body.Should().Be("Body");
     }
 
@@ -55,7 +52,6 @@ public sealed class GeneratedPostParserTests
         var post = GeneratedPostParser.Parse("""{"Title": "Hello", "BODY": "Body"}""");
 
         // Assert
-        post.Title.Should().Be("Hello");
         post.Body.Should().Be("Body");
     }
 
@@ -66,7 +62,6 @@ public sealed class GeneratedPostParserTests
         var post = GeneratedPostParser.Parse("""{"title": "Hello", "body": "Body", "hashtags": ["a", "b"]}""");
 
         // Assert
-        post.Title.Should().Be("Hello");
         post.Body.Should().Be("Body");
     }
 
@@ -80,7 +75,6 @@ public sealed class GeneratedPostParserTests
         var post = GeneratedPostParser.Parse(content);
 
         // Assert
-        post.Title.Should().Be("Hello");
         post.Body.Should().Be("Body");
     }
 
@@ -94,7 +88,6 @@ public sealed class GeneratedPostParserTests
         var post = GeneratedPostParser.Parse(content);
 
         // Assert
-        post.Title.Should().Be("Hello");
         post.Body.Should().Be("Body");
     }
 
@@ -105,11 +98,7 @@ public sealed class GeneratedPostParserTests
     [InlineData("}{")]
     [InlineData("{}")]
     [InlineData("""{"title": "Only a title"}""")]
-    [InlineData("""{"body": "Only a body"}""")]
-    [InlineData("""{"title": "", "body": "Body"}""")]
     [InlineData("""{"title": "Title", "body": "   "}""")]
-    [InlineData("""{"title": null, "body": "Body"}""")]
-    [InlineData("""{"title": 42, "body": "Body"}""")]
     [InlineData("""{"title": "Title", "body": ["a", "b"]}""")]
     [InlineData("""{"title": "Cut off""")]
     [InlineData("""{"title": "Title", "body": "Body"} {"title": "Another", "body": "Post"}""")]

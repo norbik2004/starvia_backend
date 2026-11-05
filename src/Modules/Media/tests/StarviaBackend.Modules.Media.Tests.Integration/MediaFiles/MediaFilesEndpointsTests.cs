@@ -114,7 +114,7 @@ public sealed class MediaFilesEndpointsTests(MediaApp app) : MediaIntegrationTes
     // --- get ---------------------------------------------------------------------------------
 
     [Fact]
-    public async Task Get_file_of_another_user_returns_media_file_not_owned()
+    public async Task Get_file_of_another_user_returns_forbidden()
     {
         // Arrange
         var added = await UploadAsync(CreateUserClient());
@@ -124,7 +124,7 @@ public sealed class MediaFilesEndpointsTests(MediaApp app) : MediaIntegrationTes
         var response = await stranger.GetAsync($"/v1/media-files/{added.FileId}");
 
         // Assert
-        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "media_file_not_owned");
+        await AssertErrorCodeAsync(response, HttpStatusCode.Forbidden, "media_access_denied");
     }
 
     [Fact]

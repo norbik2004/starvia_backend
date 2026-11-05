@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace StarviaBackend.Modules.Ai.Application.PostGeneration;
 
 /// <summary>A post as written by the AI.</summary>
-internal sealed record GeneratedPost(string Title, string Body);
+internal sealed record GeneratedPost(string Body);
 
 /// <summary>
 /// Reads the answer of the post generation agent. The agent is told to answer with a bare JSON object, but models
@@ -26,15 +26,14 @@ internal static class GeneratedPostParser
                 throw new InvalidGeneratedPostException();
             }
 
-            var title = ReadString(document.RootElement, "title");
             var body = ReadString(document.RootElement, "body");
 
-            if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(body))
+            if (string.IsNullOrWhiteSpace(body))
             {
                 throw new InvalidGeneratedPostException();
             }
 
-            return new GeneratedPost(title.Trim(), body.Trim());
+            return new GeneratedPost(body.Trim());
         }
         catch (JsonException)
         {

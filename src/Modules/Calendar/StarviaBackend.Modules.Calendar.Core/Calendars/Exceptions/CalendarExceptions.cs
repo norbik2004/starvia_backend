@@ -1,6 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
+using StarviaBackend.Modules.Calendar.Core.Calendars.Access;
 using StarviaBackend.Shared.Abstractions.Exceptions;
 
 namespace StarviaBackend.Modules.Calendar.Core.Calendars.Exceptions;
@@ -11,11 +9,10 @@ internal sealed class CalendarNotFoundException(Guid calendarId)
     public override string Code => "calendar_not_found";
 }
 
-
-internal sealed class CalendarNotOwnedException(Guid calendarId)
-    : BusinessException($"User is not the owner of calendar '{calendarId}'")
+internal sealed class CalendarAccessDeniedException(Guid calendarId, CalendarAction action)
+    : ForbiddenException($"You are not allowed to {action} on calendar '{calendarId}'")
 {
-    public override string Code => "calendar_not_owned";
+    public override string Code => "calendar_access_denied";
 }
 
 internal sealed class CantCreateCalendarException(Guid userId)

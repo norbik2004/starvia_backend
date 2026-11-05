@@ -17,7 +17,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
         var fileIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
 
         // Act
-        var response = await client.PostAsJsonAsync("/v1/posts/attachments", new { postId, fileIds });
+        var response = await client.PostAsJsonAsync("/v1/post-attachments/attachments", new { postId, fileIds });
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -59,7 +59,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
         var fileIds = Enumerable.Range(0, 6).Select(_ => Guid.NewGuid()).ToList();
 
         // Act
-        var response = await client.PostAsJsonAsync("/v1/posts/attachments", new { postId, fileIds });
+        var response = await client.PostAsJsonAsync("/v1/post-attachments/attachments", new { postId, fileIds });
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -74,7 +74,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
         await AddAttachmentsAsync(client, postId, 4);
 
         // Act
-        var response = await client.PostAsJsonAsync("/v1/posts/attachments", new
+        var response = await client.PostAsJsonAsync("/v1/post-attachments/attachments", new
         {
             postId,
             fileIds = new[] { Guid.NewGuid(), Guid.NewGuid() },
@@ -93,7 +93,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
         var postId = await CreatePostAsync(client);
 
         // Act
-        var response = await client.PostAsJsonAsync("/v1/posts/attachments", new { postId, fileIds = Array.Empty<Guid>() });
+        var response = await client.PostAsJsonAsync("/v1/post-attachments/attachments", new { postId, fileIds = Array.Empty<Guid>() });
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -103,7 +103,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
     public async Task Add_attachments_to_unknown_post_returns_post_not_found()
     {
         // Act
-        var response = await Client.PostAsJsonAsync("/v1/posts/attachments", new
+        var response = await Client.PostAsJsonAsync("/v1/post-attachments/attachments", new
         {
             postId = Guid.NewGuid(),
             fileIds = new[] { Guid.NewGuid() },
@@ -123,7 +123,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
         App.Media.UnknownFileIds.Add(missingFile);
 
         // Act
-        var response = await client.PostAsJsonAsync("/v1/posts/attachments", new { postId, fileIds = new[] { missingFile } });
+        var response = await client.PostAsJsonAsync("/v1/post-attachments/attachments", new { postId, fileIds = new[] { missingFile } });
 
         // Assert
         await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "media_integration_failed");
@@ -140,11 +140,125 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
         App.Media.ForeignFileIds.Add(foreignFile);
 
         // Act
-        var response = await client.PostAsJsonAsync("/v1/posts/attachments", new { postId, fileIds = new[] { foreignFile } });
+        var response = await client.PostAsJsonAsync("/v1/post-attachments/attachments", new { postId, fileIds = new[] { foreignFile } });
 
         // Assert
         await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "media_file_not_owned");
         (await GetPostAsync(client, postId)).PostAttachments.Should().BeEmpty();
+    }
+
+    // --- browse ------------------------------------------------------------------------------
+
+    [Fact]
+    public async Task Browse_attachments_returns_them_in_display_order()
+    {
+        // Arrange
+        var client = CreateUserClient();
+        var postId = await CreatePostAsync(client);
+        var ids = await AddAttachmentsAsync(client, postId, 3);
+        var reorder = await client.PutAsJsonAsync("/v1/post-attachments/attachments/order", new
+        {
+            postId,
+            postAttachmentId = ids[2],
+            order = 0,
+        });
+        reorder.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        // Act
+        var attachments = await client.GetFromJsonAsync<List<PostAttachmentResponse>>($"/v1/post-attachments?postId={postId}");
+
+        // Assert
+        attachments!.Select(a => a.Id).Should().Equal(ids[2], ids[0], ids[1]);
+        attachments.Select(a => a.Order).Should().Equal(0, 1, 2);
+    }
+
+    [Fact]
+    public async Task Browse_attachments_of_a_post_without_attachments_returns_an_empty_list()
+    {
+        // Arrange
+        var client = CreateUserClient();
+        var postId = await CreatePostAsync(client);
+
+        // Act
+        var attachments = await client.GetFromJsonAsync<List<PostAttachmentResponse>>($"/v1/post-attachments?postId={postId}");
+
+        // Assert
+        attachments.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Browse_attachments_of_another_users_post_returns_forbidden_but_admin_can_read_them()
+    {
+        // Arrange
+        var owner = CreateUserClient();
+        var postId = await CreatePostAsync(owner);
+        var ids = await AddAttachmentsAsync(owner, postId, 2);
+
+        // Act
+        var asStranger = await CreateUserClient().GetAsync($"/v1/post-attachments?postId={postId}");
+        var asAdmin = await CreateAdminClient().GetFromJsonAsync<List<PostAttachmentResponse>>($"/v1/post-attachments?postId={postId}");
+
+        // Assert
+        await AssertErrorCodeAsync(asStranger, HttpStatusCode.Forbidden, "post_access_denied");
+        asAdmin!.Select(a => a.Id).Should().Equal(ids);
+    }
+
+    [Fact]
+    public async Task Browse_attachments_of_unknown_post_returns_post_not_found()
+    {
+        // Act
+        var response = await Client.GetAsync($"/v1/post-attachments?postId={Guid.NewGuid()}");
+
+        // Assert
+        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "post_not_found");
+    }
+
+    [Fact]
+    public async Task Browse_attachments_without_identity_returns_unauthorized()
+    {
+        // Act
+        var response = await App.CreateClient().GetAsync($"/v1/post-attachments?postId={Guid.NewGuid()}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Managing_attachments_of_another_users_post_returns_forbidden()
+    {
+        // Arrange
+        var owner = CreateUserClient();
+        var postId = await CreatePostAsync(owner);
+        var attachmentId = (await AddAttachmentsAsync(owner, postId, 1))[0];
+        var stranger = CreateUserClient();
+
+        // Act
+        var add = await stranger.PostAsJsonAsync("/v1/post-attachments/attachments", new { postId, fileIds = new[] { Guid.NewGuid() } });
+        var reorder = await stranger.PutAsJsonAsync("/v1/post-attachments/attachments/order", new { postId, postAttachmentId = attachmentId, order = 0 });
+        var remove = await DeleteWithBodyAsync(stranger, "/v1/post-attachments/attachments", new { postId, postAttachmentId = attachmentId });
+
+        // Assert
+        await AssertErrorCodeAsync(add, HttpStatusCode.Forbidden, "post_access_denied");
+        await AssertErrorCodeAsync(reorder, HttpStatusCode.Forbidden, "post_access_denied");
+        await AssertErrorCodeAsync(remove, HttpStatusCode.Forbidden, "post_access_denied");
+        (await GetPostAsync(owner, postId)).PostAttachments.Should().ContainSingle();
+    }
+
+    [Fact]
+    public async Task Admin_can_manage_attachments_of_another_users_post()
+    {
+        // Arrange
+        var owner = CreateUserClient();
+        var postId = await CreatePostAsync(owner);
+        var admin = CreateAdminClient();
+
+        // Act
+        var added = await AddAttachmentsAsync(admin, postId, 2);
+        var remove = await DeleteWithBodyAsync(admin, "/v1/post-attachments/attachments", new { postId, postAttachmentId = added[0] });
+
+        // Assert
+        remove.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        (await GetPostAsync(owner, postId)).PostAttachments.Should().ContainSingle().Which.Id.Should().Be(added[1]);
     }
 
     [Fact]
@@ -154,7 +268,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
         var anonymous = App.CreateClient();
 
         // Act
-        var response = await anonymous.PostAsJsonAsync("/v1/posts/attachments", new
+        var response = await anonymous.PostAsJsonAsync("/v1/post-attachments/attachments", new
         {
             postId = Guid.NewGuid(),
             fileIds = new[] { Guid.NewGuid() },
@@ -175,7 +289,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
         var ids = await AddAttachmentsAsync(client, postId, 3);
 
         // Act
-        var response = await client.PutAsJsonAsync("/v1/posts/attachments/order", new
+        var response = await client.PutAsJsonAsync("/v1/post-attachments/attachments/order", new
         {
             postId,
             postAttachmentId = ids[2],
@@ -199,7 +313,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
         var ids = await AddAttachmentsAsync(client, postId, 2);
 
         // Act
-        var response = await client.PutAsJsonAsync("/v1/posts/attachments/order", new
+        var response = await client.PutAsJsonAsync("/v1/post-attachments/attachments/order", new
         {
             postId,
             postAttachmentId = ids[0],
@@ -219,7 +333,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
         var ids = await AddAttachmentsAsync(client, postId, 2);
 
         // Act
-        var response = await client.PutAsJsonAsync("/v1/posts/attachments/order", new
+        var response = await client.PutAsJsonAsync("/v1/post-attachments/attachments/order", new
         {
             postId,
             postAttachmentId = ids[0],
@@ -239,7 +353,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
         await AddAttachmentsAsync(client, postId, 2);
 
         // Act
-        var response = await client.PutAsJsonAsync("/v1/posts/attachments/order", new
+        var response = await client.PutAsJsonAsync("/v1/post-attachments/attachments/order", new
         {
             postId,
             postAttachmentId = Guid.NewGuid(),
@@ -261,7 +375,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
         var ids = await AddAttachmentsAsync(client, postId, 3);
 
         // Act
-        var response = await DeleteWithBodyAsync(client, "/v1/posts/attachments", new
+        var response = await DeleteWithBodyAsync(client, "/v1/post-attachments/attachments", new
         {
             postId,
             postAttachmentId = ids[1],
@@ -283,7 +397,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
         var postId = await CreatePostAsync(client);
 
         // Act
-        var response = await DeleteWithBodyAsync(client, "/v1/posts/attachments", new
+        var response = await DeleteWithBodyAsync(client, "/v1/post-attachments/attachments", new
         {
             postId,
             postAttachmentId = Guid.NewGuid(),
@@ -297,7 +411,7 @@ public sealed class PostAttachmentsEndpointsTests(PostsApp app) : PostsIntegrati
     public async Task Remove_attachment_of_unknown_post_returns_post_not_found()
     {
         // Act
-        var response = await DeleteWithBodyAsync(Client, "/v1/posts/attachments", new
+        var response = await DeleteWithBodyAsync(Client, "/v1/post-attachments/attachments", new
         {
             postId = Guid.NewGuid(),
             postAttachmentId = Guid.NewGuid(),

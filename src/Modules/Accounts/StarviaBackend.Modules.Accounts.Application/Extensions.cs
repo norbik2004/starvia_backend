@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
+using StarviaBackend.Modules.Accounts.Application.Users.Access;
 using StarviaBackend.Shared.Infrastructure.Cqrs;
 
 [assembly:InternalsVisibleTo("StarviaBackend.Modules.Accounts.Infrastructure")]
@@ -14,6 +15,7 @@ internal static class Extensions
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.RegisterHandlers(Assembly.GetExecutingAssembly());
+        services.AddScoped<IAccountAccessService, AccountAccessService>();
         return services;
     }
 }

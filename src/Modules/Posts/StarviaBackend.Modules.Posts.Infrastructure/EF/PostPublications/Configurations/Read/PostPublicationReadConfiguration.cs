@@ -18,5 +18,6 @@ internal sealed class PostPublicationReadConfiguration : IEntityTypeConfiguratio
         builder.Property(u => u.PublishedAt);
         builder.Property(u => u.ExternalPostId);
         builder.Property(u => u.UserPlatformId).IsRequired();
+        builder.Property(u => u.CreatedAt).IsRequired();
     }
 }

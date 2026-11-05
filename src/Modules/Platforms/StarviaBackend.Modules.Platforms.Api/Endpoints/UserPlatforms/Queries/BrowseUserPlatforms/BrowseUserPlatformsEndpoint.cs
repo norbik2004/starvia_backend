@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,14 +8,17 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace StarviaBackend.Modules.Platforms.Api.Endpoints.UserPlatforms.Queries.BrowseUserPlatforms;
 
-[Authorize(Roles = UserPlatformsEndpoint.AdminRole)]
+[Authorize]
 internal sealed class BrowseUserPlatformsEndpoint(IDispatcher dispatcher)
     : EndpointBaseAsync.WithRequest<BrowseUserPlatformsQuery>.WithActionResult<PagedResult<UserPlatformDto>>
 {
     [HttpGet(UserPlatformsEndpoint.BasePath)]
-    [SwaggerOperation(Summary = "Browse users (admin only)", Tags = [UserPlatformsEndpoint.Tag])]
+    [SwaggerOperation(
+        Summary = "Browse connected platform accounts",
+        Description = "Admins see all accounts, other users only their own. Supports filtering by platform, account name and owner, and sorting.",
+        Tags = [UserPlatformsEndpoint.Tag])]
     [ProducesResponseType(typeof(PagedResult<UserPlatformDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public override async Task<ActionResult<PagedResult<UserPlatformDto>>> HandleAsync(
         [FromQuery] BrowseUserPlatformsQuery request,
         CancellationToken cancellationToken = default)

@@ -8,6 +8,8 @@ internal sealed class UserPlatformReadModel
 {
     public Guid Id { get; init; }
 
+    public Guid UserId { get; init; }
+
     public Guid PlatformId { get; init; }
 
     public PlatformReadModel Platform { get; init; } = null!;

@@ -22,11 +22,15 @@ public abstract class AiIntegrationTest : IntegrationTest<AiApp>
     protected AiIntegrationTest(AiApp app) : base(app)
     {
         app.TextModel.Reset();
+        app.Posts.Reset();
         app.UseRealChatClient = false;
     }
 
     protected HttpClient CreateUserClient(Guid? userId = null) =>
         CreateClient(userId ?? Guid.NewGuid(), UserRoles.User);
+
+    protected HttpClient CreateAdminClient(Guid? userId = null) =>
+        CreateClient(userId ?? Guid.NewGuid(), UserRoles.Admin);
 
     protected static async Task<Guid> CreateChatAsync(
         HttpClient client,
@@ -78,6 +82,7 @@ public abstract class AiIntegrationTest : IntegrationTest<AiApp>
         Guid? PostId,
         DateTime? LastMessageAt,
         DateTime CreatedAt,
+        Guid OwnerId,
         List<ChatMessageResponse> Messages);
 
     protected sealed record ChatSummaryResponse(
@@ -87,7 +92,8 @@ public abstract class AiIntegrationTest : IntegrationTest<AiApp>
         ChatStatus Status,
         Guid? PostId,
         DateTime? LastMessageAt,
-        DateTime CreatedAt);
+        DateTime CreatedAt,
+        Guid OwnerId);
 
     protected sealed record ChatPageResponse(
         List<ChatSummaryResponse> Items,

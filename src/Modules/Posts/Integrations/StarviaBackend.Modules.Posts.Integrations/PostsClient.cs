@@ -54,7 +54,7 @@ internal sealed class PostsClient(HttpClient httpClient) : IPostsClient
             throw NotOwner(postId);
         }
 
-        return new PostSummary(payload.Id, payload.Title, payload.CreatedAt);
+        return new PostSummary(payload.Id, payload.Title, payload.Body, payload.CreatedAt);
     }
 
     private static IntegrationFailureRules FailureRules(Guid postId) =>

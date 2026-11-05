@@ -14,10 +14,6 @@ internal static class GoogleAiStudioExtensions
 
     /// <summary>
     /// Registers the <see cref="IChatClient"/> that writes every text of the module: the official Google Gen AI
-    /// library (Google.GenAI) talking to the Gemini API of Google AI Studio, exposed through the
-    /// Microsoft.Extensions.AI abstraction. There is no client code of our own. It is the one unkeyed
-    /// <see cref="IChatClient"/>, so whatever asks for a chat client gets Google; OpenRouter is only available
-    /// by its key (see <c>OpenRouterExtensions.ServiceKey</c>).
     /// </summary>
     public static IServiceCollection AddGoogleAiStudio(this IServiceCollection services, IConfiguration configuration)
     {
@@ -29,8 +25,6 @@ internal static class GoogleAiStudioExtensions
             client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
         });
 
-        // Scoped, not singleton: an HttpClient taken from the factory must not outlive its handler, or DNS changes
-        // are never picked up. Building the client is cheap next to a model call.
         services.AddScoped<IChatClient>(CreateChatClient);
 
         return services;
@@ -40,8 +34,6 @@ internal static class GoogleAiStudioExtensions
     {
         var settings = services.GetRequiredService<IOptions<GoogleAiStudioOptions>>().Value;
 
-        // Checked here and not at startup: the key is a secret that is absent on a fresh checkout, and only the
-        // AI endpoints need it. A missing key is reported to the caller instead of failing the whole application.
         if (string.IsNullOrWhiteSpace(settings.ApiKey))
         {
             throw new GoogleAiStudioIntegrationException("Google AI Studio API key is not configured.");

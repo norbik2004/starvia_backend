@@ -104,18 +104,6 @@ public sealed class ChatTests
     }
 
     [Fact]
-    public void IsOwnedBy_IsTrueOnlyForTheOwner()
-    {
-        // Arrange
-        var owner = Guid.NewGuid();
-        var chat = Chat.Create(owner, ChatType.AskAgent, "Title");
-
-        // Assert
-        chat.IsOwnedBy(owner).Should().BeTrue();
-        chat.IsOwnedBy(Guid.NewGuid()).Should().BeFalse();
-    }
-
-    [Fact]
     public void Rename_ReplacesAndTrimsTheTitle()
     {
         // Arrange

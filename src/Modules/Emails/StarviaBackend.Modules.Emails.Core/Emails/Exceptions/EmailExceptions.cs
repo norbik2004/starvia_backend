@@ -1,9 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using StarviaBackend.Modules.Emails.Core.Emails.Access;
 using StarviaBackend.Shared.Abstractions.Exceptions;
 
 namespace StarviaBackend.Modules.Emails.Core.Emails.Exceptions;
+
+internal sealed class EmailAccessDeniedException(EmailAction action)
+    : ForbiddenException($"You are not allowed to {action}.")
+{
+    public override string Code => "email_access_denied";
+}
 
 internal sealed class EmailNotSentException(string email)
     : BusinessException($"Email to '{email}' was not sent.")

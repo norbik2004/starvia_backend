@@ -8,9 +8,8 @@ internal sealed class GeneratePostValidator : AbstractValidator<GeneratePostComm
     {
         RuleFor(x => x.UserId).NotEmpty();
 
-        RuleFor(x => x.Request.ChatId)
-            .NotEqual(Guid.Empty).WithMessage("Chat ID cannot be empty.")
-            .When(x => x.Request.ChatId.HasValue);
+        RuleFor(x => x.Request.PostId)
+            .NotEmpty().WithMessage("Post ID cannot be empty.");
 
         RuleFor(x => x.Request.Prompt)
             .NotEmpty().WithMessage("Prompt is required.")

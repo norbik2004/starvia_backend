@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using StarviaBackend.Modules.Emails.Application.Emails.Queries.BrowseEmails;
 using StarviaBackend.Shared.Abstractions.Auth;
+using StarviaBackend.Shared.Abstractions.Email;
 using StarviaBackend.Shared.Abstractions.Queries;
 
 namespace StarviaBackend.Modules.Emails.Tests.Integration.Api;
@@ -38,14 +39,8 @@ public sealed class BrowseEmailsEndpointTests : IAsyncLifetime
         _host.Dispatcher.Queries.Should().BeEmpty();
     }
 
-    [Fact]
-    public async Task Signed_in_users_without_the_admin_role_are_forbidden()
-    {
-        var response = await _host.CreateClient(Guid.NewGuid(), UserRoles.User).GetAsync(Route);
-
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-        _host.Dispatcher.Queries.Should().BeEmpty();
-    }
+    // Who may browse is decided by the handler through the access policy (see the handler tests); the
+    // endpoint only requires a signed-in caller and passes the query on.
 
     [Fact]
     public async Task Admins_get_the_page_returned_by_the_query_handler()
@@ -71,6 +66,22 @@ public sealed class BrowseEmailsEndpointTests : IAsyncLifetime
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         _host.Dispatcher.Queries.Should().ContainSingle()
             .Which.Should().Be(new BrowseEmailsQuery(3, 50));
+    }
+
+    [Fact]
+    public async Task Filters_and_sorting_come_from_the_query_string()
+    {
+        var response = await _host.CreateClient(Guid.NewGuid(), UserRoles.Admin).GetAsync(
+            $"{Route}?search=hello&type=ResetPasswordEmail&from=2026-01-01T00:00:00Z&to=2026-02-01T00:00:00Z&sortBy=Title&descending=true");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        _host.Dispatcher.Queries.Should().ContainSingle().Which.Should().Be(new BrowseEmailsQuery(
+            Search: "hello",
+            Type: EmailType.ResetPasswordEmail,
+            From: new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            To: new DateTime(2026, 2, 1, 0, 0, 0, DateTimeKind.Utc),
+            SortBy: EmailSortBy.Title,
+            Descending: true));
     }
 
     [Fact]

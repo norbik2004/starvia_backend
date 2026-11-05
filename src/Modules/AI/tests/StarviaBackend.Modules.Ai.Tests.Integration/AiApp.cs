@@ -3,17 +3,21 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.AI;
 using StarviaBackend.Modules.Ai.Infrastructure.EF.Contexts;
+using StarviaBackend.Modules.Posts.Integrations;
 using StarviaBackend.Shared.Tests.Integration;
 
 namespace StarviaBackend.Modules.Ai.Tests.Integration;
 
-/// <summary>Test host for the AI module: applies its migrations and swaps the text chat client (Google AI Studio) for a fake.</summary>
+/// <summary>Test host for the AI module: applies its migrations and swaps the text chat client (Google AI Studio) and posts integration for fakes.</summary>
 public sealed class AiApp : BoilerplateApp
 {
     /// <summary>The model that writes the texts in these tests, in place of Google AI Studio.</summary>
     public FakeChatClient TextModel { get; } = new();
+
+    public FakePostsClient Posts { get; } = new();
 
     /// <summary>
     /// Lets one test run against the application's own Google AI Studio registration instead of the fake. It never
@@ -41,6 +45,9 @@ public sealed class AiApp : BoilerplateApp
 
             services.Remove(registered);
             services.AddScoped<IChatClient>(provider => UseRealChatClient ? (IChatClient)registered.ImplementationFactory!(provider) : TextModel);
+
+            services.RemoveAll<IPostsClient>();
+            services.AddSingleton<IPostsClient>(Posts);
         });
     }
 

@@ -107,7 +107,7 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
     }
 
     [Fact]
-    public async Task Get_chat_of_another_user_returns_chat_not_owned()
+    public async Task Get_chat_of_another_user_returns_forbidden()
     {
         // Arrange
         var chatId = await CreateChatAsync(CreateUserClient());
@@ -116,7 +116,7 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
         var response = await CreateUserClient().GetAsync($"{ChatsUrl}/{chatId}");
 
         // Assert
-        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "chat_not_owned");
+        await AssertErrorCodeAsync(response, HttpStatusCode.Forbidden, "chat_access_denied");
     }
 
     [Fact]
@@ -198,7 +198,7 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
     }
 
     [Fact]
-    public async Task Add_message_to_a_chat_of_another_user_returns_chat_not_owned_and_stores_nothing()
+    public async Task Add_message_to_a_chat_of_another_user_returns_forbidden_and_stores_nothing()
     {
         // Arrange
         var owner = CreateUserClient();
@@ -208,7 +208,7 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
         var response = await AddMessageAsync(CreateUserClient(), chatId, "Intruder");
 
         // Assert
-        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "chat_not_owned");
+        await AssertErrorCodeAsync(response, HttpStatusCode.Forbidden, "chat_access_denied");
         (await GetChatAsync(owner, chatId)).Messages.Should().BeEmpty();
     }
 
@@ -336,7 +336,7 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
     }
 
     [Fact]
-    public async Task Update_chat_of_another_user_returns_chat_not_owned_and_changes_nothing()
+    public async Task Update_chat_of_another_user_returns_forbidden_and_changes_nothing()
     {
         // Arrange
         var owner = CreateUserClient();
@@ -348,7 +348,7 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
             new { title = "Hijacked", status = ChatStatus.Archived });
 
         // Assert
-        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "chat_not_owned");
+        await AssertErrorCodeAsync(response, HttpStatusCode.Forbidden, "chat_access_denied");
         var chat = await GetChatAsync(owner, chatId);
         chat.Title.Should().Be("Private");
         chat.Status.Should().Be(ChatStatus.Active);
@@ -472,7 +472,7 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
     }
 
     [Fact]
-    public async Task Remove_chat_of_another_user_returns_chat_not_owned_and_keeps_the_chat()
+    public async Task Remove_chat_of_another_user_returns_forbidden_and_keeps_the_chat()
     {
         // Arrange
         var owner = CreateUserClient();
@@ -482,7 +482,7 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
         var response = await CreateUserClient().DeleteAsync($"{ChatsUrl}/{chatId}");
 
         // Assert
-        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "chat_not_owned");
+        await AssertErrorCodeAsync(response, HttpStatusCode.Forbidden, "chat_access_denied");
         (await GetChatAsync(owner, chatId)).Id.Should().Be(chatId);
     }
 

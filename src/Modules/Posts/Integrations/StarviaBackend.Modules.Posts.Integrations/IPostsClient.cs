@@ -13,4 +13,4 @@ public interface IPostsClient
 }
 
 /// <summary>Domain-shaped post returned by the posts integration.</summary>
-public sealed record PostSummary(Guid Id, string Title, DateTime CreatedAt);
+public sealed record PostSummary(Guid Id, string Title, string Body, DateTime CreatedAt);

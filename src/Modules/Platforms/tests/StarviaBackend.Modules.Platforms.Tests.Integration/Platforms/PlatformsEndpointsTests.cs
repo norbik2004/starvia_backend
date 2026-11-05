@@ -146,15 +146,17 @@ public sealed class PlatformsEndpointsTests(PlatformsApp app) : PlatformsIntegra
     }
 
     [Fact]
-    public async Task Browse_user_platforms_requires_admin_role()
+    public async Task Browse_user_platforms_is_open_to_any_authenticated_user_but_not_to_anonymous_callers()
     {
         // Act
         var asUser = await CreateUserClient().GetAsync("/v1/user-platforms");
         var asAdmin = await CreateAdminClient().GetAsync("/v1/user-platforms");
+        var anonymous = await App.CreateClient().GetAsync("/v1/user-platforms");
 
         // Assert
-        asUser.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        asUser.StatusCode.Should().Be(HttpStatusCode.OK);
         asAdmin.StatusCode.Should().Be(HttpStatusCode.OK);
+        anonymous.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     [Fact]

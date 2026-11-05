@@ -9,12 +9,12 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace StarviaBackend.Modules.Accounts.Api.Endpoints.Users.Queries.BrowseUsers;
 
-[Authorize(Roles = UsersEndpoint.AdminRole)]
+[Authorize]
 internal sealed class BrowseUsersEndpoint(IDispatcher dispatcher)
     : EndpointBaseAsync.WithRequest<BrowseUsersQuery>.WithActionResult<PagedResult<UserDto>>
 {
     [HttpGet(UsersEndpoint.BasePath)]
-    [SwaggerOperation(Summary = "Browse users (admin only)", Tags = [UsersEndpoint.Tag])]
+    [SwaggerOperation(Summary = "Browse and search users (admin only)", Tags = [UsersEndpoint.Tag])]
     [ProducesResponseType(typeof(ActionResult<PagedResult<UserDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public override async Task<ActionResult<PagedResult<UserDto>>> HandleAsync(

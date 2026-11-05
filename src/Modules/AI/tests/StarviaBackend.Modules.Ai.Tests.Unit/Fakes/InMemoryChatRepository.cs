@@ -35,6 +35,12 @@ internal sealed class InMemoryChatRepository : IChatRepository
         return Task.FromResult(chat);
     }
 
+    public Task<Chat?> GetByPostIdAsync(Guid postId, CancellationToken cancellationToken = default)
+    {
+        var chat = _chats.Values.FirstOrDefault(c => c.PostId == postId);
+        return Task.FromResult(chat);
+    }
+
     public Task UpdateAsync(Chat chat, CancellationToken cancellationToken = default)
     {
         UpdateCalls++;

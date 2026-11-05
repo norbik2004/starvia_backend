@@ -1,5 +1,6 @@
 namespace StarviaBackend.Modules.Ai.Infrastructure.GoogleAiStudio;
 
+// TODO: make it possible to change the model per request, so we can use Gemini 1.5 for short answers and Gemini 3.5 for long ones.
 internal sealed class GoogleAiStudioOptions
 {
     public const string SectionName = "integrations:googleaistudio";

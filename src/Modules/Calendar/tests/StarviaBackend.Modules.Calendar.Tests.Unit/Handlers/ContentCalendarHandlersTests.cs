@@ -63,7 +63,8 @@ public sealed class UpdateContentCalendarHandlerTests
     private readonly InMemoryCalendarRepository _calendars = new();
     private readonly Guid _ownerId = Guid.NewGuid();
 
-    private UpdateContentCalendarHandler CreateHandler() => new(_calendars);
+    private UpdateContentCalendarHandler CreateHandler(Guid? actingUserId = null, bool isAdmin = false) =>
+        new(_calendars, TestAccess.For(actingUserId ?? _ownerId, isAdmin));
 
     private static UpdateContentCalendarCommand Command(Guid calendarId, Guid userId, string name = "Renamed") =>
         new(new UpdateContentCalendarRequest(calendarId, name), userId);
@@ -85,12 +86,27 @@ public sealed class UpdateContentCalendarHandlerTests
         var calendar = _calendars.Seed(_ownerId, "Original");
 
         // Act
-        var act = () => CreateHandler().HandleAsync(Command(calendar.Id, Guid.NewGuid()));
+        var stranger = Guid.NewGuid();
+        var act = () => CreateHandler(stranger).HandleAsync(Command(calendar.Id, stranger));
 
         // Assert
-        await act.Should().ThrowAsync<UnauthorizedAccessException>();
+        await act.Should().ThrowAsync<CalendarAccessDeniedException>();
         calendar.Name.Should().Be("Original");
         _calendars.Updated.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserIsAnAdmin_RenamesSomeoneElsesCalendar()
+    {
+        // Arrange
+        var calendar = _calendars.Seed(_ownerId, "Original");
+        var admin = Guid.NewGuid();
+
+        // Act
+        await CreateHandler(admin, isAdmin: true).HandleAsync(Command(calendar.Id, admin, "By admin"));
+
+        // Assert
+        calendar.Name.Should().Be("By admin");
     }
 
     [Fact]
@@ -114,7 +130,8 @@ public sealed class RemoveContentCalendarHandlerTests
     private readonly InMemoryCalendarRepository _calendars = new();
     private readonly Guid _ownerId = Guid.NewGuid();
 
-    private RemoveContentCalendarHandler CreateHandler() => new(_calendars);
+    private RemoveContentCalendarHandler CreateHandler(Guid? actingUserId = null, bool isAdmin = false) =>
+        new(_calendars, TestAccess.For(actingUserId ?? _ownerId, isAdmin));
 
     private static RemoveContentCalendarCommand Command(Guid calendarId, Guid userId) =>
         new(new RemoveContentCalendarRequest(calendarId), userId);
@@ -136,12 +153,27 @@ public sealed class RemoveContentCalendarHandlerTests
         var calendar = _calendars.Seed(_ownerId);
 
         // Act
-        var act = () => CreateHandler().HandleAsync(Command(calendar.Id, Guid.NewGuid()));
+        var stranger = Guid.NewGuid();
+        var act = () => CreateHandler(stranger).HandleAsync(Command(calendar.Id, stranger));
 
         // Assert
-        await act.Should().ThrowAsync<UnauthorizedAccessException>();
+        await act.Should().ThrowAsync<CalendarAccessDeniedException>();
         _calendars.Calendars.Should().ContainSingle();
         _calendars.Removed.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserIsAnAdmin_RemovesSomeoneElsesCalendar()
+    {
+        // Arrange
+        var calendar = _calendars.Seed(_ownerId);
+        var admin = Guid.NewGuid();
+
+        // Act
+        await CreateHandler(admin, isAdmin: true).HandleAsync(Command(calendar.Id, admin));
+
+        // Assert
+        _calendars.Removed.Should().ContainSingle().Which.Should().BeSameAs(calendar);
     }
 
     [Fact]

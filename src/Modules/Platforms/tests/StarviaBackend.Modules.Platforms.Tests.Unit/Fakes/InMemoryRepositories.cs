@@ -23,9 +23,6 @@ internal sealed class InMemoryUserPlatformRepository : IUserPlatformRepository
 {
     public List<UserPlatform> UserPlatforms { get; } = [];
 
-    public Task<UserPlatform?> GetByIdAndUserIdAsync(Guid userPlatformId, Guid UserId, CancellationToken cancellationToken = default)
-        => Task.FromResult(UserPlatforms.FirstOrDefault(u => u.Id == userPlatformId && u.UserId == UserId));
-
     public Task AddAsync(UserPlatform userPlatform)
     {
         UserPlatforms.Add(userPlatform);

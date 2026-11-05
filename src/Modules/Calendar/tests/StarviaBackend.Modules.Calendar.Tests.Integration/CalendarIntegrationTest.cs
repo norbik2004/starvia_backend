@@ -23,6 +23,9 @@ public abstract class CalendarIntegrationTest : IntegrationTest<CalendarApp>
     protected HttpClient CreateUserClient(Guid? userId = null) =>
         CreateClient(userId ?? Guid.NewGuid(), UserRoles.User);
 
+    protected HttpClient CreateAdminClient(Guid? userId = null) =>
+        CreateClient(userId ?? Guid.NewGuid(), UserRoles.Admin);
+
     protected static async Task<Guid> CreateCalendarAsync(HttpClient client, string name = "My calendar")
     {
         var response = await client.PostAsJsonAsync("/v1/calendars", new { name });

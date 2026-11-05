@@ -1,3 +1,4 @@
+using StarviaBackend.Modules.Ai.Core.Chats.Access;
 using StarviaBackend.Modules.Ai.Core.Chats.Enums;
 using StarviaBackend.Shared.Abstractions.Exceptions;
 
@@ -9,10 +10,10 @@ internal sealed class ChatNotFoundException(Guid chatId)
     public override string Code => "chat_not_found";
 }
 
-internal sealed class ChatNotOwnedException(Guid chatId)
-    : BusinessException($"User is not the owner of chat '{chatId}'")
+internal sealed class ChatAccessDeniedException(Guid chatId, ChatAction action)
+    : ForbiddenException($"You are not allowed to {action} on chat '{chatId}'")
 {
-    public override string Code => "chat_not_owned";
+    public override string Code => "chat_access_denied";
 }
 
 internal sealed class ChatArchivedException(Guid chatId)

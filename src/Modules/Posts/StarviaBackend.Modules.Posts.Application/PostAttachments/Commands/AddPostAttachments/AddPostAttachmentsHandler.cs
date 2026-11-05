@@ -1,5 +1,7 @@
 using StarviaBackend.Modules.Media.Integrations;
 using StarviaBackend.Modules.Posts.Application.PostAttachments.Commands.AddPostAttachment;
+using StarviaBackend.Modules.Posts.Application.Posts.Access;
+using StarviaBackend.Modules.Posts.Core.Posts.Access;
 using StarviaBackend.Modules.Posts.Core.Posts.Entities;
 using StarviaBackend.Modules.Posts.Core.Posts.Exceptions;
 using StarviaBackend.Modules.Posts.Core.Posts.Repositories;
@@ -10,7 +12,8 @@ namespace StarviaBackend.Modules.Posts.Application.PostAttachments.Commands.AddP
 internal sealed class AddPostAttachmentsHandler(
     IPostRepository postRepository,
     IPostAttachmentRepository postAttachmentRepository,
-    IMediaClient mediaClient)
+    IMediaClient mediaClient,
+    IPostAccessService access)
     : ICommandHandler<AddPostAttachmentsCommand, AddPostAttachmentsResult>
 {
     public async Task<AddPostAttachmentsResult> HandleAsync(
@@ -21,10 +24,7 @@ internal sealed class AddPostAttachmentsHandler(
         var post = await postRepository.GetPostByIdAsync(request.postId, cancellationToken)
             ?? throw new PostNotFoundException(request.postId);
 
-        if (post.CreatedBy != command.userId.ToString())
-        {
-            throw new UnauthorizedAccessException("You are not authorized to add attachments to this post.");
-        }
+        access.EnsureAllowed(PostAction.ManageAttachments, post);
 
         var existingAttachments = await postAttachmentRepository.GetByPostIdAsync(request.postId, cancellationToken);
         if (existingAttachments.Count + request.fileIds.Count > PostAttachment.MaxPerPost)

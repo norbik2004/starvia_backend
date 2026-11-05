@@ -1,13 +1,9 @@
-using StarviaBackend.Modules.Ai.Core.Chats.Enums;
+ using StarviaBackend.Modules.Ai.Core.Chats.Enums;
 using StarviaBackend.Modules.Ai.Core.Chats.Exceptions;
 using StarviaBackend.Shared.Abstractions.Domain;
 
 namespace StarviaBackend.Modules.Ai.Core.Chats.Entities;
 
-/// <summary>
-/// A single entry of a <see cref="Chat"/>: a prompt written by the user or an answer produced by the AI.
-/// Messages are created only through the owning <see cref="Chat"/>, which keeps the history consistent.
-/// </summary>
 internal sealed class ChatMessage : AuditableEntity
 {
     public const int MaxModelLength = 100;
@@ -15,21 +11,16 @@ internal sealed class ChatMessage : AuditableEntity
     public Guid ChatId { get; private set; }
     public Chat Chat { get; private set; } = null!;
 
-    /// <summary>1-based position of the message inside the chat. Defines the order of the history.</summary>
     public int Sequence { get; private set; }
 
     public ChatMessageRole Role { get; private set; }
 
-    /// <summary>The raw text of the prompt or answer, stored exactly as received.</summary>
     public string Content { get; private set; } = null!;
 
-    /// <summary>Name of the AI model that produced the message. Set only for assistant messages.</summary>
     public string? Model { get; private set; }
 
-    /// <summary>Tokens consumed by the request that produced this message, when reported by the provider.</summary>
     public int? InputTokens { get; private set; }
 
-    /// <summary>Tokens generated for this message, when reported by the provider.</summary>
     public int? OutputTokens { get; private set; }
 
     private ChatMessage()

@@ -8,6 +8,7 @@ using StarviaBackend.Modules.Ai.Infrastructure.EF.Contexts;
 using StarviaBackend.Modules.Ai.Infrastructure.EF.Initializers;
 using StarviaBackend.Modules.Ai.Infrastructure.GoogleAiStudio;
 using StarviaBackend.Modules.Ai.Infrastructure.OpenRouter;
+using StarviaBackend.Modules.Posts.Integrations;
 using StarviaBackend.Shared.Infrastructure.Cqrs;
 using StarviaBackend.Shared.Infrastructure.Postgres;
 
@@ -27,6 +28,8 @@ internal static class Extensions
         // Every text is written by Google AI Studio. OpenRouter is registered by key and kept for the images.
         services.AddGoogleAiStudio(configuration);
         services.AddOpenRouter(configuration);
+
+        services.AddPostsIntegration(configuration);
 
         services.AddHostedService<AiDataInitializer>();
 

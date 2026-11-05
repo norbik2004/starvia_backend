@@ -31,7 +31,7 @@ internal sealed class FakePostsClient : IPostsClient
                 throw new PostsIntegrationNotOwnerException($"User is not the owner of post '{postId}'.");
             }
 
-            posts.Add(new PostSummary(postId, $"Post {postId}", DateTime.UtcNow));
+            posts.Add(new PostSummary(postId, $"Post {postId}", $"Body of {postId}", DateTime.UtcNow));
         }
 
         return Task.FromResult<IReadOnlyList<PostSummary>>(posts);

@@ -1,3 +1,5 @@
+using StarviaBackend.Modules.Media.Application.MediaFiles.Access;
+using StarviaBackend.Modules.Media.Core.Media.Access;
 using StarviaBackend.Modules.Media.Core.Media.Exceptions;
 using StarviaBackend.Modules.Media.Core.Media.Repositories;
 using StarviaBackend.Modules.Media.Core.Media.Storage;
@@ -6,7 +8,10 @@ using StarviaBackend.Shared.Abstractions.Storage;
 
 namespace StarviaBackend.Modules.Media.Application.MediaFiles.Commands.RemoveFile;
 
-internal sealed class RemoveFileHandler(IMediaFileRepository mediaFileRepository, IFileStorageService fileStorageService)
+internal sealed class RemoveFileHandler(
+    IMediaFileRepository mediaFileRepository,
+    IFileStorageService fileStorageService,
+    IMediaAccessService access)
     : ICommandHandler<RemoveFileCommand>
 {
     public const string BucketName = BucketNames.UserUploads;
@@ -16,10 +21,7 @@ internal sealed class RemoveFileHandler(IMediaFileRepository mediaFileRepository
         var file = await mediaFileRepository.GetByIdAsync(command.FileId, cancellationToken)
             ?? throw new MediaNotFoundException(command.FileId);
 
-        if(file.CreatedBy != command.UserId.ToString())
-        {
-            throw new MediaFileCannotBeDeletedException(file.Id);
-        }
+        access.EnsureAllowed(MediaAction.Delete, file);
 
         try
         {

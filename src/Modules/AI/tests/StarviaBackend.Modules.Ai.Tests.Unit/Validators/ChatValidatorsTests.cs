@@ -196,7 +196,7 @@ public sealed class BrowseChatsQueryTests
     [Fact]
     public void Defaults_start_on_the_first_page_of_twenty()
     {
-        var query = new BrowseChatsQuery(Guid.NewGuid());
+        var query = new BrowseChatsQuery();
 
         Assert.Equal(1, query.Page);
         Assert.Equal(20, query.PageSize);
@@ -211,7 +211,7 @@ public sealed class BrowseChatsQueryTests
     [InlineData(7, 7)]
     public void Page_below_one_falls_back_to_the_first_page(int page, int expected)
     {
-        var query = new BrowseChatsQuery(Guid.NewGuid(), Page: page);
+        var query = new BrowseChatsQuery(Page: page);
 
         Assert.Equal(expected, query.Page);
     }
@@ -224,7 +224,7 @@ public sealed class BrowseChatsQueryTests
     [InlineData(100, 100)]
     public void Page_size_outside_the_allowed_range_falls_back_to_the_default(int pageSize, int expected)
     {
-        var query = new BrowseChatsQuery(Guid.NewGuid(), PageSize: pageSize);
+        var query = new BrowseChatsQuery(PageSize: pageSize);
 
         Assert.Equal(expected, query.PageSize);
     }

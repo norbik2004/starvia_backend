@@ -34,7 +34,8 @@ public sealed class UpdatePostHandlerTests
     private readonly InMemoryPostRepository _repository = new();
     private readonly Guid _ownerId = Guid.NewGuid();
 
-    private UpdatePostHandler CreateHandler() => new(_repository);
+    private UpdatePostHandler CreateHandler(Guid? actingUserId = null, bool isAdmin = false) =>
+        new(_repository, TestAccess.For(actingUserId ?? _ownerId, isAdmin));
 
     private static UpdatePostCommand Command(Guid postId, Guid userId) =>
         new(new UpdatePostRequest(postId, "Updated title", "Updated body", PostStatus.Done), userId);
@@ -54,12 +55,13 @@ public sealed class UpdatePostHandlerTests
     {
         // Arrange
         var post = _repository.Seed(_ownerId, "Original title");
+        var stranger = Guid.NewGuid();
 
         // Act
-        var act = () => CreateHandler().HandleAsync(Command(post.Id, Guid.NewGuid()));
+        var act = () => CreateHandler(stranger).HandleAsync(Command(post.Id, stranger));
 
         // Assert
-        await act.Should().ThrowAsync<UnauthorizedAccessException>();
+        await act.Should().ThrowAsync<PostAccessDeniedException>();
         post.Title.Should().Be("Original title");
         _repository.Updated.Should().BeEmpty();
     }
@@ -80,6 +82,21 @@ public sealed class UpdatePostHandlerTests
         post.Status.Should().Be(PostStatus.Done);
         _repository.Updated.Should().ContainSingle().Which.Should().BeSameAs(post);
     }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserIsAnAdmin_UpdatesSomeoneElsesPost()
+    {
+        // Arrange
+        var post = _repository.Seed(_ownerId, "Original title");
+        var admin = Guid.NewGuid();
+
+        // Act
+        await CreateHandler(admin, isAdmin: true).HandleAsync(Command(post.Id, admin));
+
+        // Assert
+        post.Title.Should().Be("Updated title");
+        _repository.Updated.Should().ContainSingle();
+    }
 }
 
 public sealed class RemovePostHandlerTests
@@ -87,7 +104,8 @@ public sealed class RemovePostHandlerTests
     private readonly InMemoryPostRepository _repository = new();
     private readonly Guid _ownerId = Guid.NewGuid();
 
-    private RemovePostHandler CreateHandler() => new(_repository);
+    private RemovePostHandler CreateHandler(Guid? actingUserId = null, bool isAdmin = false) =>
+        new(_repository, TestAccess.For(actingUserId ?? _ownerId, isAdmin));
 
     [Fact]
     public async Task HandleAsync_WhenPostDoesNotExist_Throws()
@@ -104,12 +122,13 @@ public sealed class RemovePostHandlerTests
     {
         // Arrange
         var post = _repository.Seed(_ownerId);
+        var stranger = Guid.NewGuid();
 
         // Act
-        var act = () => CreateHandler().HandleAsync(new RemovePostCommand(new RemovePostRequest(post.Id), Guid.NewGuid()));
+        var act = () => CreateHandler(stranger).HandleAsync(new RemovePostCommand(new RemovePostRequest(post.Id), stranger));
 
         // Assert
-        await act.Should().ThrowAsync<UnauthorizedAccessException>();
+        await act.Should().ThrowAsync<PostAccessDeniedException>();
         _repository.Posts.Should().ContainSingle();
         _repository.Removed.Should().BeEmpty();
     }
@@ -125,6 +144,20 @@ public sealed class RemovePostHandlerTests
 
         // Assert
         _repository.Posts.Should().BeEmpty();
+        _repository.Removed.Should().ContainSingle().Which.Should().BeSameAs(post);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserIsAnAdmin_RemovesSomeoneElsesPost()
+    {
+        // Arrange
+        var post = _repository.Seed(_ownerId);
+        var admin = Guid.NewGuid();
+
+        // Act
+        await CreateHandler(admin, isAdmin: true).HandleAsync(new RemovePostCommand(new RemovePostRequest(post.Id), admin));
+
+        // Assert
         _repository.Removed.Should().ContainSingle().Which.Should().BeSameAs(post);
     }
 }

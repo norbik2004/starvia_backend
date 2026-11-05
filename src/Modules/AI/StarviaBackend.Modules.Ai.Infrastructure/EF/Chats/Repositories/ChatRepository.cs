@@ -22,11 +22,6 @@ internal sealed class ChatRepository(AiWriteDbContext dbContext) : IChatReposito
 
     public async Task UpdateAsync(Chat chat, CancellationToken cancellationToken = default)
     {
-        // The chat must come from this repository (or be added through it), so it is already tracked and
-        // change detection picks up only the changed columns and inserts any messages added to it.
-        // DbSet.Update is avoided on purpose: it would rewrite every column of the chat and, for an
-        // untracked chat, mark freshly added messages as Modified, so the save would try to UPDATE rows
-        // that do not exist yet.
         if (dbContext.Entry(chat).State == EntityState.Detached)
         {
             throw new InvalidOperationException(
@@ -40,5 +35,12 @@ internal sealed class ChatRepository(AiWriteDbContext dbContext) : IChatReposito
     {
         dbContext.Chats.Remove(chat);
         await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public Task<Chat?> GetByPostIdAsync(Guid postId, CancellationToken cancellationToken = default)
+    {
+        return dbContext.Chats
+            .Include(c => c.Messages.OrderBy(m => m.Sequence))
+            .FirstOrDefaultAsync(c => c.PostId == postId, cancellationToken);
     }
 }

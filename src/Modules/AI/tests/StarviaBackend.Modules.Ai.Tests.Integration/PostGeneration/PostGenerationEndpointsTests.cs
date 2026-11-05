@@ -239,7 +239,7 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
     }
 
     [Fact]
-    public async Task Generate_in_a_chat_of_another_user_returns_chat_not_owned_and_stores_nothing()
+    public async Task Generate_in_a_chat_of_another_user_returns_forbidden_and_stores_nothing()
     {
         // Arrange
         var owner = CreateUserClient();
@@ -249,7 +249,7 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
         var response = await GenerateAsync(CreateUserClient(), "A post about coffee", chatId);
 
         // Assert
-        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "chat_not_owned");
+        await AssertErrorCodeAsync(response, HttpStatusCode.Forbidden, "chat_access_denied");
         TextModel.Requests.Should().BeEmpty();
         (await GetChatAsync(owner, chatId)).Messages.Should().BeEmpty();
     }

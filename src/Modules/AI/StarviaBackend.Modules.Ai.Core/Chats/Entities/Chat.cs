@@ -4,34 +4,22 @@ using StarviaBackend.Shared.Abstractions.Domain;
 
 namespace StarviaBackend.Modules.Ai.Core.Chats.Entities;
 
-/// <summary>
-/// A conversation between a user and one of the AI agents (see <see cref="ChatType"/>).
-/// It is the aggregate root of the chat history: every prompt and every AI answer is a
-/// <see cref="ChatMessage"/> owned by the chat.
-/// </summary>
 internal sealed class Chat : AuditableEntity
 {
     public const int MaxTitleLength = 150;
 
     private readonly List<ChatMessage> _messages = [];
 
-    /// <summary>Owner of the chat. Only the owner can see and continue the conversation.</summary>
     public Guid UserId { get; private set; }
 
     public ChatType Type { get; private set; }
     public string Title { get; private set; } = null!;
     public ChatStatus Status { get; private set; }
 
-    /// <summary>
-    /// Post (from the Posts module, referenced by id only) that this chat produced or is refining.
-    /// Supported only by <see cref="ChatType.PostContentGeneration"/> chats.
-    /// </summary>
     public Guid? PostId { get; private set; }
 
-    /// <summary>When the last message was added. Used to order the chat history.</summary>
     public DateTime? LastMessageAt { get; private set; }
 
-    /// <summary>The messages of the chat, ordered by <see cref="ChatMessage.Sequence"/>.</summary>
     public IReadOnlyCollection<ChatMessage> Messages => _messages.AsReadOnly();
 
     private Chat()
@@ -60,8 +48,6 @@ internal sealed class Chat : AuditableEntity
         };
     }
 
-    public bool IsOwnedBy(Guid userId) => UserId == userId;
-
     public void Rename(string title)
     {
         Title = NormalizeTitle(title);
@@ -77,7 +63,6 @@ internal sealed class Chat : AuditableEntity
         Status = ChatStatus.Active;
     }
 
-    /// <summary>Links the chat to the post it produced. Allowed only for post content generation chats.</summary>
     public void LinkPost(Guid postId)
     {
         if (Type != ChatType.PostContentGeneration)
@@ -93,13 +78,9 @@ internal sealed class Chat : AuditableEntity
         PostId = postId;
     }
 
-    /// <summary>Stores a prompt written by the user.</summary>
-    /// <param name="content">The prompt, kept exactly as typed.</param>
-    /// <param name="utcNow">Current UTC time, used to update <see cref="LastMessageAt"/>.</param>
     public ChatMessage AddUserMessage(string content, DateTime utcNow)
         => AddMessage(ChatMessageRole.User, content, utcNow);
 
-    /// <summary>Stores an answer produced by the AI together with the model and token usage it reported.</summary>
     public ChatMessage AddAssistantMessage(
         string content,
         DateTime utcNow,
@@ -108,7 +89,6 @@ internal sealed class Chat : AuditableEntity
         int? outputTokens = null)
         => AddMessage(ChatMessageRole.Assistant, content, utcNow, model, inputTokens, outputTokens);
 
-    /// <summary>Stores the instructions given to the model, so the exact context of the chat can be replayed.</summary>
     public ChatMessage AddSystemMessage(string content, DateTime utcNow)
         => AddMessage(ChatMessageRole.System, content, utcNow);
 

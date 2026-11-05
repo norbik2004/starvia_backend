@@ -1,5 +1,8 @@
 namespace StarviaBackend.Modules.Ai.Infrastructure.OpenRouter;
 
+// TODO: Same as GoogleAiStudioOptions, but for OpenRouter. The OpenRouter API is a proxy to multiple LLMs (including OpenAI's),
+// so it has a different set of options. We may want to merge these two classes in the future,
+// but for now we keep them separate because they have different options and are used in different contexts.
 internal sealed class OpenRouterOptions
 {
     public const string SectionName = "integrations:openrouter";

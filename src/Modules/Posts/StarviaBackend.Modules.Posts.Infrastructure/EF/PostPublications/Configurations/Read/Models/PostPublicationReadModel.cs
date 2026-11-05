@@ -13,4 +13,5 @@ internal sealed class PostPublicationReadModel
     public DateTime? PublishedAt { get; init; }
     public string? ExternalPostId { get; init; }
     public Guid UserPlatformId { get; init; }
+    public DateTime CreatedAt { get; init; }
 }

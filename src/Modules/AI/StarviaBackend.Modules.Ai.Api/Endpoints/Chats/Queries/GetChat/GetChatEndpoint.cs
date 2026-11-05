@@ -2,14 +2,13 @@ using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarviaBackend.Modules.Ai.Application.Chats.Queries.GetChat;
-using StarviaBackend.Shared.Abstractions.Contexts;
 using StarviaBackend.Shared.Abstractions.Dispatchers;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace StarviaBackend.Modules.Ai.Api.Endpoints.Chats.Queries.GetChat;
 
 [Authorize]
-internal sealed class GetChatEndpoint(IDispatcher dispatcher, IContext context)
+internal sealed class GetChatEndpoint(IDispatcher dispatcher)
     : EndpointBaseAsync.WithRequest<Guid>.WithActionResult<ChatLongDto>
 {
     [HttpGet($"{ChatsEndpoint.BasePath}/{{chatId:guid}}")]
@@ -17,16 +16,12 @@ internal sealed class GetChatEndpoint(IDispatcher dispatcher, IContext context)
     [ProducesResponseType(typeof(ChatLongDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public override async Task<ActionResult<ChatLongDto>> HandleAsync(
         [FromRoute] Guid chatId,
         CancellationToken cancellationToken = default)
     {
-        if (context.Identity.UserId is not { } userId)
-        {
-            return Unauthorized();
-        }
-
-        var query = new GetChatQuery(chatId, userId);
+        var query = new GetChatQuery(chatId);
         var result = await dispatcher.QueryAsync(query, cancellationToken);
 
         return Ok(result);

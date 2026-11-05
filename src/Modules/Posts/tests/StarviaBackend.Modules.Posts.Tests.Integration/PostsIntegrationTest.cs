@@ -1,6 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
+using StarviaBackend.Modules.Posts.Core.Posts.Entities;
+using StarviaBackend.Modules.Posts.Core.Posts.Enums;
+using StarviaBackend.Modules.Posts.Core.Posts.Repositories;
 using StarviaBackend.Shared.Abstractions.Auth;
 using StarviaBackend.Shared.Abstractions.Exceptions;
 using StarviaBackend.Shared.Tests.Integration;
@@ -45,10 +49,29 @@ public abstract class PostsIntegrationTest : IntegrationTest<PostsApp>
     protected static async Task<List<Guid>> AddAttachmentsAsync(HttpClient client, Guid postId, int count)
     {
         var fileIds = Enumerable.Range(0, count).Select(_ => Guid.NewGuid()).ToList();
-        var response = await client.PostAsJsonAsync("/v1/posts/attachments", new { postId, fileIds });
+        var response = await client.PostAsJsonAsync("/v1/post-attachments/attachments", new { postId, fileIds });
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         var body = await response.Content.ReadFromJsonAsync<AttachmentIdsResponse>();
         return body!.PostAttachmentIds;
+    }
+
+    /// <summary>Publications have no write endpoint yet, so tests seed them through the module's repository.</summary>
+    protected async Task<Guid> SeedPublicationAsync(
+        Guid postId,
+        PostPublicationStatus status = PostPublicationStatus.Published,
+        Guid? userPlatformId = null)
+    {
+        using var scope = App.Services.CreateScope();
+        var repository = scope.ServiceProvider.GetRequiredService<IPostPublicationRepository>();
+        var publication = PostPublication.Create(
+            postId,
+            status,
+            userPlatformId ?? Guid.NewGuid(),
+            status == PostPublicationStatus.Published ? DateTime.UtcNow : null,
+            externalPostId: $"external-{Guid.NewGuid():N}");
+
+        await repository.AddAsync(publication);
+        return publication.Id;
     }
 
     protected static Task<HttpResponseMessage> DeleteWithBodyAsync(HttpClient client, string url, object body) =>
@@ -75,11 +98,28 @@ public abstract class PostsIntegrationTest : IntegrationTest<PostsApp>
         DateTime CreatedAt,
         string CreatedBy,
         DateTime? LastModifiedAt,
-        List<PostAttachmentResponse> PostAttachments);
+        List<PostAttachmentResponse> PostAttachments,
+        List<PostPublicationResponse> PostPublications);
+
+    protected sealed record PostPublicationResponse(
+        Guid Id,
+        Guid PostId,
+        int Status,
+        Guid UserPlatformId,
+        DateTime? PublishedAt,
+        string? ExternalPostId,
+        DateTime CreatedAt);
 
     protected sealed record PagedPostsResponse(List<PostSummaryResponse> Items, int Page, int PageSize, long TotalCount);
 
-    protected sealed record PostSummaryResponse(Guid Id, string Title, DateTime CreatedAt, string CreatedBy);
+    protected sealed record PostSummaryResponse(
+        Guid Id,
+        string Title,
+        int Status,
+        DateTime CreatedAt,
+        string CreatedBy,
+        DateTime? LastModifiedAt,
+        int AttachmentsCount);
 }
 
 [CollectionDefinition(PostsCollection.Name)]
