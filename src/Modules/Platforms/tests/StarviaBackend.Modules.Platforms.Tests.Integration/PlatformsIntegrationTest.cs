@@ -1,8 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using FluentAssertions;
 using StarviaBackend.Shared.Abstractions.Auth;
 using StarviaBackend.Shared.Abstractions.Exceptions;
+using StarviaBackend.Shared.Abstractions.Platforms;
+using StarviaBackend.Shared.Infrastructure.Serialization;
 using StarviaBackend.Shared.Tests.Integration;
 
 namespace StarviaBackend.Modules.Platforms.Tests.Integration;
@@ -15,10 +18,15 @@ namespace StarviaBackend.Modules.Platforms.Tests.Integration;
 [Collection(PlatformsCollection.Name)]
 public abstract class PlatformsIntegrationTest(PlatformsApp app) : IntegrationTest<PlatformsApp>(app)
 {
-    // Numeric values of StarviaBackend.Shared.Abstractions.Platforms.PlatformType.
-    protected const int LinkedIn = 0;
-    protected const int Facebook = 1;
-    protected const int Instagram = 2;
+    protected static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new PlatformTypeJsonConverter() },
+    };
+
+    protected const PlatformType LinkedIn = PlatformType.LinkedIn;
+    protected const PlatformType Facebook = PlatformType.Facebook;
+    protected const PlatformType Instagram = PlatformType.Instagram;
 
     protected HttpClient CreateUserClient(Guid? userId = null) =>
         CreateClient(userId ?? Guid.NewGuid(), UserRoles.User);
@@ -27,11 +35,11 @@ public abstract class PlatformsIntegrationTest(PlatformsApp app) : IntegrationTe
 
     protected static async Task<List<PlatformResponse>> GetPlatformsAsync(HttpClient client)
     {
-        var page = await client.GetFromJsonAsync<PagedResponse<PlatformResponse>>("/v1/platforms?pageSize=100");
+        var page = await client.GetFromJsonAsync<PagedResponse<PlatformResponse>>("/v1/platforms?pageSize=100", JsonOptions);
         return page!.Items;
     }
 
-    protected static async Task<Guid> GetPlatformIdAsync(HttpClient client, int platformType) =>
+    protected static async Task<Guid> GetPlatformIdAsync(HttpClient client, PlatformType platformType) =>
         (await GetPlatformsAsync(client)).Single(p => p.PlatformType == platformType).Id;
 
     /// <summary>The add endpoint binds <c>[FromForm]</c>, so it takes a url-encoded form, not JSON.</summary>
@@ -63,26 +71,26 @@ public abstract class PlatformsIntegrationTest(PlatformsApp app) : IntegrationTe
     {
         var response = await PostUserPlatformAsync(client, platformId, accountUserName, accountComment);
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var body = await response.Content.ReadFromJsonAsync<UserPlatformIdResponse>();
+        var body = await response.Content.ReadFromJsonAsync<UserPlatformIdResponse>(JsonOptions);
         return body!.UserPlatformId;
     }
 
     protected static async Task AssertErrorCodeAsync(HttpResponseMessage response, HttpStatusCode status, string code)
     {
         response.StatusCode.Should().Be(status);
-        var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+        var error = await response.Content.ReadFromJsonAsync<ErrorResponse>(JsonOptions);
         error!.Errors.Should().Contain(e => e.Code == code);
     }
 
     protected sealed record PagedResponse<T>(List<T> Items, int Page, int PageSize, long TotalCount);
 
-    protected sealed record PlatformResponse(Guid Id, int PlatformType, bool IsOnline);
+    protected sealed record PlatformResponse(Guid Id, PlatformType PlatformType, bool IsOnline);
 
     protected sealed record UserPlatformIdResponse(Guid UserPlatformId);
 
     protected sealed record UserPlatformResponse(
         Guid Id,
-        int PlatformType,
+        PlatformType PlatformType,
         string AccountUsername,
         DateTime CreatedAt,
         string? ExternalAccountId,

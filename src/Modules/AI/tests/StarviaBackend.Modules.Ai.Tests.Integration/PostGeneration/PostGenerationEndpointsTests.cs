@@ -6,6 +6,7 @@ using Microsoft.Extensions.AI;
 using StarviaBackend.Modules.Ai.Application.PostGeneration;
 using StarviaBackend.Modules.Ai.Core.Chats.Enums;
 using StarviaBackend.Modules.Ai.Infrastructure.GoogleAiStudio;
+using StarviaBackend.Shared.Abstractions.Platforms;
 
 namespace StarviaBackend.Modules.Ai.Tests.Integration.PostGeneration;
 
@@ -91,6 +92,7 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
         request.Options.MaxOutputTokens.Should().Be(PostGenerationPrompt.MaxTokens);
         request.Messages.Select(m => (m.Role, m.Text)).Should().Equal(
             (ChatRole.System, PostGenerationPrompt.Instructions),
+            (ChatRole.System, PostGenerationPrompt.PlatformContextOf([PlatformType.LinkedIn])),
             (ChatRole.System, PostGenerationPrompt.CurrentContentOf($"Body of {postId}")),
             (ChatRole.User, "A post about coffee"));
     }
@@ -162,6 +164,7 @@ public sealed class PostGenerationEndpointsTests(AiApp app) : AiIntegrationTest(
         var followUp = TextModel.Requests.Should().HaveCount(2).And.Subject.Last();
         followUp.Messages.Select(m => (m.Role, m.Text)).Should().Equal(
             (ChatRole.System, PostGenerationPrompt.Instructions),
+            (ChatRole.System, PostGenerationPrompt.PlatformContextOf([PlatformType.LinkedIn])),
             (ChatRole.System, PostGenerationPrompt.CurrentContentOf($"Body of {postId}")),
             (ChatRole.User, "Make it shorter"));
     }

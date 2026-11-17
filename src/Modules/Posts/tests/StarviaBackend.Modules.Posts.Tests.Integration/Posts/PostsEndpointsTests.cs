@@ -60,7 +60,10 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
         var anonymous = App.CreateClient();
 
         // Act
-        var response = await anonymous.PostAsJsonAsync("/v1/posts", new { title = UniqueTitle() });
+        var response = await anonymous.PostAsJsonAsync(
+            "/v1/posts",
+            new { title = UniqueTitle(), platforms = new[] { PlatformType.LinkedIn } },
+            JsonOptions);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
