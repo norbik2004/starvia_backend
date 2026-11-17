@@ -38,6 +38,7 @@ internal sealed class BrowsePostsHandler(PostReadDbContext dbContext, IPostAcces
                 p.Id,
                 p.Title,
                 p.Status,
+                p.Platforms,
                 p.CreatedAt,
                 p.CreatedBy,
                 p.LastModifiedAt,
@@ -67,6 +68,17 @@ internal sealed class BrowsePostsHandler(PostReadDbContext dbContext, IPostAcces
         if (query.Status is { } status)
         {
             posts = posts.Where(p => p.Status == status);
+        }
+
+        if (query.PlatformTypes is { Count: > 0 } platformTypes)
+        {
+            // Platforms is jsonb of enum ints (e.g. [0,2]); match posts containing any requested type.
+            var needles = platformTypes.Select(p => $"[{(int)p}]").ToArray();
+            posts = posts.Where(p =>
+                needles.Any(needle =>
+                    Microsoft.EntityFrameworkCore.EF.Functions.JsonContains(
+                        Microsoft.EntityFrameworkCore.EF.Property<string>(p, nameof(PostReadModel.Platforms)),
+                        needle)));
         }
 
         if (query.Search is { } search)

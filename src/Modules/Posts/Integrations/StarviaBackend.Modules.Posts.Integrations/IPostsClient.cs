@@ -1,3 +1,5 @@
+using StarviaBackend.Shared.Abstractions.Platforms;
+
 namespace StarviaBackend.Modules.Posts.Integrations;
 
 /// <summary>
@@ -13,4 +15,9 @@ public interface IPostsClient
 }
 
 /// <summary>Domain-shaped post returned by the posts integration.</summary>
-public sealed record PostSummary(Guid Id, string Title, string Body, DateTime CreatedAt);
+public sealed record PostSummary(
+    Guid Id,
+    string Title,
+    string Body,
+    IReadOnlyList<PlatformType> Platforms,
+    DateTime CreatedAt);

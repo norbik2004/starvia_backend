@@ -14,7 +14,7 @@ internal sealed class BrowsePostsEndpoint(IDispatcher dispatcher) : EndpointBase
     [HttpGet(PostsEndpoint.BasePath)]
     [SwaggerOperation(
         Summary = "Browse posts",
-        Description = "Admins see all posts, other users only their own. Supports filtering by status, title text and creator, and sorting.",
+        Description = "Admins see all posts, other users only their own. Supports filtering by status, platforms (comma-separated names, e.g. Facebook,Instagram,LinkedIn), title text and creator, and sorting.",
         Tags = [PostsEndpoint.Tag])]
     [ProducesResponseType(typeof(PagedResult<PostDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

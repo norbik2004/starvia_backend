@@ -4,6 +4,8 @@ using StarviaBackend.Modules.Ai.Core.Chats.Entities;
 using StarviaBackend.Modules.Ai.Core.Chats.Enums;
 using StarviaBackend.Modules.Ai.Core.Chats.Exceptions;
 using StarviaBackend.Modules.Ai.Core.Chats.Repositories;
+using StarviaBackend.Modules.Brands.Integrations;
+using StarviaBackend.Modules.Brands.Integrations.Models;
 using StarviaBackend.Modules.Posts.Integrations;
 using StarviaBackend.Shared.Abstractions.Commands;
 using StarviaBackend.Shared.Abstractions.Time;
@@ -15,6 +17,7 @@ namespace StarviaBackend.Modules.Ai.Application.PostGeneration.Commands.Generate
 internal sealed class GeneratePostHandler(
     IChatRepository chatRepository,
     IPostsClient postsClient,
+    IBrandsClient brandsClient,
     IChatClient chatClient,
     IClock clock)
     : ICommandHandler<GeneratePostCommand, GeneratePostResult>
@@ -27,6 +30,14 @@ internal sealed class GeneratePostHandler(
 
         var posts = await postsClient.GetPostsAsync(command.UserId, [request.PostId], cancellationToken);
         var post = posts.Single();
+
+        string? brandContext = null;
+        if (request.BrandProfileId is { } brandProfileId)
+        {
+            var profile = await brandsClient.GetProfileAsync(command.UserId, brandProfileId, cancellationToken);
+            var generation = MergeGeneration(profile.GenerationDefaults, request.GenerationOverrides);
+            brandContext = PostGenerationPrompt.BrandContextOf(profile, generation);
+        }
 
         var chat = await chatRepository.GetByPostIdAsync(request.PostId, cancellationToken);
         var isNewChat = chat is null;
@@ -49,12 +60,22 @@ internal sealed class GeneratePostHandler(
 
         chat.AddUserMessage(request.Prompt, clock.UtcNow);
 
+        List<ModelMessage> messages =
+        [
+            new ModelMessage(ChatRole.System, PostGenerationPrompt.Instructions),
+            new ModelMessage(ChatRole.System, PostGenerationPrompt.PlatformContextOf(post.Platforms)),
+            new ModelMessage(ChatRole.System, PostGenerationPrompt.CurrentContentOf(post.Body)),
+        ];
+
+        if (brandContext is not null)
+        {
+            messages.Add(new ModelMessage(ChatRole.System, brandContext));
+        }
+
+        messages.Add(new ModelMessage(ChatRole.User, request.Prompt));
+
         var response = await chatClient.GetResponseAsync(
-            [
-                new ModelMessage(ChatRole.System, PostGenerationPrompt.Instructions),
-                new ModelMessage(ChatRole.System, PostGenerationPrompt.CurrentContentOf(post.Body)),
-                new ModelMessage(ChatRole.User, request.Prompt),
-            ],
+            messages,
             new ChatOptions
             {
                 ResponseFormat = ChatResponseFormat.Json,
@@ -94,10 +115,16 @@ internal sealed class GeneratePostHandler(
             outputTokens);
     }
 
-    /// <summary>The library counts tokens as <see cref="long"/>; a single answer never comes near the int range.</summary>
+    private static BrandGenerationDefaults MergeGeneration(
+        BrandGenerationDefaults? defaults,
+        BrandGenerationDefaults? overrides) =>
+        new(
+            overrides?.PostType ?? defaults?.PostType,
+            overrides?.Goal ?? defaults?.Goal,
+            overrides?.Language ?? defaults?.Language);
+
     private static int? ToTokenCount(long? count) => count is { } value ? (int)Math.Min(value, int.MaxValue) : null;
 
-    /// <summary>Providers can report long versioned model names. A name that does not fit must not lose the answer.</summary>
     private static string FitModelName(string model) =>
         model.Length <= StoredMessage.MaxModelLength ? model : model[..StoredMessage.MaxModelLength];
 }

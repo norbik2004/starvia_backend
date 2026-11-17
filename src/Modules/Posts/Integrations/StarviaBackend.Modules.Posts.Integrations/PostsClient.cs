@@ -1,7 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using StarviaBackend.Modules.Posts.Integrations.External;
 using StarviaBackend.Shared.Infrastructure.Integrations;
+using StarviaBackend.Shared.Infrastructure.Serialization;
 
 namespace StarviaBackend.Modules.Posts.Integrations;
 
@@ -12,6 +14,12 @@ namespace StarviaBackend.Modules.Posts.Integrations;
 /// </summary>
 internal sealed class PostsClient(HttpClient httpClient) : IPostsClient
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new PlatformTypeJsonConverter() },
+    };
+
     public async Task<IReadOnlyList<PostSummary>> GetPostsAsync(
         Guid userId,
         IEnumerable<Guid> postIds,
@@ -46,7 +54,7 @@ internal sealed class PostsClient(HttpClient httpClient) : IPostsClient
             throw await response.ToFailureAsync(FailureRules(postId), cancellationToken);
         }
 
-        var payload = await response.Content.ReadFromJsonAsync<PostApiResponse>(cancellationToken)
+        var payload = await response.Content.ReadFromJsonAsync<PostApiResponse>(JsonOptions, cancellationToken)
                       ?? throw new PostsIntegrationException("Posts API returned an empty body.");
 
         if (!IsOwner(payload.CreatedBy, userId))
@@ -54,7 +62,12 @@ internal sealed class PostsClient(HttpClient httpClient) : IPostsClient
             throw NotOwner(postId);
         }
 
-        return new PostSummary(payload.Id, payload.Title, payload.Body, payload.CreatedAt);
+        return new PostSummary(
+            payload.Id,
+            payload.Title,
+            payload.Body,
+            payload.Platforms ?? [],
+            payload.CreatedAt);
     }
 
     private static IntegrationFailureRules FailureRules(Guid postId) =>

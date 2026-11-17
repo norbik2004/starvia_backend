@@ -22,7 +22,8 @@ internal class UpdatePostHandler(IPostRepository postRepository, IPostAccessServ
         post.Update(
             command.request.Title,
             command.request.Body,
-            command.request.Status);
+            command.request.Status,
+            command.request.Platforms);
 
         await postRepository.UpdateAsync(post);
 

@@ -1,4 +1,5 @@
 using StarviaBackend.Modules.Posts.Integrations;
+using StarviaBackend.Shared.Abstractions.Platforms;
 
 namespace StarviaBackend.Modules.Ai.Tests.Unit.Fakes;
 
@@ -31,7 +32,7 @@ internal sealed class FakePostsClient : IPostsClient
                 throw new PostsIntegrationNotOwnerException($"User is not the owner of post '{postId}'.");
             }
 
-            posts.Add(new PostSummary(postId, $"Post {postId}", $"Body of {postId}", DateTime.UtcNow));
+            posts.Add(new PostSummary(postId, $"Post {postId}", $"Body of {postId}", [PlatformType.LinkedIn], DateTime.UtcNow));
         }
 
         return Task.FromResult<IReadOnlyList<PostSummary>>(posts);

@@ -1,5 +1,6 @@
 using StarviaBackend.Modules.Posts.Core.Posts.Entities;
 using StarviaBackend.Modules.Posts.Core.Posts.Repositories;
+using StarviaBackend.Shared.Abstractions.Platforms;
 
 namespace StarviaBackend.Modules.Posts.Tests.Unit.Fakes;
 
@@ -32,9 +33,9 @@ internal sealed class InMemoryPostRepository : IPostRepository
     }
 
     /// <summary>Seeds a post "created" by the given user, as the audit interceptor would.</summary>
-    public Post Seed(Guid ownerId, string title = "Seeded post")
+    public Post Seed(Guid ownerId, string title = "Seeded post", IReadOnlyList<PlatformType>? platforms = null)
     {
-        var post = Post.Create(title);
+        var post = Post.Create(title, platforms ?? [PlatformType.LinkedIn]);
         post.CreatedBy = ownerId.ToString();
         Posts.Add(post);
         return post;

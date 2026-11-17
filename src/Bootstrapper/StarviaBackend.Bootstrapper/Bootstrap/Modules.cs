@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Modules.Accounts.Api;
 using StarviaBackend.Modules.Ai.Api;
+using StarviaBackend.Modules.Brands.Api;
 using StarviaBackend.Modules.Calendar.Api;
 using StarviaBackend.Modules.Emails.Api;
 using StarviaBackend.Modules.Media.Api;
@@ -25,6 +26,7 @@ internal static class Modules
         services.RegisterMediaModule();
         services.RegisterCalendarsModule(configuration);
         services.RegisterAiModule(configuration);
+        services.RegisterBrandsModule();
         return services;
     }
 }

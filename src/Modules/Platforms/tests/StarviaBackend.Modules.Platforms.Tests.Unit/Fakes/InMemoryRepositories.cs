@@ -1,5 +1,5 @@
 using StarviaBackend.Modules.Platforms.Core.Platforms.Entities;
-using StarviaBackend.Modules.Platforms.Core.Platforms.Enums;
+using StarviaBackend.Shared.Abstractions.Platforms;
 using StarviaBackend.Modules.Platforms.Core.Platforms.Repositories;
 
 namespace StarviaBackend.Modules.Platforms.Tests.Unit.Fakes;

@@ -1,5 +1,6 @@
 using StarviaBackend.Modules.Posts.Core.Posts.Access;
 using StarviaBackend.Shared.Abstractions.Exceptions;
+using StarviaBackend.Shared.Abstractions.Platforms;
 
 namespace StarviaBackend.Modules.Posts.Core.Posts.Exceptions;
 
@@ -14,4 +15,10 @@ internal sealed class PostAccessDeniedException(Guid postId, PostAction action)
     : ForbiddenException($"You are not allowed to {action} post '{postId}'")
 {
     public override string Code => "post_access_denied";
+}
+
+internal sealed class DuplicatePlatformTypeException(PlatformType platformType)
+    : BusinessException($"Platform type '{platformType}' is selected more than once")
+{
+    public override string Code => "duplicate_platform_type";
 }

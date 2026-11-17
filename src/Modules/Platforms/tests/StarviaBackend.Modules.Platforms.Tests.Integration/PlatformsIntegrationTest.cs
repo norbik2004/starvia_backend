@@ -15,7 +15,7 @@ namespace StarviaBackend.Modules.Platforms.Tests.Integration;
 [Collection(PlatformsCollection.Name)]
 public abstract class PlatformsIntegrationTest(PlatformsApp app) : IntegrationTest<PlatformsApp>(app)
 {
-    // Numeric values of StarviaBackend.Modules.Platforms.Core.Platforms.Enums.PlatformType.
+    // Numeric values of StarviaBackend.Shared.Abstractions.Platforms.PlatformType.
     protected const int LinkedIn = 0;
     protected const int Facebook = 1;
     protected const int Instagram = 2;

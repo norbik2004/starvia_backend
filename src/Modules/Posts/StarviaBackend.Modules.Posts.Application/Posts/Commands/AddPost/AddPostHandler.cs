@@ -12,7 +12,7 @@ internal sealed class AddPostHandler(IPostRepository postRepository) : ICommandH
 {
     public async Task<AddPostResult> HandleAsync(AddPostCommand command, CancellationToken cancellationToken = default)
     {
-        var post = Post.Create(command.request.Title);
+        var post = Post.Create(command.request.Title, command.request.Platforms);
 
         await postRepository.AddAsync(post);
 

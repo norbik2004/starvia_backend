@@ -5,6 +5,7 @@ using StarviaBackend.Modules.Posts.Application.Posts.Commands.UpdatePost;
 using StarviaBackend.Modules.Posts.Core.Posts.Enums;
 using StarviaBackend.Modules.Posts.Core.Posts.Exceptions;
 using StarviaBackend.Modules.Posts.Tests.Unit.Fakes;
+using StarviaBackend.Shared.Abstractions.Platforms;
 
 namespace StarviaBackend.Modules.Posts.Tests.Unit.Handlers;
 
@@ -16,7 +17,9 @@ public sealed class AddPostHandlerTests
         // Arrange
         var repository = new InMemoryPostRepository();
         var handler = new AddPostHandler(repository);
-        var command = new AddPostCommand(new AddPostRequest("Launch announcement"), Guid.NewGuid());
+        var command = new AddPostCommand(
+            new AddPostRequest("Launch announcement", [PlatformType.LinkedIn, PlatformType.Facebook]),
+            Guid.NewGuid());
 
         // Act
         var result = await handler.HandleAsync(command);
@@ -26,6 +29,7 @@ public sealed class AddPostHandlerTests
         result.PostId.Should().Be(stored.Id);
         stored.Title.Should().Be("Launch announcement");
         stored.Status.Should().Be(PostStatus.Draft);
+        stored.Platforms.Should().Equal(PlatformType.LinkedIn, PlatformType.Facebook);
     }
 }
 
@@ -38,7 +42,7 @@ public sealed class UpdatePostHandlerTests
         new(_repository, TestAccess.For(actingUserId ?? _ownerId, isAdmin));
 
     private static UpdatePostCommand Command(Guid postId, Guid userId) =>
-        new(new UpdatePostRequest(postId, "Updated title", "Updated body", PostStatus.Done), userId);
+        new(new UpdatePostRequest(postId, "Updated title", "Updated body", PostStatus.Done, [PlatformType.Instagram]), userId);
 
     [Fact]
     public async Task HandleAsync_WhenPostDoesNotExist_Throws()
@@ -80,6 +84,7 @@ public sealed class UpdatePostHandlerTests
         post.Title.Should().Be("Updated title");
         post.Body.Should().Be("Updated body");
         post.Status.Should().Be(PostStatus.Done);
+        post.Platforms.Should().Equal(PlatformType.Instagram);
         _repository.Updated.Should().ContainSingle().Which.Should().BeSameAs(post);
     }
 

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using StarviaBackend.Modules.Platforms.Core.Platforms.Enums;
+using StarviaBackend.Shared.Abstractions.Platforms;
 
 namespace StarviaBackend.Modules.Platforms.Infrastructure.EF.Platforms.Configurations.Read.Models;
 

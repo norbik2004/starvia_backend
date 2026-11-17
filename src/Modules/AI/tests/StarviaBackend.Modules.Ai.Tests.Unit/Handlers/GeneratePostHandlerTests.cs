@@ -6,6 +6,7 @@ using StarviaBackend.Modules.Ai.Core.Chats.Enums;
 using StarviaBackend.Modules.Ai.Infrastructure.GoogleAiStudio;
 using StarviaBackend.Modules.Ai.Tests.Unit.Fakes;
 using StarviaBackend.Modules.Posts.Integrations;
+using StarviaBackend.Shared.Abstractions.Platforms;
 
 namespace StarviaBackend.Modules.Ai.Tests.Unit.Handlers;
 
@@ -15,13 +16,14 @@ public sealed class GeneratePostHandlerTests
 
     private readonly InMemoryChatRepository _chats = new();
     private readonly FakePostsClient _posts = new();
+    private readonly FakeBrandsClient _brands = new();
     private readonly FakeChatClient _model = new();
     private readonly FakeClock _clock = new(Now);
     private readonly Guid _userId = Guid.NewGuid();
     private readonly Guid _postId = Guid.NewGuid();
 
     private GeneratePostHandler CreateHandler() =>
-        new(_chats, _posts, _model, _clock);
+        new(_chats, _posts, _brands, _model, _clock);
 
     private GeneratePostCommand Command(string prompt = "A post about coffee", Guid? postId = null, Guid? userId = null) =>
         new(new GeneratePostRequest(prompt, postId ?? _postId), userId ?? _userId);
@@ -125,6 +127,7 @@ public sealed class GeneratePostHandlerTests
         request.Options.MaxOutputTokens.Should().Be(PostGenerationPrompt.MaxTokens);
         request.Messages.Select(m => (m.Role, m.Text)).Should().Equal(
             (ChatRole.System, PostGenerationPrompt.Instructions),
+            (ChatRole.System, PostGenerationPrompt.PlatformContextOf([PlatformType.LinkedIn])),
             (ChatRole.System, PostGenerationPrompt.CurrentContentOf($"Body of {_postId}")),
             (ChatRole.User, "A post about coffee"));
     }
@@ -145,6 +148,7 @@ public sealed class GeneratePostHandlerTests
         _chats.UpdateCalls.Should().Be(1);
         _model.Requests.Should().ContainSingle().Subject.Messages.Select(m => m.Text).Should().Equal(
             PostGenerationPrompt.Instructions,
+            PostGenerationPrompt.PlatformContextOf([PlatformType.LinkedIn]),
             PostGenerationPrompt.CurrentContentOf($"Body of {_postId}"),
             "Second prompt");
     }
