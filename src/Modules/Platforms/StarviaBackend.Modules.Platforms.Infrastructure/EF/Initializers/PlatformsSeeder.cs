@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StarviaBackend.Modules.Platforms.Core.Platforms.Entities;
 using StarviaBackend.Modules.Platforms.Infrastructure.EF.Contexts;
-using StarviaBackend.Modules.Platforms.Core.Platforms.Enums;
+using StarviaBackend.Shared.Abstractions.Platforms;
 
 namespace StarviaBackend.Modules.Platforms.Infrastructure.EF.Initializers;
 

@@ -18,8 +18,8 @@ public sealed class UserPlatformsAccessEndpointsTests(PlatformsApp app) : Platfo
         var id = await AddUserPlatformAsync(owner, await GetPlatformIdAsync(owner, Instagram), "myaccount", "Mine");
 
         // Act
-        var asOwner = await owner.GetFromJsonAsync<UserPlatformResponse>($"/v1/user-platforms/{id}");
-        var asAdmin = await CreateAdminClient().GetFromJsonAsync<UserPlatformResponse>($"/v1/user-platforms/{id}");
+        var asOwner = await owner.GetFromJsonAsync<UserPlatformResponse>($"/v1/user-platforms/{id}", JsonOptions);
+        var asAdmin = await CreateAdminClient().GetFromJsonAsync<UserPlatformResponse>($"/v1/user-platforms/{id}", JsonOptions);
 
         // Assert
         asOwner!.AccountUsername.Should().Be("myaccount");
@@ -76,7 +76,7 @@ public sealed class UserPlatformsAccessEndpointsTests(PlatformsApp app) : Platfo
         await AddUserPlatformAsync(CreateUserClient(), platformId, "otheraccount");
 
         // Act
-        var page = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?pageSize=100");
+        var page = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?pageSize=100", JsonOptions);
 
         // Assert
         page!.TotalCount.Should().Be(1);
@@ -93,7 +93,7 @@ public sealed class UserPlatformsAccessEndpointsTests(PlatformsApp app) : Platfo
         await AddUserPlatformAsync(other, await GetPlatformIdAsync(other, LinkedIn), "hiddenaccount");
 
         // Act
-        var page = await CreateUserClient().GetFromJsonAsync<PagedResponse<UserPlatformResponse>>($"/v1/user-platforms?ownerId={otherId}");
+        var page = await CreateUserClient().GetFromJsonAsync<PagedResponse<UserPlatformResponse>>($"/v1/user-platforms?ownerId={otherId}", JsonOptions);
 
         // Assert
         page!.Items.Should().BeEmpty();
@@ -112,7 +112,7 @@ public sealed class UserPlatformsAccessEndpointsTests(PlatformsApp app) : Platfo
 
         // Act
         var page = await CreateAdminClient()
-            .GetFromJsonAsync<PagedResponse<UserPlatformResponse>>($"/v1/user-platforms?ownerId={ownerId}");
+            .GetFromJsonAsync<PagedResponse<UserPlatformResponse>>($"/v1/user-platforms?ownerId={ownerId}", JsonOptions);
 
         // Assert
         page!.Items.Select(u => u.Id).Should().Equal(mine);
@@ -128,9 +128,9 @@ public sealed class UserPlatformsAccessEndpointsTests(PlatformsApp app) : Platfo
         var facebook = await AddUserPlatformAsync(owner, await GetPlatformIdAsync(owner, Facebook), "Janedoe");
 
         // Act
-        var byPlatform = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>($"/v1/user-platforms?platformType={Facebook}");
-        var byText = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?search=SMITH");
-        var none = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?search=nobody");
+        var byPlatform = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>($"/v1/user-platforms?platformType={Facebook}", JsonOptions);
+        var byText = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?search=SMITH", JsonOptions);
+        var none = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?search=nobody", JsonOptions);
 
         // Assert
         byPlatform!.Items.Select(u => u.Id).Should().Equal(facebook);
@@ -148,9 +148,9 @@ public sealed class UserPlatformsAccessEndpointsTests(PlatformsApp app) : Platfo
         var a = await AddUserPlatformAsync(owner, platformId, "aaaaccount");
 
         // Act
-        var ascending = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?sortBy=AccountUsername");
-        var descending = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?sortBy=AccountUsername&descending=true");
-        var past = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?page=50");
+        var ascending = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?sortBy=AccountUsername", JsonOptions);
+        var descending = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?sortBy=AccountUsername&descending=true", JsonOptions);
+        var past = await owner.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?page=50", JsonOptions);
 
         // Assert
         ascending!.Items.Select(u => u.Id).Should().Equal(a, b);
@@ -166,9 +166,9 @@ public sealed class UserPlatformsAccessEndpointsTests(PlatformsApp app) : Platfo
     {
         // Act
         var anonymous = App.CreateClient();
-        var facebook = await anonymous.GetFromJsonAsync<PagedResponse<PlatformResponse>>($"/v1/platforms?platformType={Facebook}");
-        var offline = await anonymous.GetFromJsonAsync<PagedResponse<PlatformResponse>>("/v1/platforms?isOnline=false");
-        var online = await anonymous.GetFromJsonAsync<PagedResponse<PlatformResponse>>("/v1/platforms?isOnline=true&pageSize=100");
+        var facebook = await anonymous.GetFromJsonAsync<PagedResponse<PlatformResponse>>($"/v1/platforms?platformType={Facebook}", JsonOptions);
+        var offline = await anonymous.GetFromJsonAsync<PagedResponse<PlatformResponse>>("/v1/platforms?isOnline=false", JsonOptions);
+        var online = await anonymous.GetFromJsonAsync<PagedResponse<PlatformResponse>>("/v1/platforms?isOnline=true&pageSize=100", JsonOptions);
 
         // Assert
         facebook!.Items.Should().ContainSingle().Which.PlatformType.Should().Be(Facebook);

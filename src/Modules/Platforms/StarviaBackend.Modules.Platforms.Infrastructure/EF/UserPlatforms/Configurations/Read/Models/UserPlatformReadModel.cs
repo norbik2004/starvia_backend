@@ -1,5 +1,5 @@
 using StarviaBackend.Modules.Platforms.Core.Platforms.Entities;
-using StarviaBackend.Modules.Platforms.Core.Platforms.Enums;
+using StarviaBackend.Shared.Abstractions.Platforms;
 using StarviaBackend.Modules.Platforms.Infrastructure.EF.Platforms.Configurations.Read.Models;
 
 namespace StarviaBackend.Modules.Platforms.Infrastructure.EF.UserPlatforms.Configurations.Read.Models;

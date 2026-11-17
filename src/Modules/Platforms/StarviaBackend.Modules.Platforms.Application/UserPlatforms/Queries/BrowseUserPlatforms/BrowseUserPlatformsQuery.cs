@@ -1,4 +1,4 @@
-using StarviaBackend.Modules.Platforms.Core.Platforms.Enums;
+using StarviaBackend.Shared.Abstractions.Platforms;
 using StarviaBackend.Shared.Abstractions.Queries;
 
 namespace StarviaBackend.Modules.Platforms.Application.UserPlatforms.Queries.BrowseUserPlatforms;

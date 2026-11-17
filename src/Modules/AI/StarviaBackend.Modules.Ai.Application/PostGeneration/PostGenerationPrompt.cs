@@ -1,3 +1,7 @@
+using System.Text;
+using System.Text.Json;
+using StarviaBackend.Modules.Brands.Integrations.Models;
+using StarviaBackend.Shared.Abstractions.Platforms;
 using StarviaBackend.Shared.Abstractions.Posts;
 
 namespace StarviaBackend.Modules.Ai.Application.PostGeneration;
@@ -22,7 +26,8 @@ internal static class PostGenerationPrompt
 
         Rules:
         - Write in the language of the user's request, unless the user asks for another language.
-        - Follow the platform, tone and audience the user describes. When they are not given, write a friendly, professional post for a general social media audience.
+        - Follow the target platform from PLATFORM CONTEXT when present. Adapt length, tone and formatting to that network.
+        - Follow the brand tone and audience when BRAND PROFILE CONTEXT is present. Prefer them over generic assumptions.
         - Use only the facts the user provided. Never invent statistics, prices, dates, offers or quotes.
         - The body may have at most {{MaxBodyLength - 25}} characters, including hashtags and emojis. Never go over this limit !IMPORTANT!.
         - You always receive the current post body in a message marked CURRENT POST CONTENT. Use it as the starting point.
@@ -46,4 +51,50 @@ internal static class PostGenerationPrompt
         {body}
         CURRENT_POST_BODY>>>
         """;
+
+    /// <summary>Tells the model which social networks this post is written for.</summary>
+    public static string PlatformContextOf(IReadOnlyList<PlatformType> platforms)
+    {
+        var names = string.Join(", ", platforms);
+        return $"""
+            PLATFORM CONTEXT
+            Write this post for: {names}. Adapt length, tone, formatting and hashtag style so the draft works across these platforms.
+
+            <<<TARGET_PLATFORMS
+            {names}
+            TARGET_PLATFORMS>>>
+            """;
+    }
+
+    /// <summary>Injects a brand profile brief, platforms and merged generation settings into the model context.</summary>
+    public static string BrandContextOf(BrandProfileSummary profile, BrandGenerationDefaults generation)
+    {
+        var payload = new
+        {
+            profile = new
+            {
+                profile.Name,
+                profile.Brief,
+                platforms = profile.Platforms,
+            },
+            generation,
+        };
+
+        var json = JsonSerializer.Serialize(payload, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = false,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+        });
+
+        var builder = new StringBuilder();
+        builder.AppendLine("BRAND PROFILE CONTEXT");
+        builder.AppendLine("Use this brand brief and generation settings when writing the post. Prefer them over generic assumptions.");
+        builder.AppendLine("The brand platforms list describes which networks the brand covers; the post PLATFORM CONTEXT is the target for this draft.");
+        builder.AppendLine();
+        builder.AppendLine("<<<BRAND_PROFILE");
+        builder.AppendLine(json);
+        builder.Append("BRAND_PROFILE>>>");
+        return builder.ToString();
+    }
 }

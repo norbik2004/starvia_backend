@@ -33,8 +33,8 @@ public sealed class PlatformsEndpointsTests(PlatformsApp app) : PlatformsIntegra
         var client = CreateUserClient();
 
         // Act
-        var first = await client.GetFromJsonAsync<PagedResponse<PlatformResponse>>("/v1/platforms?page=1&pageSize=2");
-        var second = await client.GetFromJsonAsync<PagedResponse<PlatformResponse>>("/v1/platforms?page=2&pageSize=2");
+        var first = await client.GetFromJsonAsync<PagedResponse<PlatformResponse>>("/v1/platforms?page=1&pageSize=2", JsonOptions);
+        var second = await client.GetFromJsonAsync<PagedResponse<PlatformResponse>>("/v1/platforms?page=2&pageSize=2", JsonOptions);
 
         // Assert
         first!.TotalCount.Should().Be(3);
@@ -169,7 +169,7 @@ public sealed class PlatformsEndpointsTests(PlatformsApp app) : PlatformsIntegra
 
         // Act
         var page = await CreateAdminClient()
-            .GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?pageSize=100");
+            .GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?pageSize=100", JsonOptions);
 
         // Assert
         var listed = page!.Items.Should().ContainSingle(u => u.Id == userPlatformId).Subject;
@@ -191,7 +191,7 @@ public sealed class PlatformsEndpointsTests(PlatformsApp app) : PlatformsIntegra
         var admin = CreateAdminClient();
 
         // Act
-        var page = await admin.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?page=1&pageSize=1");
+        var page = await admin.GetFromJsonAsync<PagedResponse<UserPlatformResponse>>("/v1/user-platforms?page=1&pageSize=1", JsonOptions);
 
         // Assert
         page!.Items.Should().ContainSingle();

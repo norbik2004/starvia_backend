@@ -19,6 +19,8 @@
     <ProjectReference Include="..\..\Modules\AI\StarviaBackend.Modules.Ai.Infrastructure\StarviaBackend.Modules.Ai.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Calendar\StarviaBackend.Modules.Calendar.Api\StarviaBackend.Modules.Calendar.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Calendar\StarviaBackend.Modules.Calendar.Infrastructure\StarviaBackend.Modules.Calendar.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Brands\StarviaBackend.Modules.Brands.Api\StarviaBackend.Modules.Brands.Api.csproj" />
+    <ProjectReference Include="..\..\Modules\Brands\StarviaBackend.Modules.Brands.Infrastructure\StarviaBackend.Modules.Brands.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Media\StarviaBackend.Modules.Media.Api\StarviaBackend.Modules.Media.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Media\StarviaBackend.Modules.Media.Infrastructure\StarviaBackend.Modules.Media.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Platforms\StarviaBackend.Modules.Platforms.Api\StarviaBackend.Modules.Platforms.Api.csproj" />

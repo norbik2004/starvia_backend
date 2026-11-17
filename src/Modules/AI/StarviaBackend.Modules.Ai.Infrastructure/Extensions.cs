@@ -8,6 +8,7 @@ using StarviaBackend.Modules.Ai.Infrastructure.EF.Contexts;
 using StarviaBackend.Modules.Ai.Infrastructure.EF.Initializers;
 using StarviaBackend.Modules.Ai.Infrastructure.GoogleAiStudio;
 using StarviaBackend.Modules.Ai.Infrastructure.OpenRouter;
+using StarviaBackend.Modules.Brands.Integrations;
 using StarviaBackend.Modules.Posts.Integrations;
 using StarviaBackend.Shared.Infrastructure.Cqrs;
 using StarviaBackend.Shared.Infrastructure.Postgres;
@@ -30,6 +31,7 @@ internal static class Extensions
         services.AddOpenRouter(configuration);
 
         services.AddPostsIntegration(configuration);
+        services.AddBrandsIntegration(configuration);
 
         services.AddHostedService<AiDataInitializer>();
 

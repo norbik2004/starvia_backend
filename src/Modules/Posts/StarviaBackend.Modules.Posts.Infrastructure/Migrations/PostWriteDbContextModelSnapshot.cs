@@ -44,6 +44,10 @@ namespace StarviaBackend.Modules.Posts.Infrastructure.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
 
+                    b.Property<string>("Platforms")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 

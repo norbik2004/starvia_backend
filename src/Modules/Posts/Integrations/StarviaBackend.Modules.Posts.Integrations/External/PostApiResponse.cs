@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using StarviaBackend.Shared.Abstractions.Platforms;
 
 namespace StarviaBackend.Modules.Posts.Integrations.External;
 
@@ -15,6 +16,9 @@ internal sealed record PostApiResponse
 
     [JsonPropertyName("body")]
     public string Body { get; init; } = string.Empty;
+
+    [JsonPropertyName("platforms")]
+    public IReadOnlyList<PlatformType> Platforms { get; init; } = [];
 
     [JsonPropertyName("createdAt")]
     public DateTime CreatedAt { get; init; }

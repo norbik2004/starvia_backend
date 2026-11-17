@@ -3,6 +3,7 @@ using StarviaBackend.Modules.Posts.Application.Posts.Commands.AddPost;
 using StarviaBackend.Modules.Posts.Application.Posts.Commands.RemovePost;
 using StarviaBackend.Modules.Posts.Application.Posts.Commands.UpdatePost;
 using StarviaBackend.Modules.Posts.Core.Posts.Enums;
+using StarviaBackend.Shared.Abstractions.Platforms;
 using StarviaBackend.Shared.Abstractions.Posts;
 
 namespace StarviaBackend.Modules.Posts.Tests.Unit.Validators;
@@ -11,12 +12,36 @@ public sealed class AddPostValidatorTests
 {
     private readonly AddPostValidator _validator = new();
 
-    private static AddPostCommand Command(string title) => new(new AddPostRequest(title), Guid.NewGuid());
+    private static AddPostCommand Command(
+        string title,
+        IReadOnlyList<PlatformType>? platforms = null) =>
+        new(new AddPostRequest(title, platforms ?? [PlatformType.LinkedIn]), Guid.NewGuid());
 
     [Fact]
     public void Valid_title_passes()
     {
         _validator.TestValidate(Command("A fine title")).ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public void Empty_platforms_fails()
+    {
+        _validator.TestValidate(Command("A fine title", []))
+            .ShouldHaveValidationErrorFor(x => x.request.Platforms);
+    }
+
+    [Fact]
+    public void Undefined_platform_type_fails()
+    {
+        _validator.TestValidate(Command("A fine title", [(PlatformType)99]))
+            .ShouldHaveValidationErrorFor("request.Platforms[0]");
+    }
+
+    [Fact]
+    public void Duplicate_platforms_fail()
+    {
+        _validator.TestValidate(Command("A fine title", [PlatformType.LinkedIn, PlatformType.LinkedIn]))
+            .ShouldHaveValidationErrorFor(x => x.request.Platforms);
     }
 
     [Theory]
@@ -43,8 +68,9 @@ public sealed class UpdatePostValidatorTests
     private static UpdatePostCommand Command(
         string title = "A fine title",
         string body = "Body",
-        PostStatus status = PostStatus.Draft) =>
-        new(new UpdatePostRequest(Guid.NewGuid(), title, body, status), Guid.NewGuid());
+        PostStatus status = PostStatus.Draft,
+        IReadOnlyList<PlatformType>? platforms = null) =>
+        new(new UpdatePostRequest(Guid.NewGuid(), title, body, status, platforms ?? [PlatformType.LinkedIn]), Guid.NewGuid());
 
     [Fact]
     public void Valid_request_passes()
@@ -77,6 +103,20 @@ public sealed class UpdatePostValidatorTests
     public void Undefined_status_fails()
     {
         _validator.TestValidate(Command(status: (PostStatus)99)).ShouldHaveValidationErrorFor(x => x.request.Status);
+    }
+
+    [Fact]
+    public void Empty_platforms_fails()
+    {
+        _validator.TestValidate(Command(platforms: []))
+            .ShouldHaveValidationErrorFor(x => x.request.Platforms);
+    }
+
+    [Fact]
+    public void Undefined_platform_type_fails()
+    {
+        _validator.TestValidate(Command(platforms: [(PlatformType)99]))
+            .ShouldHaveValidationErrorFor("request.Platforms[0]");
     }
 }
 

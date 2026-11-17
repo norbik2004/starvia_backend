@@ -13,6 +13,7 @@ using StarviaBackend.Shared.Infrastructure.Email;
 using StarviaBackend.Shared.Infrastructure.Exceptions;
 using StarviaBackend.Shared.Infrastructure.Postgres;
 using StarviaBackend.Shared.Infrastructure.Api;
+using StarviaBackend.Shared.Infrastructure.Serialization;
 using StarviaBackend.Shared.Infrastructure.Time;
 
 namespace StarviaBackend.Shared.Infrastructure;
@@ -40,6 +41,8 @@ public static class Extensions
             policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
         services.AddControllers()
+            .AddJsonOptions(options =>
+                options.JsonSerializerOptions.Converters.Add(new PlatformTypeJsonConverter()))
             .ConfigureApplicationPartManager(manager =>
                 manager.FeatureProviders.Add(new InternalControllerFeatureProvider()));
 

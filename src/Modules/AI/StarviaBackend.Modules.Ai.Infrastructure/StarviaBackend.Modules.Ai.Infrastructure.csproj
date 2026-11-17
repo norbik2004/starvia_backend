@@ -21,6 +21,7 @@
     <ProjectReference Include="..\StarviaBackend.Modules.Ai.Application\StarviaBackend.Modules.Ai.Application.csproj" />
     <ProjectReference Include="..\StarviaBackend.Modules.Ai.Core\StarviaBackend.Modules.Ai.Core.csproj" />
     <ProjectReference Include="..\..\Posts\Integrations\StarviaBackend.Modules.Posts.Integrations\StarviaBackend.Modules.Posts.Integrations.csproj" />
+    <ProjectReference Include="..\..\Brands\Integrations\StarviaBackend.Modules.Brands.Integrations\StarviaBackend.Modules.Brands.Integrations.csproj" />
   </ItemGroup>
 
   <ItemGroup>

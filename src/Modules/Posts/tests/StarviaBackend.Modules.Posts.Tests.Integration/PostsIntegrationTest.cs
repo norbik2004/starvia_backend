@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Modules.Posts.Core.Posts.Entities;
@@ -7,6 +8,8 @@ using StarviaBackend.Modules.Posts.Core.Posts.Enums;
 using StarviaBackend.Modules.Posts.Core.Posts.Repositories;
 using StarviaBackend.Shared.Abstractions.Auth;
 using StarviaBackend.Shared.Abstractions.Exceptions;
+using StarviaBackend.Shared.Abstractions.Platforms;
+using StarviaBackend.Shared.Infrastructure.Serialization;
 using StarviaBackend.Shared.Tests.Integration;
 
 namespace StarviaBackend.Modules.Posts.Tests.Integration;
@@ -19,6 +22,12 @@ namespace StarviaBackend.Modules.Posts.Tests.Integration;
 [Collection(PostsCollection.Name)]
 public abstract class PostsIntegrationTest : IntegrationTest<PostsApp>
 {
+    protected static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new PlatformTypeJsonConverter() },
+    };
+
     protected PostsIntegrationTest(PostsApp app) : base(app)
     {
         app.Media.Reset();
@@ -31,11 +40,17 @@ public abstract class PostsIntegrationTest : IntegrationTest<PostsApp>
 
     protected static string UniqueTitle() => $"Post {Guid.NewGuid():N}";
 
-    protected static async Task<Guid> CreatePostAsync(HttpClient client, string? title = null)
+    protected static async Task<Guid> CreatePostAsync(
+        HttpClient client,
+        string? title = null,
+        IReadOnlyList<PlatformType>? platforms = null)
     {
-        var response = await client.PostAsJsonAsync("/v1/posts", new { title = title ?? UniqueTitle() });
+        var response = await client.PostAsJsonAsync(
+            "/v1/posts",
+            new { title = title ?? UniqueTitle(), platforms = platforms ?? [PlatformType.LinkedIn] },
+            JsonOptions);
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var body = await response.Content.ReadFromJsonAsync<PostIdResponse>();
+        var body = await response.Content.ReadFromJsonAsync<PostIdResponse>(JsonOptions);
         return body!.PostId;
     }
 
@@ -43,7 +58,7 @@ public abstract class PostsIntegrationTest : IntegrationTest<PostsApp>
     {
         var response = await client.GetAsync($"/v1/posts/{postId}");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        return (await response.Content.ReadFromJsonAsync<PostResponse>())!;
+        return (await response.Content.ReadFromJsonAsync<PostResponse>(JsonOptions))!;
     }
 
     protected static async Task<List<Guid>> AddAttachmentsAsync(HttpClient client, Guid postId, int count)
@@ -95,6 +110,7 @@ public abstract class PostsIntegrationTest : IntegrationTest<PostsApp>
         string Title,
         string Body,
         int Status,
+        List<PlatformType> Platforms,
         DateTime CreatedAt,
         string CreatedBy,
         DateTime? LastModifiedAt,
@@ -116,6 +132,7 @@ public abstract class PostsIntegrationTest : IntegrationTest<PostsApp>
         Guid Id,
         string Title,
         int Status,
+        List<PlatformType> Platforms,
         DateTime CreatedAt,
         string CreatedBy,
         DateTime? LastModifiedAt,

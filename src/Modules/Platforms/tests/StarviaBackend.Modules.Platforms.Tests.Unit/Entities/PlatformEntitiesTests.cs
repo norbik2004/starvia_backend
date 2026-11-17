@@ -1,6 +1,6 @@
 using FluentAssertions;
 using StarviaBackend.Modules.Platforms.Core.Platforms.Entities;
-using StarviaBackend.Modules.Platforms.Core.Platforms.Enums;
+using StarviaBackend.Shared.Abstractions.Platforms;
 
 namespace StarviaBackend.Modules.Platforms.Tests.Unit.Entities;
 

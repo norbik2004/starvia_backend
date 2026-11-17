@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
+using StarviaBackend.Shared.Abstractions.Platforms;
 
 namespace StarviaBackend.Modules.Posts.Tests.Integration.Posts;
 
@@ -11,7 +12,9 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
 
     private static async Task UpdateStatusAsync(HttpClient client, Guid postId, string title, int status)
     {
-        var response = await client.PutAsJsonAsync("/v1/posts", new { postId, title, body = "", status });
+        var response = await client.PutAsJsonAsync(
+            "/v1/posts",
+            new { postId, title, body = "", status, platforms = new[] { PlatformType.LinkedIn } }, JsonOptions);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -33,6 +36,7 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
         post.Id.Should().Be(postId);
         post.Title.Should().Be(title);
         post.Status.Should().Be(DraftStatus);
+        post.Platforms.Should().Equal(PlatformType.LinkedIn);
         post.CreatedBy.Should().Be(userId.ToString());
         post.PostAttachments.Should().BeEmpty();
     }
@@ -43,7 +47,7 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
     public async Task Add_post_with_invalid_title_returns_bad_request(string title)
     {
         // Act
-        var response = await Client.PostAsJsonAsync("/v1/posts", new { title });
+        var response = await Client.PostAsJsonAsync("/v1/posts", new { title, platforms = new[] { PlatformType.LinkedIn } }, JsonOptions);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -56,7 +60,10 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
         var anonymous = App.CreateClient();
 
         // Act
-        var response = await anonymous.PostAsJsonAsync("/v1/posts", new { title = UniqueTitle() });
+        var response = await anonymous.PostAsJsonAsync(
+            "/v1/posts",
+            new { title = UniqueTitle(), platforms = new[] { PlatformType.LinkedIn } },
+            JsonOptions);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -154,7 +161,8 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
             title = newTitle,
             body = "Fresh body",
             status = DoneStatus,
-        });
+            platforms = new[] { PlatformType.LinkedIn },
+        }, JsonOptions);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -182,7 +190,8 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
             title = UniqueTitle(),
             body = "",
             status = DraftStatus,
-        });
+            platforms = new[] { PlatformType.LinkedIn },
+        }, JsonOptions);
 
         // Assert
         await AssertErrorCodeAsync(response, HttpStatusCode.Forbidden, "post_access_denied");
@@ -203,7 +212,8 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
             title = newTitle,
             body = "Edited by admin",
             status = DoneStatus,
-        });
+            platforms = new[] { PlatformType.LinkedIn },
+        }, JsonOptions);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -219,7 +229,7 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
         var postId = await CreatePostAsync(client);
 
         // Act
-        var response = await client.PutAsJsonAsync("/v1/posts", new { postId, title = "ab", body = "", status = DraftStatus });
+        var response = await client.PutAsJsonAsync("/v1/posts", new { postId, title = "ab", body = "", status = DraftStatus, platforms = new[] { PlatformType.LinkedIn } }, JsonOptions);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -235,7 +245,8 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
             title = UniqueTitle(),
             body = "",
             status = DraftStatus,
-        });
+            platforms = new[] { PlatformType.LinkedIn },
+        }, JsonOptions);
 
         // Assert
         await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "post_not_found");
@@ -262,7 +273,7 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
         var someoneElses = await CreatePostAsync(CreateUserClient());
 
         // Act
-        var page = await owner.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?pageSize=100");
+        var page = await owner.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?pageSize=100", JsonOptions);
 
         // Assert
         var ids = page!.Items.Select(p => p.Id).ToList();
@@ -278,7 +289,7 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
         var second = await CreatePostAsync(CreateUserClient());
 
         // Act
-        var page = await CreateAdminClient().GetFromJsonAsync<PagedPostsResponse>("/v1/posts?pageSize=100");
+        var page = await CreateAdminClient().GetFromJsonAsync<PagedPostsResponse>("/v1/posts?pageSize=100", JsonOptions);
 
         // Assert
         page!.Items.Select(p => p.Id).Should().Contain([first, second]);
@@ -295,9 +306,9 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
         await UpdateStatusAsync(client, done, $"Beta {marker}", DoneStatus);
 
         // Act
-        var byText = await client.GetFromJsonAsync<PagedPostsResponse>($"/v1/posts?search={marker.ToUpperInvariant()}");
-        var byStatus = await client.GetFromJsonAsync<PagedPostsResponse>($"/v1/posts?status={DoneStatus}");
-        var byBoth = await client.GetFromJsonAsync<PagedPostsResponse>($"/v1/posts?status={DraftStatus}&search=alpha");
+        var byText = await client.GetFromJsonAsync<PagedPostsResponse>($"/v1/posts?search={marker.ToUpperInvariant()}", JsonOptions);
+        var byStatus = await client.GetFromJsonAsync<PagedPostsResponse>($"/v1/posts?status={DoneStatus}", JsonOptions);
+        var byBoth = await client.GetFromJsonAsync<PagedPostsResponse>($"/v1/posts?status={DraftStatus}&search=alpha", JsonOptions);
 
         // Assert
         byText!.Items.Select(p => p.Id).Should().BeEquivalentTo([draft, done]);
@@ -313,7 +324,7 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
         await CreatePostAsync(client, "Plain title one");
 
         // Act
-        var page = await client.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?search=%25");
+        var page = await client.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?search=%25", JsonOptions);
 
         // Assert
         page!.Items.Should().BeEmpty();
@@ -328,8 +339,8 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
         await CreatePostAsync(client, "Plain title one");
 
         // Act
-        var percent = await client.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?search=%25");
-        var underscore = await client.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?search=_");
+        var percent = await client.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?search=%25", JsonOptions);
+        var underscore = await client.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?search=_", JsonOptions);
 
         // Assert
         percent!.Items.Select(p => p.Id).Should().Equal(literal);
@@ -346,8 +357,8 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
         await AddAttachmentsAsync(client, b, 2);
 
         // Act
-        var ascending = await client.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?sortBy=Title&descending=false");
-        var descending = await client.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?sortBy=Title&descending=true");
+        var ascending = await client.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?sortBy=Title&descending=false", JsonOptions);
+        var descending = await client.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?sortBy=Title&descending=true", JsonOptions);
 
         // Assert
         ascending!.Items.Select(p => p.Id).Should().Equal(a, b);
@@ -364,7 +375,7 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
         await CreatePostAsync(client);
 
         // Act
-        var page = await client.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?page=5&pageSize=10");
+        var page = await client.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?page=5&pageSize=10", JsonOptions);
 
         // Assert
         page!.Items.Should().BeEmpty();
@@ -381,7 +392,7 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
         var other = await CreatePostAsync(CreateUserClient());
 
         // Act
-        var page = await CreateAdminClient().GetFromJsonAsync<PagedPostsResponse>($"/v1/posts?createdBy={ownerId}&pageSize=100");
+        var page = await CreateAdminClient().GetFromJsonAsync<PagedPostsResponse>($"/v1/posts?createdBy={ownerId}&pageSize=100", JsonOptions);
 
         // Assert
         var ids = page!.Items.Select(p => p.Id).ToList();
@@ -399,8 +410,8 @@ public sealed class PostsEndpointsTests(PostsApp app) : PostsIntegrationTest(app
         var admin = CreateAdminClient();
 
         // Act
-        var page = await admin.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?page=1&pageSize=100");
-        var firstPage = await admin.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?page=1&pageSize=1");
+        var page = await admin.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?page=1&pageSize=100", JsonOptions);
+        var firstPage = await admin.GetFromJsonAsync<PagedPostsResponse>("/v1/posts?page=1&pageSize=1", JsonOptions);
 
         // Assert
         var ids = page!.Items.Select(p => p.Id).ToList();

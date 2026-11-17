@@ -38,6 +38,11 @@
     <ProjectReference Include="..\..\src\Modules\Emails\StarviaBackend.Modules.Emails.Infrastructure\StarviaBackend.Modules.Emails.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Modules\Emails\StarviaBackend.Modules.Emails.Api\StarviaBackend.Modules.Emails.Api.csproj" />
 
+    <ProjectReference Include="..\..\src\Modules\Brands\StarviaBackend.Modules.Brands.Core\StarviaBackend.Modules.Brands.Core.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Brands\StarviaBackend.Modules.Brands.Application\StarviaBackend.Modules.Brands.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Brands\StarviaBackend.Modules.Brands.Infrastructure\StarviaBackend.Modules.Brands.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Brands\StarviaBackend.Modules.Brands.Api\StarviaBackend.Modules.Brands.Api.csproj" />
+
     <ProjectReference Include="..\..\src\Modules\Media\StarviaBackend.Modules.Media.Core\StarviaBackend.Modules.Media.Core.csproj" />
     <ProjectReference Include="..\..\src\Modules\Media\StarviaBackend.Modules.Media.Application\StarviaBackend.Modules.Media.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\Media\StarviaBackend.Modules.Media.Infrastructure\StarviaBackend.Modules.Media.Infrastructure.csproj" />
