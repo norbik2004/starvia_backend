@@ -27,7 +27,7 @@ public sealed class ChatsAccessEndpointsTests(AiApp app) : AiIntegrationTest(app
     }
 
     [Fact]
-    public async Task An_admin_cannot_rename_archive_or_extend_someone_elses_chat()
+    public async Task An_admin_cannot_rename_archive_or_ask_on_someone_elses_chat()
     {
         // Arrange
         var owner = CreateUserClient();
@@ -36,11 +36,11 @@ public sealed class ChatsAccessEndpointsTests(AiApp app) : AiIntegrationTest(app
 
         // Act
         var update = await admin.PutAsJsonAsync($"{ChatsUrl}/{chatId}", new { title = "Renamed", status = ChatStatus.Archived });
-        var message = await AddMessageAsync(admin, chatId, "Hello from the admin");
+        var ask = await AskAsync(admin, "Hello from the admin", chatId);
 
         // Assert
         await AssertErrorCodeAsync(update, HttpStatusCode.Forbidden, "chat_access_denied");
-        await AssertErrorCodeAsync(message, HttpStatusCode.Forbidden, "chat_access_denied");
+        await AssertErrorCodeAsync(ask, HttpStatusCode.Forbidden, "chat_access_denied");
         var chat = await GetChatAsync(owner, chatId);
         chat.Title.Should().Be("Private");
         chat.Status.Should().Be(ChatStatus.Active);

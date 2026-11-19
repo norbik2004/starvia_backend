@@ -241,4 +241,54 @@ public sealed class PostsClientTests
         await act.Should().ThrowAsync<PostsIntegrationException>().WithMessage("Post id cannot be empty.");
         handler.RequestedUris.Should().BeEmpty();
     }
+
+    [Fact]
+    public async Task GetPostForPublishAsync_ReturnsBodyAndOrderedAttachments()
+    {
+        var fileA = Guid.NewGuid();
+        var fileB = Guid.NewGuid();
+        var body = new
+        {
+            id = _postId,
+            title = "Hello",
+            body = "Try our new blend.",
+            createdAt = DateTime.UtcNow,
+            createdBy = _userId.ToString(),
+            postAttachments = new[]
+            {
+                new { id = Guid.NewGuid(), fileId = fileB, order = 1 },
+                new { id = Guid.NewGuid(), fileId = fileA, order = 0 },
+            },
+        };
+        var client = CreateClient(StubHttpMessageHandler.Json(HttpStatusCode.OK, body));
+
+        var post = await client.GetPostForPublishAsync(_userId, _postId);
+
+        post.Title.Should().Be("Hello");
+        post.Body.Should().Be("Try our new blend.");
+        post.Attachments.Select(a => a.FileId).Should().Equal(fileA, fileB);
+    }
+
+    [Fact]
+    public async Task CreatePublicationAsync_PostsToPublicationsEndpoint()
+    {
+        var publicationId = Guid.NewGuid();
+        var publishedAt = new DateTime(2026, 5, 1, 12, 0, 0, DateTimeKind.Utc);
+        var handler = StubHttpMessageHandler.Json(HttpStatusCode.Created, new
+        {
+            id = publicationId,
+            postId = _postId,
+            externalPostId = "urn:li:share:1",
+            publishedAt,
+        });
+        var client = CreateClient(handler);
+
+        var result = await client.CreatePublicationAsync(
+            _userId,
+            new CreatePostPublicationRequest(_postId, Guid.NewGuid(), "urn:li:share:1", publishedAt));
+
+        result.Id.Should().Be(publicationId);
+        result.ExternalPostId.Should().Be("urn:li:share:1");
+        handler.RequestedUris.Should().ContainSingle().Which.AbsolutePath.Should().Be("/v1/post-publications");
+    }
 }

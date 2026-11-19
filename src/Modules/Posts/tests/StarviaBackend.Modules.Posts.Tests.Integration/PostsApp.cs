@@ -9,7 +9,7 @@ using StarviaBackend.Shared.Tests.Integration;
 
 namespace StarviaBackend.Modules.Posts.Tests.Integration;
 
-/// <summary>Test host for the Posts module: applies its migrations and swaps the media integration for a fake.</summary>
+/// <summary>Test host for the Posts module: applies its migrations and swaps external integrations for fakes.</summary>
 public sealed class PostsApp : BoilerplateApp
 {
     public FakeMediaClient Media { get; } = new();

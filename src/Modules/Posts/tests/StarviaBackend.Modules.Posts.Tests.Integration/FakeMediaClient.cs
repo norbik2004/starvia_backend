@@ -44,4 +44,22 @@ public sealed class FakeMediaClient : IMediaClient
 
         return Task.FromResult<IReadOnlyList<MediaFile>>(files);
     }
+
+    public Task<MediaFileContent> DownloadContentAsync(
+        Guid fileId,
+        CancellationToken cancellationToken = default)
+    {
+        if (UnknownFileIds.Contains(fileId))
+        {
+            throw new MediaIntegrationException($"File '{fileId}' was not found in the media API.");
+        }
+
+        if (ForeignFileIds.Contains(fileId))
+        {
+            throw new MediaIntegrationNotOwnerException("User is not the owner of file.");
+        }
+
+        var stream = new MemoryStream([1, 2, 3, 4]);
+        return Task.FromResult(new MediaFileContent(stream, "image/png", $"{fileId}.png"));
+    }
 }

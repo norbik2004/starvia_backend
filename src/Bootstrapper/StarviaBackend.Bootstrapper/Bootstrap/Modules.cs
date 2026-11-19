@@ -20,7 +20,7 @@ internal static class Modules
     public static IServiceCollection AddModules(this IServiceCollection services, IConfiguration configuration)
     {
         services.RegisterAccountsModule();
-        services.RegisterPlatformsModule();
+        services.RegisterPlatformsModule(configuration);
         services.RegisterEmailsModule();
         services.RegisterPostsModule(configuration);
         services.RegisterMediaModule();

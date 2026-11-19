@@ -1,10 +1,8 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StarviaBackend.Modules.Media.Integrations;
-using StarviaBackend.Modules.Posts.Core.Posts.Entities;
 using StarviaBackend.Modules.Posts.Core.Posts.Repositories;
 using StarviaBackend.Modules.Posts.Infrastructure.EF.Contexts;
 using StarviaBackend.Modules.Posts.Infrastructure.EF.Initializers;

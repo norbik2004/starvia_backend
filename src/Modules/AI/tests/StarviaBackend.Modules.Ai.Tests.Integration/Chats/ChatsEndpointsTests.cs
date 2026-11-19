@@ -139,139 +139,6 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    // --- messages ----------------------------------------------------------------------------
-
-    [Fact]
-    public async Task Add_message_stores_the_prompt_verbatim_and_returns_the_sequence()
-    {
-        // Arrange
-        var client = CreateUserClient();
-        var chatId = await CreateChatAsync(client);
-
-        // Act
-        var response = await AddMessageAsync(client, chatId, "  Suggest a post about coffee  ");
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var created = await response.Content.ReadFromJsonAsync<MessageIdResponse>();
-        created!.Sequence.Should().Be(1);
-
-        var chat = await GetChatAsync(client, chatId);
-        var message = chat.Messages.Should().ContainSingle().Subject;
-        message.Id.Should().Be(created.MessageId);
-        message.Sequence.Should().Be(1);
-        message.Role.Should().Be(ChatMessageRole.User);
-        message.Content.Should().Be("  Suggest a post about coffee  ");
-        message.Model.Should().BeNull();
-        message.InputTokens.Should().BeNull();
-        message.OutputTokens.Should().BeNull();
-        chat.LastMessageAt.Should().NotBeNull();
-    }
-
-    [Fact]
-    public async Task Add_message_keeps_the_conversation_in_order()
-    {
-        // Arrange
-        var client = CreateUserClient();
-        var chatId = await CreateChatAsync(client);
-
-        // Act
-        foreach (var content in new[] { "First", "Second", "Third" })
-        {
-            (await AddMessageAsync(client, chatId, content)).StatusCode.Should().Be(HttpStatusCode.Created);
-        }
-
-        // Assert
-        var chat = await GetChatAsync(client, chatId);
-        chat.Messages.Select(m => m.Content).Should().Equal("First", "Second", "Third");
-        chat.Messages.Select(m => m.Sequence).Should().Equal(1, 2, 3);
-    }
-
-    [Fact]
-    public async Task Add_message_to_an_unknown_chat_returns_chat_not_found()
-    {
-        // Act
-        var response = await AddMessageAsync(Client, Guid.NewGuid(), "Hello");
-
-        // Assert
-        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "chat_not_found");
-    }
-
-    [Fact]
-    public async Task Add_message_to_a_chat_of_another_user_returns_forbidden_and_stores_nothing()
-    {
-        // Arrange
-        var owner = CreateUserClient();
-        var chatId = await CreateChatAsync(owner);
-
-        // Act
-        var response = await AddMessageAsync(CreateUserClient(), chatId, "Intruder");
-
-        // Assert
-        await AssertErrorCodeAsync(response, HttpStatusCode.Forbidden, "chat_access_denied");
-        (await GetChatAsync(owner, chatId)).Messages.Should().BeEmpty();
-    }
-
-    [Fact]
-    public async Task Add_message_to_an_archived_chat_returns_chat_archived()
-    {
-        // Arrange
-        var client = CreateUserClient();
-        var chatId = await CreateChatAsync(client);
-        (await client.PutAsJsonAsync($"{ChatsUrl}/{chatId}", new { title = "Done", status = ChatStatus.Archived }))
-            .StatusCode.Should().Be(HttpStatusCode.NoContent);
-
-        // Act
-        var response = await AddMessageAsync(client, chatId, "Too late");
-
-        // Assert
-        await AssertErrorCodeAsync(response, HttpStatusCode.BadRequest, "chat_archived");
-        (await GetChatAsync(client, chatId)).Messages.Should().BeEmpty();
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    public async Task Add_message_with_blank_content_returns_bad_request(string content)
-    {
-        // Arrange
-        var client = CreateUserClient();
-        var chatId = await CreateChatAsync(client);
-
-        // Act
-        var response = await AddMessageAsync(client, chatId, content);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    }
-
-    [Fact]
-    public async Task Add_message_accepts_the_maximum_length_and_rejects_longer_content()
-    {
-        // Arrange
-        var client = CreateUserClient();
-        var chatId = await CreateChatAsync(client);
-
-        // Act
-        var atLimit = await AddMessageAsync(client, chatId, new string('a', 8000));
-        var overLimit = await AddMessageAsync(client, chatId, new string('a', 8001));
-
-        // Assert
-        atLimit.StatusCode.Should().Be(HttpStatusCode.Created);
-        overLimit.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        (await GetChatAsync(client, chatId)).Messages.Should().ContainSingle();
-    }
-
-    [Fact]
-    public async Task Add_message_without_identity_returns_unauthorized()
-    {
-        // Act
-        var response = await AddMessageAsync(App.CreateClient(), Guid.NewGuid(), "Hello");
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-    }
-
     // --- update ------------------------------------------------------------------------------
 
     [Fact]
@@ -314,7 +181,7 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
         // Arrange
         var client = CreateUserClient();
         var chatId = await CreateChatAsync(client);
-        await AddMessageAsync(client, chatId, "Remember me");
+        await AskOkAsync(client, "Remember me", chatId);
 
         // Act
         var response = await client.PutAsJsonAsync($"{ChatsUrl}/{chatId}", new { title = "Renamed", status = ChatStatus.Archived });
@@ -322,7 +189,7 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         var chat = await GetChatAsync(client, chatId);
-        chat.Messages.Should().ContainSingle().Which.Content.Should().Be("Remember me");
+        chat.Messages.Should().Contain(m => m.Role == ChatMessageRole.User && m.Content == "Remember me");
     }
 
     [Fact]
@@ -429,10 +296,10 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
         // Arrange
         var client = CreateUserClient();
         var chatId = await CreateChatAsync(client);
-        await AddMessageAsync(client, chatId, "First");
-        await AddMessageAsync(client, chatId, "Second");
+        await AskOkAsync(client, "First", chatId);
+        await AskOkAsync(client, "Second", chatId);
         var before = await WithDbAsync<AiWriteDbContext, int>(db => db.ChatMessages.CountAsync(m => m.ChatId == chatId));
-        before.Should().Be(2);
+        before.Should().Be(5);
 
         // Act
         var response = await client.DeleteAsync($"{ChatsUrl}/{chatId}");
@@ -450,7 +317,7 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
         var client = CreateUserClient();
         var toRemove = await CreateChatAsync(client, title: "Remove me");
         var toKeep = await CreateChatAsync(client, title: "Keep me");
-        await AddMessageAsync(client, toKeep, "Still here");
+        await AskOkAsync(client, "Still here", toKeep);
 
         // Act
         await client.DeleteAsync($"{ChatsUrl}/{toRemove}");
@@ -458,7 +325,7 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
         // Assert
         var chat = await GetChatAsync(client, toKeep);
         chat.Title.Should().Be("Keep me");
-        chat.Messages.Should().ContainSingle();
+        chat.Messages.Should().Contain(m => m.Role == ChatMessageRole.User && m.Content == "Still here");
     }
 
     [Fact]
@@ -549,7 +416,7 @@ public sealed class ChatsEndpointsTests(AiApp app) : AiIntegrationTest(app)
 
         // Act
         var beforeActivity = await client.GetFromJsonAsync<ChatPageResponse>(ChatsUrl);
-        await AddMessageAsync(client, oldest, "Bump");
+        await AskOkAsync(client, "Bump", oldest);
         var afterActivity = await client.GetFromJsonAsync<ChatPageResponse>(ChatsUrl);
 
         // Assert

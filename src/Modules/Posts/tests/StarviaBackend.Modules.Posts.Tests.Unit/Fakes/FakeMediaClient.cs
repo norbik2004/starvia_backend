@@ -34,4 +34,22 @@ internal sealed class FakeMediaClient : IMediaClient
 
         return Task.FromResult(files);
     }
+
+    public Task<MediaFileContent> DownloadContentAsync(
+        Guid fileId,
+        CancellationToken cancellationToken = default)
+    {
+        if (Failure is not null)
+        {
+            throw Failure;
+        }
+
+        if (MissingFileIds.Contains(fileId))
+        {
+            throw new MediaIntegrationException($"File '{fileId}' was not found in the media API.");
+        }
+
+        var stream = new MemoryStream([1, 2, 3, 4]);
+        return Task.FromResult(new MediaFileContent(stream, "image/png", $"{fileId}.png"));
+    }
 }

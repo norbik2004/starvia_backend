@@ -1,7 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using StarviaBackend.Modules.Posts.Core.Posts.Entities;
 using StarviaBackend.Modules.Posts.Core.Posts.Enums;
+using StarviaBackend.Modules.Posts.Infrastructure.EF.Contexts;
 
 namespace StarviaBackend.Modules.Posts.Tests.Integration.Posts;
 
@@ -129,6 +132,40 @@ public sealed class PostPublicationsEndpointsTests(PostsApp app) : PostsIntegrat
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    // --- record ------------------------------------------------------------------------------
+
+    [Fact]
+    public async Task Record_publication_persists_published_entry()
+    {
+        var client = CreateUserClient();
+        var postId = await CreatePostAsync(client);
+        var userPlatformId = Guid.NewGuid();
+        var publishedAt = DateTime.UtcNow;
+
+        var response = await client.PostAsJsonAsync(
+            "/v1/post-publications",
+            new
+            {
+                postId,
+                userPlatformId,
+                externalPostId = "urn:li:share:abc",
+                publishedAt,
+            });
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var payload = await response.Content.ReadFromJsonAsync<PostPublicationResponse>(JsonOptions);
+        payload.Should().NotBeNull();
+        payload!.PostId.Should().Be(postId);
+        payload.UserPlatformId.Should().Be(userPlatformId);
+        payload.ExternalPostId.Should().Be("urn:li:share:abc");
+        payload.Status.Should().Be(PublishedStatus);
+
+        var stored = await WithDbAsync<PostWriteDbContext, PostPublication>(db =>
+            db.Set<PostPublication>().SingleAsync(p => p.Id == payload.Id));
+        stored.ExternalPostId.Should().Be("urn:li:share:abc");
+        stored.Status.Should().Be(PostPublicationStatus.Published);
     }
 
     // --- get ---------------------------------------------------------------------------------

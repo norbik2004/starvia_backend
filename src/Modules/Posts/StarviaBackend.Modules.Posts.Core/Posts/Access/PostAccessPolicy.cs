@@ -16,6 +16,7 @@ internal enum PostAction
     ViewAttachments,
     ManageAttachments,
     ViewPublications,
+    Publish,
 }
 
 /// <summary>
@@ -34,6 +35,7 @@ internal static class PostAccessPolicy
         PostAction.ViewAttachments => actor.OwnerOrAdmin(),
         PostAction.ManageAttachments => actor.OwnerOrAdmin(),
         PostAction.ViewPublications => actor.OwnerOrAdmin(),
+        PostAction.Publish => actor.OwnerOrAdmin(),
         _ => throw new ArgumentOutOfRangeException(nameof(action), action, "No access rule defined for this action."),
     };
 

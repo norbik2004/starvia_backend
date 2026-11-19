@@ -70,7 +70,7 @@ public abstract class PostsIntegrationTest : IntegrationTest<PostsApp>
         return body!.PostAttachmentIds;
     }
 
-    /// <summary>Publications have no write endpoint yet, so tests seed them through the module's repository.</summary>
+    /// <summary>Seeds a publication directly through the repository (bypasses the HTTP record endpoint).</summary>
     protected async Task<Guid> SeedPublicationAsync(
         Guid postId,
         PostPublicationStatus status = PostPublicationStatus.Published,

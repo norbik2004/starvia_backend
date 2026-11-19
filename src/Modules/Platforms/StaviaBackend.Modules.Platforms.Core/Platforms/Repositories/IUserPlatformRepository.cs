@@ -8,4 +8,6 @@ namespace StarviaBackend.Modules.Platforms.Core.Platforms.Repositories;
 internal interface IUserPlatformRepository
 {
     Task AddAsync(UserPlatform userPlatform);
+
+    Task<UserPlatform?> GetByIdAsync(Guid userPlatformId, CancellationToken cancellationToken = default);
 }

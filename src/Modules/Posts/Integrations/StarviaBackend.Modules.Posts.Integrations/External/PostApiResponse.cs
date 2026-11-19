@@ -25,4 +25,19 @@ internal sealed record PostApiResponse
 
     [JsonPropertyName("createdBy")]
     public string? CreatedBy { get; init; }
+
+    [JsonPropertyName("postAttachments")]
+    public IReadOnlyList<PostAttachmentApiResponse> PostAttachments { get; init; } = [];
+}
+
+internal sealed record PostAttachmentApiResponse
+{
+    [JsonPropertyName("id")]
+    public Guid Id { get; init; }
+
+    [JsonPropertyName("fileId")]
+    public Guid FileId { get; init; }
+
+    [JsonPropertyName("order")]
+    public int Order { get; init; }
 }

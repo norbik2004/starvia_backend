@@ -22,7 +22,7 @@ public sealed class PlatformsEndpointsTests(PlatformsApp app) : PlatformsIntegra
         platforms.Select(p => p.PlatformType).Should().Equal(LinkedIn, Facebook, Instagram);
         platforms.Single(p => p.PlatformType == Facebook).IsOnline.Should().BeTrue();
         platforms.Single(p => p.PlatformType == Instagram).IsOnline.Should().BeFalse();
-        platforms.Single(p => p.PlatformType == LinkedIn).IsOnline.Should().BeFalse();
+        platforms.Single(p => p.PlatformType == LinkedIn).IsOnline.Should().BeTrue();
         platforms.Select(p => p.Id).Should().OnlyHaveUniqueItems();
     }
 

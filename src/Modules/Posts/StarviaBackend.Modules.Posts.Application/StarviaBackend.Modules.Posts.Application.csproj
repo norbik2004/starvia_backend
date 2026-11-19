@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="PostPublications\Commands\" />
     <Folder Include="PostPublications\Events\" />
     <Folder Include="PostPublications\Queries\" />
     <Folder Include="Posts\Events\" />

@@ -163,6 +163,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1DE9734F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarviaBackend.Modules.Brands.Tests.Integration", "src\Modules\Brands\tests\StarviaBackend.Modules.Brands.Tests.Integration\StarviaBackend.Modules.Brands.Tests.Integration.csproj", "{69B86014-7DDC-4303-9B6E-100963A670CB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{CCCAE1AC-84F9-47FE-9B44-F8760B8A3653}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -928,6 +930,7 @@ Global
 		{C3FCC5CA-5E6F-4947-BBFA-6F4BDB66C0E4} = {FDC093A5-A00E-A395-AFFE-3839DBAF7091}
 		{1DE9734F-2AF8-9CC1-A061-E4F54CA8C916} = {A092A965-E9B2-400D-B3CD-1FD8FA7EAFE3}
 		{69B86014-7DDC-4303-9B6E-100963A670CB} = {1DE9734F-2AF8-9CC1-A061-E4F54CA8C916}
+		{CCCAE1AC-84F9-47FE-9B44-F8760B8A3653} = {93EF8800-7976-4397-A6E6-B322EC4A286C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {06F57D9F-0013-49B6-A091-060DF8AFE057}

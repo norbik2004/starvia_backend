@@ -29,19 +29,51 @@ public sealed class FakePostsClient : IPostsClient
 
         foreach (var postId in postIds.Distinct())
         {
-            if (UnknownPostIds.Contains(postId))
-            {
-                throw new PostsIntegrationException($"Post '{postId}' was not found in the posts API.");
-            }
-
-            if (ForeignPostIds.Contains(postId))
-            {
-                throw new PostsIntegrationNotOwnerException($"User is not the owner of post '{postId}'.");
-            }
-
-            posts.Add(new PostSummary(postId, $"Post {postId}", $"Body of {postId}", [StarviaBackend.Shared.Abstractions.Platforms.PlatformType.LinkedIn], DateTime.UtcNow));
+            posts.Add(ResolveSummary(postId));
         }
 
         return Task.FromResult<IReadOnlyList<PostSummary>>(posts);
+    }
+
+    public Task<PostForPublish> GetPostForPublishAsync(
+        Guid userId,
+        Guid postId,
+        CancellationToken cancellationToken = default)
+    {
+        var summary = ResolveSummary(postId);
+        return Task.FromResult(new PostForPublish(summary.Id, summary.Title, summary.Body, []));
+    }
+
+    public Task<PostPublicationRecord> CreatePublicationAsync(
+        Guid userId,
+        CreatePostPublicationRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        _ = ResolveSummary(request.PostId);
+        return Task.FromResult(new PostPublicationRecord(
+            Guid.NewGuid(),
+            request.PostId,
+            request.ExternalPostId,
+            request.PublishedAt));
+    }
+
+    private PostSummary ResolveSummary(Guid postId)
+    {
+        if (UnknownPostIds.Contains(postId))
+        {
+            throw new PostsIntegrationException($"Post '{postId}' was not found in the posts API.");
+        }
+
+        if (ForeignPostIds.Contains(postId))
+        {
+            throw new PostsIntegrationNotOwnerException($"User is not the owner of post '{postId}'.");
+        }
+
+        return new PostSummary(
+            postId,
+            $"Post {postId}",
+            $"Body of {postId}",
+            [StarviaBackend.Shared.Abstractions.Platforms.PlatformType.LinkedIn],
+            DateTime.UtcNow);
     }
 }

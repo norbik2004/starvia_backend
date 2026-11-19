@@ -1,6 +1,5 @@
 using FluentValidation.TestHelper;
 using StarviaBackend.Modules.Ai.Application.Chats.Commands.AddChat;
-using StarviaBackend.Modules.Ai.Application.Chats.Commands.AddChatMessage;
 using StarviaBackend.Modules.Ai.Application.Chats.Commands.RemoveChat;
 using StarviaBackend.Modules.Ai.Application.Chats.Commands.UpdateChat;
 using StarviaBackend.Modules.Ai.Application.Chats.Queries.BrowseChats;
@@ -142,52 +141,6 @@ public sealed class RemoveChatValidatorTests
     {
         _validator.TestValidate(new RemoveChatCommand(Guid.NewGuid(), Guid.Empty))
             .ShouldHaveValidationErrorFor(x => x.UserId);
-    }
-}
-
-public sealed class AddChatMessageValidatorTests
-{
-    private readonly AddChatMessageValidator _validator = new();
-
-    private static AddChatMessageCommand Command(string content = "Hello", Guid? chatId = null) =>
-        new(chatId ?? Guid.NewGuid(), new AddChatMessageRequest(content), Guid.NewGuid());
-
-    [Fact]
-    public void Valid_command_passes()
-    {
-        _validator.TestValidate(Command()).ShouldNotHaveAnyValidationErrors();
-    }
-
-    [Fact]
-    public void Empty_chat_id_fails()
-    {
-        _validator.TestValidate(Command(chatId: Guid.Empty))
-            .ShouldHaveValidationErrorFor(x => x.ChatId)
-            .WithErrorMessage("Chat ID is required.");
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void Blank_content_fails(string content)
-    {
-        _validator.TestValidate(Command(content))
-            .ShouldHaveValidationErrorFor(x => x.Request.Content)
-            .WithErrorMessage("Content is required.");
-    }
-
-    [Fact]
-    public void Content_of_max_length_passes()
-    {
-        _validator.TestValidate(Command(new string('a', 8000))).ShouldNotHaveAnyValidationErrors();
-    }
-
-    [Fact]
-    public void Too_long_content_fails()
-    {
-        _validator.TestValidate(Command(new string('a', 8001)))
-            .ShouldHaveValidationErrorFor(x => x.Request.Content)
-            .WithErrorMessage("Content cannot exceed 8000 characters.");
     }
 }
 

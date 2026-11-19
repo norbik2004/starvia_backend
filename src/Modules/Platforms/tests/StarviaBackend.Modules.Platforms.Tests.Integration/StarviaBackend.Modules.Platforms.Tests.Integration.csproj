@@ -17,6 +17,9 @@
     <ProjectReference Include="..\..\..\..\Shared\StarviaBackend.Shared.Tests.Integration\StarviaBackend.Shared.Tests.Integration.csproj" />
     <ProjectReference Include="..\..\StarviaBackend.Modules.Platforms.Infrastructure\StarviaBackend.Modules.Platforms.Infrastructure.csproj" />
     <ProjectReference Include="..\..\StarviaBackend.Modules.Platforms.Application\StarviaBackend.Modules.Platforms.Application.csproj" />
+    <ProjectReference Include="..\..\..\Posts\Integrations\StarviaBackend.Modules.Posts.Integrations\StarviaBackend.Modules.Posts.Integrations.csproj" />
+    <ProjectReference Include="..\..\..\Media\Integrations\StarviaBackend.Modules.Media.Integrations\StarviaBackend.Modules.Media.Integrations.csproj" />
+    <ProjectReference Include="..\..\Integrations\StarviaBackend.Modules.Platforms.Integrations.LinkedIn\StarviaBackend.Modules.Platforms.Integrations.LinkedIn.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,11 +5,7 @@ using StarviaBackend.Shared.Infrastructure.Integrations;
 
 namespace StarviaBackend.Modules.Media.Integrations;
 
-/// <summary>
-/// Typed HttpClient implementation of <see cref="IMediaClient"/>. Loads each file from the media API,
-/// rejects the call when the requesting user does not own the file, maps the wire format into
-/// <see cref="MediaFile"/>, and turns transport failures into <see cref="MediaIntegrationException"/>.
-/// </summary>
+
 internal sealed class MediaClient(HttpClient httpClient) : IMediaClient
 {
     public async Task<IReadOnlyList<MediaFile>> GetFilesAsync(
@@ -37,6 +33,32 @@ internal sealed class MediaClient(HttpClient httpClient) : IMediaClient
         return files;
     }
 
+    public async Task<MediaFileContent> DownloadContentAsync(
+        Guid fileId,
+        CancellationToken cancellationToken = default)
+    {
+        if (fileId == Guid.Empty)
+        {
+            throw new MediaIntegrationException("File id cannot be empty.");
+        }
+
+        using var response = await SendAsync($"v1/media-files/{fileId}/content", cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw await response.ToFailureAsync(FailureRules(fileId), cancellationToken);
+        }
+
+        var stream = new MemoryStream();
+        await response.Content.CopyToAsync(stream, cancellationToken);
+        stream.Position = 0;
+
+        var contentType = response.Content.Headers.ContentType?.MediaType ?? "application/octet-stream";
+        var fileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"');
+
+        return new MediaFileContent(stream, contentType, fileName);
+    }
+
     private async Task<MediaFile> GetFileAsync(Guid userId, Guid fileId, CancellationToken cancellationToken)
     {
         using var response = await SendAsync($"v1/media-files/{fileId}", cancellationToken);
@@ -60,6 +82,8 @@ internal sealed class MediaClient(HttpClient httpClient) : IMediaClient
     private static IntegrationFailureRules FailureRules(Guid fileId) =>
         new IntegrationFailureRules(status => new MediaIntegrationException($"Media API returned {(int)status}."))
             .OnStatus(HttpStatusCode.NotFound, () => FileNotFound(fileId))
+            .OnStatus(HttpStatusCode.Unauthorized, () => new MediaIntegrationException(
+                $"Media API returned 401 when downloading file '{fileId}'. Authorization was not forwarded."))
             .OnCode("media_not_found", () => FileNotFound(fileId))
             .OnCode("media_access_denied", () => new MediaIntegrationNotOwnerException("User is not the owner of file."))
             .OnCode("media_file_not_owned", () => new MediaIntegrationNotOwnerException("User is not the owner of file."));

@@ -29,7 +29,6 @@ public sealed class ChatsSwaggerTests(AiApp app) : AiIntegrationTest(app)
             "GET /v1/ai/chats/{chatId}",
             "PUT /v1/ai/chats/{chatId}",
             "DELETE /v1/ai/chats/{chatId}",
-            "POST /v1/ai/chats/{chatId}/messages",
         ]);
     }
 }

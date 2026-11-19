@@ -16,8 +16,15 @@ namespace StarviaBackend.Modules.Platforms.Tests.Integration;
 /// would race. New test classes just derive this and belong to the same collection.
 /// </summary>
 [Collection(PlatformsCollection.Name)]
-public abstract class PlatformsIntegrationTest(PlatformsApp app) : IntegrationTest<PlatformsApp>(app)
+public abstract class PlatformsIntegrationTest : IntegrationTest<PlatformsApp>
 {
+    protected PlatformsIntegrationTest(PlatformsApp app) : base(app)
+    {
+        app.Posts.Reset();
+        app.Media.Reset();
+        app.LinkedIn.Reset();
+    }
+
     protected static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,

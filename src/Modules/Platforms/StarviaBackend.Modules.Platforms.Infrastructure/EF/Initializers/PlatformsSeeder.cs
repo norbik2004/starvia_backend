@@ -20,7 +20,7 @@ internal static class PlatformsSeeder
 
         var facebookPlatform = Platform.Create(PlatformType.Facebook, IsOnline: true);
         var instagramPlatform = Platform.Create(PlatformType.Instagram, IsOnline: false);
-        var linkedInPlatform = Platform.Create(PlatformType.LinkedIn, IsOnline: false);
+        var linkedInPlatform = Platform.Create(PlatformType.LinkedIn, IsOnline: true);
 
         await dbContext.AddRangeAsync([facebookPlatform, instagramPlatform, linkedInPlatform], cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);

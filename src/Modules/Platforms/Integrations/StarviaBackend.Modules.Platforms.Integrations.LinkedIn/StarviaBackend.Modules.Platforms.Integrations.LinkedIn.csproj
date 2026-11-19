@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>StarviaBackend.Modules.Platforms.Integrations.LinkedIn</RootNamespace>
+    <PackageId>StarviaBackend.Modules.Platforms.Integrations.LinkedIn</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Shared\StarviaBackend.Shared.Abstractions\StarviaBackend.Shared.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="StarviaBackend.Modules.Platforms.Tests.Unit" />
+  </ItemGroup>
+
+</Project>

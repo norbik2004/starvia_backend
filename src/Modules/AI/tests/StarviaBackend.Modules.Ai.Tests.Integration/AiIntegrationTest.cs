@@ -18,6 +18,7 @@ public abstract class AiIntegrationTest : IntegrationTest<AiApp>
 {
     protected const string ChatsUrl = "/v1/ai/chats";
     protected const string GeneratePostUrl = "/v1/ai/posts/generate";
+    protected const string AskAgentUrl = "/v1/ai/agent/ask";
 
     protected AiIntegrationTest(AiApp app) : base(app)
     {
@@ -43,8 +44,14 @@ public abstract class AiIntegrationTest : IntegrationTest<AiApp>
         return body!.ChatId;
     }
 
-    protected static Task<HttpResponseMessage> AddMessageAsync(HttpClient client, Guid chatId, string content) =>
-        client.PostAsJsonAsync($"{ChatsUrl}/{chatId}/messages", new { content });
+    protected static Task<HttpResponseMessage> AskAsync(HttpClient client, string prompt, Guid? chatId = null) =>
+        client.PostAsJsonAsync(AskAgentUrl, new { prompt, chatId });
+
+    protected static async Task AskOkAsync(HttpClient client, string prompt, Guid? chatId = null)
+    {
+        var response = await AskAsync(client, prompt, chatId);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
 
     protected static async Task<ChatResponse> GetChatAsync(HttpClient client, Guid chatId)
     {
@@ -61,8 +68,6 @@ public abstract class AiIntegrationTest : IntegrationTest<AiApp>
     }
 
     protected sealed record ChatIdResponse(Guid ChatId);
-
-    protected sealed record MessageIdResponse(Guid MessageId, int Sequence);
 
     protected sealed record ChatMessageResponse(
         Guid Id,
